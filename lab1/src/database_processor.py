@@ -1,9 +1,5 @@
 import mysql.connector
 import pandas as pd
-import yaml
-
-
-
 import traceback
 
 from util import read_yaml,read_csv
@@ -26,6 +22,7 @@ class MysqlProcessor:
             print("Database connected")
             self.cursor=cursor
             self.conn=conn
+            self.database_name=db_config['database']
             
 
         except Exception as e:
@@ -44,13 +41,16 @@ class MysqlProcessor:
         except Exception as e:
             print("Error creating table:", e)
             
-    def insert_data_from_csv(self, csv_file_path: str, table_name: str,primary_keys: str|list, encoding="utf-8"):
+    def insert_data_from_csv(self, csv_file_path: str, table_name: str,primary_keys: str|list,mapping: dict = None, encoding="utf-8"):
         """读取 CSV 数据，并将数据插入指定数据表"""
         try:
             df = read_csv(csv_file_path,encoding=encoding)
             columns = list(df.columns)
             placeholders = ', '.join(['%s'] * len(columns))
-            col_names = ', '.join(columns)
+            if mapping == None:
+                col_names = ', '.join(columns)
+            else:
+                col_names = ', '.join([mapping.get(col, col) for col in columns])
             
             insert_sql_template = f"INSERT INTO {table_name} ({col_names}) VALUES ({placeholders})"
             
@@ -131,9 +131,28 @@ if __name__=="__main__":
         
         processor.create_table("./src/create_table.sql")
         
-        processor.insert_data_from_csv("./student.csv", "student_info", "registno")
         
-        processor.insert_data_from_csv("./room.csv", "room_info", ["kdno","kcno","ccno"], encoding="gbk")
+        
+        stu_mapping={
+            "registno":"registration_number",
+            "name" : "name",
+            "kdno" : "exam_center_id",
+            "kcno" : "exam_room_id",
+            "ccno" : "session_id",
+            "seat" : "seat"
+        }
+        
+        room_mapping={
+            "kdno" : "exam_center_id",
+            "kcno" : "exam_room_id",
+            "ccno" : "session_id",
+            "kdname": "exam_center_name",
+            "exptime": "expected_time",
+            "papername":"paper_name"
+        }
+        processor.insert_data_from_csv("./student.csv", "student_info", "registno",mapping=stu_mapping)
+        
+        processor.insert_data_from_csv("./room.csv", "room_info", ["kdno","kcno","ccno"], encoding="gbk",mapping=room_mapping)
         
         processor.close()
 
