@@ -26,7 +26,7 @@ public class AuthController {
     public ResponseEntity<RegisterResponseDTO> register(RegisterRequestDTO requestDTO){
         User user = userService.createUser(requestDTO);
         var builder = RegisterResponseDTO.builder()
-        .succes(true);
+        .success(true);
         var response = builder.build();
         return new ResponseEntity<>(response,HttpStatus.OK);
     }

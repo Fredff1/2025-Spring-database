@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class RegisterResponseDTO {
-    private Boolean succes;
+    private Boolean success;
 }
