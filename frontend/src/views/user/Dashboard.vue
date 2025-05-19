@@ -1,35 +1,185 @@
 <template>
   <div class="dashboard">
-    <page-header title="仪表盘" />
-    <el-row :gutter="20" class="mt-20">
-      <el-col :span="6"><stat-card :count="userProfile.username" label="当前用户" /></el-col>
-      <el-col :span="6"><stat-card :count="stats.totalOrders" label="历史工单" /></el-col>
-      <el-col :span="6"><stat-card :count="stats.pendingOrders" label="进行中工单" /></el-col>
-      <el-col :span="6"><stat-card :count="stats.cost" label="累计消费(元)" /></el-col>
-    </el-row>
-    <line-chart :x-data="trend.dates" :series="trend.values" class="mt-30" />
+    <h2 class="page-title">首页</h2>
+    
+    <!-- 统计卡片 -->
+    <div class="stat-cards">
+      <el-row :gutter="20">
+        <el-col :span="8">
+          <el-card shadow="hover" class="stat-card">
+            <template #header>
+              <div class="card-header">
+                <span>我的车辆</span>
+                <el-icon><van /></el-icon>
+              </div>
+            </template>
+            <div class="card-content">
+              <div class="number">{{ stats.vehicleCount }}</div>
+              <div class="label">辆</div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card shadow="hover" class="stat-card">
+            <template #header>
+              <div class="card-header">
+                <span>维修订单</span>
+                <el-icon><tools /></el-icon>
+              </div>
+            </template>
+            <div class="card-content">
+              <div class="number">{{ stats.orderCount }}</div>
+              <div class="label">个</div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card shadow="hover" class="stat-card">
+            <template #header>
+              <div class="card-header">
+                <span>维修历史</span>
+                <el-icon><document /></el-icon>
+              </div>
+            </template>
+            <div class="card-content">
+              <div class="number">{{ stats.historyCount }}</div>
+              <div class="label">次</div>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
+
+    <!-- 最近订单 -->
+    <el-card class="recent-orders" shadow="hover">
+      <template #header>
+        <div class="card-header">
+          <span>最近订单</span>
+          <el-button type="primary" link @click="goToOrders">查看全部</el-button>
+        </div>
+      </template>
+      <el-table :data="recentOrders" style="width: 100%">
+        <el-table-column prop="orderNo" label="订单号" width="180" />
+        <el-table-column prop="vehiclePlate" label="车牌号" width="120" />
+        <el-table-column prop="repairType" label="维修类型" width="120" />
+        <el-table-column prop="status" label="状态" width="100">
+          <template #default="{ row }">
+            <el-tag :type="getStatusType(row.status)">{{ row.status }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" width="180" />
+        <el-table-column prop="amount" label="金额" width="120">
+          <template #default="{ row }">
+            ¥{{ row.amount.toFixed(2) }}
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { profile as getProfile, listUserOrders } from '@/api/user';
-import PageHeader from '@/components/common/PageHeader.vue';
-import StatCard   from '@/components/common/StatCard.vue';
-import LineChart  from '@/components/common/LineChart.vue';
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { Van, Tools, Document } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { order } from '@/api'
 
-const userProfile = ref({});
-const stats   = ref({ totalOrders: 0, pendingOrders: 0, cost: 0 });
-const trend   = ref({ dates: [], values: [] });
+const router = useRouter()
 
-onMounted(async () => {
-  userProfile.value = await getProfile();
-  const orders = await listUserOrders();
-  stats.value.totalOrders   = orders.length;
-  stats.value.pendingOrders = orders.filter(o => o.status === 'IN_PROGRESS').length;
-  trend.value.dates  = orders.map(o => o.createdAt);
-  trend.value.values = orders.map((_, idx) => idx + 1);
-});
+// 统计数据
+const stats = ref({
+  vehicleCount: 0,
+  orderCount: 0,
+  historyCount: 0
+})
+
+// 最近订单
+const recentOrders = ref([])
+
+// 获取状态标签类型
+const getStatusType = (status) => {
+  const types = {
+    '待处理': 'info',
+    '处理中': 'warning',
+    '已完成': 'success',
+    '已取消': 'danger'
+  }
+  return types[status] || 'info'
+}
+
+// 跳转到订单页面
+const goToOrders = () => {
+  router.push('/user/repair-orders')
+}
+
+// 获取数据
+const fetchData = async () => {
+  try {
+    // 获取统计数据
+    const statsRes = await order.getStats()
+    stats.value = statsRes
+
+    // 获取最近订单
+    const ordersRes = await order.getList({ page: 1, limit: 5 })
+    recentOrders.value = ordersRes.list
+  } catch (error) {
+    console.error('获取数据失败:', error)
+    ElMessage.error('获取数据失败')
+  }
+}
+
+onMounted(() => {
+  fetchData()
+})
 </script>
 
-<style scoped>.mt-20{margin-top:20px}.mt-30{margin-top:30px}</style>
+<style scoped>
+.dashboard {
+  padding: 20px;
+}
+
+.page-title {
+  margin-bottom: 24px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stat-cards {
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  height: 160px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+}
+
+.number {
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.label {
+  margin-top: 8px;
+  color: var(--text-secondary);
+}
+
+.recent-orders {
+  margin-bottom: 24px;
+}
+</style> 
