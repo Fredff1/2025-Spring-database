@@ -1,0 +1,10 @@
+@import "@/styles/variables.scss";
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'PingFang SC', Helvetica, Arial, sans-serif; background: $color-bg; color: $font-color; }
+a { color: $color-primary; text-decoration: none; }
+ul,ol { list-style: none; }
+
+.mt-10 { margin-top:10px!important; } .mt-20 { margin-top:20px!important; } .mt-30 { margin-top:30px!important; }
+.w-full { width:100%!important; }
+.text-center { text-align:center!important; }
