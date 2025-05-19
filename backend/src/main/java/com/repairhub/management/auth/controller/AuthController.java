@@ -4,9 +4,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.repairhub.management.auth.dto.LoginRequestDTO;
+import com.repairhub.management.auth.dto.LoginResponseDTO;
+import com.repairhub.management.auth.dto.LogoutRequestDTO;
+import com.repairhub.management.auth.dto.LogoutResponseDTO;
 import com.repairhub.management.auth.dto.RegisterRequestDTO;
 import com.repairhub.management.auth.dto.RegisterResponseDTO;
 import com.repairhub.management.auth.entity.User;
@@ -23,11 +28,23 @@ public class AuthController {
     }
     
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponseDTO> register(RegisterRequestDTO requestDTO){
-        User user = userService.createUser(requestDTO);
+    public ResponseEntity<RegisterResponseDTO> register(@RequestBody RegisterRequestDTO requestDTO){
+        User user = userService.registerUser(requestDTO);
         var builder = RegisterResponseDTO.builder()
         .success(true);
         var response = builder.build();
         return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO requestDTO){
+        var responseDto = userService.loginUser(requestDTO);
+        return new ResponseEntity<>(responseDto,HttpStatus.OK);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponseDTO> logout(@RequestBody LogoutRequestDTO requestDTO){
+        var responseDto = userService.logout(requestDTO.getToken());
+        return new ResponseEntity<>(responseDto,HttpStatus.OK);
     }
 }

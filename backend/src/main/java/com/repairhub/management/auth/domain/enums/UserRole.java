@@ -1,6 +1,6 @@
 package com.repairhub.management.auth.domain.enums;
 
-public enum UserRoles {
+public enum UserRole {
     CUSTOMER,
     STAFF,
     ADMIN

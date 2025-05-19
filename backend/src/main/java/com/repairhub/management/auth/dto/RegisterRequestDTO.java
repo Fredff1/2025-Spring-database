@@ -2,7 +2,7 @@ package com.repairhub.management.auth.dto;
 
 import java.util.List;
 
-import com.repairhub.management.auth.domain.enums.UserRoles;
+import com.repairhub.management.auth.domain.enums.UserRole;
 import com.repairhub.management.auth.domain.enums.UserStatus;
 
 import jakarta.validation.constraints.NotNull;
@@ -23,11 +23,14 @@ public class RegisterRequestDTO {
     @NotNull
     private String password;
 
+    @NotNull
+    private UserRole role;
+
     private String email;
 
     private String phone;
 
-    private List<UserRoles> roles;
+    private List<UserRole> roles;
 
     @NotNull
     private UserStatus userStatus;
