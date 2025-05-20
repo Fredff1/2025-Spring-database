@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.repairhub.management.utils.JwtUtil;
 
+@Configuration
 public class SecurityConfig {
     private final JwtUtil jwtUtil;
 

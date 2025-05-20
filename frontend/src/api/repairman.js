@@ -1,8 +1,8 @@
 import http from './http'
 
-export const login = data => http.post('/repairman/login', data)
+export const login = data => http.post('/auth/login', data)
 export const getProfile = () => http.get('/repairman/profile')
-export const updateProfile = data => http.put('/repairman/profile', data)
+
 
 // 订单管理
 export const getOrders = params => http.get('/repairman/orders', { params })

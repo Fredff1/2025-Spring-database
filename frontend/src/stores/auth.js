@@ -34,21 +34,23 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       let res
       switch (credentials.role) {
-        case 'admin':
+        case 'ADMIN':
           res = await admin.login(credentials)
           break
-        case 'repairman':
+        case 'REPAIRMAN':
           res = await repairman.login(credentials)
           break
-        case 'customer':
+        case 'CUSTOMER':
+          console.log(credentials.role)
           res = await customer.login(credentials)
           break
         default:
           throw new Error('Invalid role')
       }
+      
 
       setToken(res.token)
-      setUserInfo(res.userInfo)
+      //setUserInfo(res.userInfo)
       setRole(credentials.role)
       return res
     } catch (error) {
@@ -66,29 +68,29 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('role')
   }
 
-  const updateUserInfo = async () => {
-    try {
-      let res
-      switch (role.value) {
-        case 'admin':
-          res = await admin.getProfile()
-          break
-        case 'repairman':
-          res = await repairman.getProfile()
-          break
-        case 'customer':
-          res = await customer.getProfile()
-          break
-        default:
-          throw new Error('Invalid role')
-      }
-      setUserInfo(res)
-      return res
-    } catch (error) {
-      console.error('Update user info failed:', error)
-      throw error
-    }
-  }
+  // const updateUserInfo = async () => {
+  //   try {
+  //     let res
+  //     switch (role.value) {
+  //       case 'admin':
+  //         res = await admin.getProfile()
+  //         break
+  //       case 'repairman':
+  //         res = await repairman.getProfile()
+  //         break
+  //       case 'customer':
+  //         res = await customer.getProfile()
+  //         break
+  //       default:
+  //         throw new Error('Invalid role')
+  //     }
+  //     setUserInfo(res)
+  //     return res
+  //   } catch (error) {
+  //     console.error('Update user info failed:', error)
+  //     throw error
+  //   }
+  // }
 
   return {
     // 状态
@@ -106,6 +108,6 @@ export const useAuthStore = defineStore('auth', () => {
     setRole,
     login,
     logout,
-    updateUserInfo
+    // updateUserInfo
   }
 }) 

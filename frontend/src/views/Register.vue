@@ -84,7 +84,7 @@ const form = ref({
   confirmPassword: '',
   name: '',
   phone: '',
-  role: 'customer' // 默认角色
+  role: 'CUSTOMER' // 默认角色
 })
 
 const validatePass = (rule, value, callback) => {

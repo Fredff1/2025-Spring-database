@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -22,24 +23,32 @@ public class UserJdbcRepository implements UserRepository{
     @Override
     public int insert(User user) {
         String sql = """
-          INSERT INTO `user`
-            (username, password, email, phone, status, created_at)
+          INSERT INTO `users`
+            (username, password, email, phone, status, created_at, role)
           VALUES
-            (:username, :password, :email, :phone, :status, NOW())
+            (:username, :password, :email, :phone, :status, NOW(), :role)
         """;
-        return jdbc.update(sql, new BeanPropertySqlParameterSource(user));
+        MapSqlParameterSource params = new MapSqlParameterSource()
+        .addValue("username", user.getUsername())
+        .addValue("password", user.getPassword())
+        .addValue("email",    user.getEmail())
+        .addValue("phone",    user.getPhone())
+        // 这里使用 name()，插入 "ACTIVE"/"DISABLED"/"LOCKED"
+        .addValue("status",   user.getStatus().name())
+        .addValue("role", user.getRole().name());
+       return jdbc.update(sql, params);
     }
 
     @Override
     public Optional<User> findById(Long userId) {
-        String sql = "SELECT * FROM `user` WHERE user_id = :userId";
+        String sql = "SELECT * FROM `users` WHERE user_id = :userId";
         return jdbc.query(sql, Map.of("userId", userId), mapper)
                    .stream().findFirst();
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
-        String sql = "SELECT * FROM `user` WHERE username = :username";
+        String sql = "SELECT * FROM `users` WHERE username = :username";
         return jdbc.query(sql, Map.of("username", username), mapper)
                    .stream().findFirst();
     }
@@ -47,7 +56,7 @@ public class UserJdbcRepository implements UserRepository{
     @Override
     public int updateStatus(Long userId, String status) {
         String sql = """
-          UPDATE `user`
+          UPDATE `users`
              SET status = :status
            WHERE user_id = :userId
         """;

@@ -59,7 +59,7 @@ const loading = ref(false)
 const form = ref({
   username: '',
   password: '',
-  role: 'customer' // 默认角色
+  role: 'CUSTOMER' // 默认角色
 })
 
 const rules = {
@@ -85,12 +85,12 @@ const handleLogin = async () => {
         ElMessage.success('登录成功')
         // 根据用户角色跳转到不同的首页
         const role = res.role
-        if (role === 'admin') {
+        if (role === 'ADMIN') {
           router.push('/admin/dashboard')
-        } else if (role === 'repairman') {
+        } else if (role === 'REPAIRMAN') {
           router.push('/repairman/dashboard')
         } else {
-          router.push('/customer/dashboard')
+          router.push('/user/dashboard')
         }
       } catch (error) {
         console.error('登录失败:', error)

@@ -26,13 +26,10 @@ public class RegisterRequestDTO {
     @NotNull
     private UserRole role;
 
-    private String email;
-
     private String phone;
 
-    private List<UserRole> roles;
+    private UserRole roles;
 
-    @NotNull
-    private UserStatus userStatus;
+
 
 }

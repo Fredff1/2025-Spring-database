@@ -1,7 +1,7 @@
 import http from './http'
 
-export const login = data => http.post('/customer/login', data)
-export const register = data => http.post('/customer/register', data)
+export const login = data => http.post('/auth/login', data)
+export const register = data => http.post('/auth/register', data)
 export const getProfile = () => http.get('/customer/profile')
 export const updateProfile = data => http.put('/customer/profile', data)
 

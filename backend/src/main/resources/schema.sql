@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS `user`;
+DROP TABLE IF EXISTS `users`;
 
-CREATE TABLE `user` (
+CREATE TABLE `users` (
   user_id    BIGINT      NOT NULL AUTO_INCREMENT,
   username   VARCHAR(50) NOT NULL,
   role       VARCHAR(20) NOT NULL,
@@ -14,6 +14,6 @@ CREATE TABLE `user` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `uk_user_username` (`username`),
   UNIQUE KEY `uk_user_email`    (`email`),
-  CHECK (status IN ('ACTIVE','DISABLED','LOCKED'))
-  CHECK (Role IN ('CUSTOMER','STAFF','ADMIN'))
+  CHECK (status IN ('ACTIVE','DISABLED','LOCKED')),
+  CHECK (role IN ('CUSTOMER','REPAIRMAN','ADMIN'))
 ) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4;

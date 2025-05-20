@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.repairhub.management.auth.service.UserDetailService;
 import com.repairhub.management.auth.service.UserService;
 import com.repairhub.management.utils.JwtUtil;
 
@@ -18,10 +19,10 @@ import jakarta.validation.constraints.NotNull;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter{
     private final JwtUtil jwtUtil;
-    private final UserService userService;
+    private final UserDetailService userDetailService;
 
-    public JwtAuthenticationFilter(UserService userService, JwtUtil jwtUtil) {
-        this.userService = userService;
+    public JwtAuthenticationFilter(UserDetailService userDetailService, JwtUtil jwtUtil) {
+        this.userDetailService = userDetailService;
         this.jwtUtil = jwtUtil;
     }
 
@@ -37,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
             String token = header.substring(7);
             if (jwtUtil.isValidToken(token)) {
                 String username = jwtUtil.getUsernameFromToken(token);
-                UserDetails userDetails = userService.loadUserByUsername(username);
+                UserDetails userDetails = userDetailService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);

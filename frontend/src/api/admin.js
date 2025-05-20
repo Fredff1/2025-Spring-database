@@ -1,8 +1,8 @@
 import http from './http'
 
-export const login = data => http.post('/admin/login', data)
+export const login = data => http.post('/auth/login', data)
 export const getProfile = () => http.get('/admin/profile')
-export const updateProfile = data => http.put('/admin/profile', data)
+
 
 // 基本设置
 export const getBasicSettings = () => http.get('/admin/settings/basic')
