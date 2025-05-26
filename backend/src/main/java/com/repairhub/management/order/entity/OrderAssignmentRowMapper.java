@@ -14,7 +14,7 @@ public class OrderAssignmentRowMapper implements RowMapper<OrderAssignment> {
                 .orderId(rs.getLong("order_id"))
                 .repairmanId(rs.getLong("repairman_id"))
                 .accepted(rs.getBoolean("accepted"))
-                .assignmentTime(rs.getTimestamp("assignment_time").toLocalDateTime())
+                .assignmentTime(rs.getTimestamp("assigned_time").toLocalDateTime())
                 .actualWorkHour(rs.getBigDecimal("actual_work_hour"))
                 .build();
     }

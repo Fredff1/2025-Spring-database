@@ -3,6 +3,7 @@ package com.repairhub.management.auth.entity;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,6 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.repairhub.management.auth.domain.enums.UserRole ;
 import com.repairhub.management.auth.domain.enums.UserStatus;
+import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.repair.entity.RepairRecord;
+import com.repairhub.management.vehicle.entity.Vehicle;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +34,10 @@ public class User implements UserDetails{
     private UserStatus  status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private List<Vehicle> vehicles;
+    private List<RepairOrder> repairOrders;
+    private List<RepairRecord> repairRecords;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
