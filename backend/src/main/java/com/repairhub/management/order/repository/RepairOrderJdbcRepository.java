@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import com.repairhub.management.order.entity.RepairOrder;
@@ -14,22 +16,26 @@ import com.repairhub.management.order.entity.RepairOrderRowMapper;
 public class RepairOrderJdbcRepository implements RepairOrderRepository{
 
     private final NamedParameterJdbcTemplate jdbc;
+    private final SimpleJdbcInsert simpleJdbcInsert;
     private final RepairOrderRowMapper mapper = new RepairOrderRowMapper();
 
-    public RepairOrderJdbcRepository(NamedParameterJdbcTemplate jdbc) {
+    public RepairOrderJdbcRepository(
+        NamedParameterJdbcTemplate jdbc,
+        SimpleJdbcInsert simpleJdbcInsert) {
         this.jdbc = jdbc;
+        this.simpleJdbcInsert = simpleJdbcInsert
+            .withTableName("repair_order")
+            .usingGeneratedKeyColumns("order_id");
     }
 
 
     @Override
     public int insert(RepairOrder order){
-        String sql = """
-                INSERT INTO repair_order
-                    (user_id, vehicle_id, submit_time, status, description)
-                VALUES
-                    (:userId, :vehicleId, :submitTime, :status, :description)
-                """;
-        return jdbc.update(sql, new BeanPropertySqlParameterSource(order));
+        SqlParameterSource params = new BeanPropertySqlParameterSource(order);
+        Number key = simpleJdbcInsert.executeAndReturnKey(params);
+        long orderId = key.longValue();
+        order.setOrderId(orderId);
+        return 1;
     }
 
     @Override

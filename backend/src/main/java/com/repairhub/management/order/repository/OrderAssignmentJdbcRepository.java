@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import com.repairhub.management.order.entity.OrderAssignment;
@@ -15,22 +17,27 @@ import com.repairhub.management.order.entity.OrderAssignmentRowMapper;
 public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
     
     private final NamedParameterJdbcTemplate jdbc;
+    private final SimpleJdbcInsert simpleJdbcInsert;
     private final OrderAssignmentRowMapper mapper = new OrderAssignmentRowMapper();
 
-    public OrderAssignmentJdbcRepository(NamedParameterJdbcTemplate jdbc) {
+    public OrderAssignmentJdbcRepository(
+        NamedParameterJdbcTemplate jdbc,
+        SimpleJdbcInsert simpleJdbcInsert
+    ) {
         this.jdbc = jdbc;
+        this.simpleJdbcInsert = simpleJdbcInsert
+            .withTableName("order_assignment")
+            .usingGeneratedKeyColumns("assignment_id");
     }
 
     // 新增一条订单分配记录
     @Override
     public int insert(OrderAssignment orderAssignment){
-        String sql = """
-            INSERT INTO order_assignment
-              (order_id, repairman_id, assignment_time, status)
-            VALUES
-              (:orderId, :repairmanId, :assignmentTime, :status)
-            """;
-        return jdbc.update(sql, new BeanPropertySqlParameterSource(orderAssignment));
+        SqlParameterSource params = new BeanPropertySqlParameterSource(orderAssignment);
+        Number key = simpleJdbcInsert.executeAndReturnKey(params);
+        long assignmentId = key.longValue();
+        orderAssignment.setAssignmentId(assignmentId);
+        return 1;
     }
 
     // 更新订单分配记录（如接受或拒绝）

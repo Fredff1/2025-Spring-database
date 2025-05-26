@@ -1,42 +1,42 @@
 package com.repairhub.management.auth.repository;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import com.repairhub.management.auth.domain.enums.UserRole;
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.entity.UserRowMapper;
 
 @Repository
 public class UserJdbcRepository implements UserRepository{
     private final NamedParameterJdbcTemplate jdbc;
+    private final SimpleJdbcInsert simpleJdbcInsert;
     private final UserRowMapper mapper = new UserRowMapper();
 
-    public UserJdbcRepository(NamedParameterJdbcTemplate jdbc) {
+    public UserJdbcRepository(
+      NamedParameterJdbcTemplate jdbc,
+      SimpleJdbcInsert simpleJdbcInsert) {
         this.jdbc = jdbc;
+        this.simpleJdbcInsert = simpleJdbcInsert.
+        withTableName("users")
+        .usingGeneratedKeyColumns("user_id");
     }
 
     @Override
     public int insert(User user) {
-        String sql = """
-          INSERT INTO `users`
-            (username, password, email, phone, status, created_at, role)
-          VALUES
-            (:username, :password, :email, :phone, :status, NOW(), :role)
-        """;
-        MapSqlParameterSource params = new MapSqlParameterSource()
-        .addValue("username", user.getUsername())
-        .addValue("password", user.getPassword())
-        .addValue("email",    user.getEmail())
-        .addValue("phone",    user.getPhone())
-        // 这里使用 name()，插入 "ACTIVE"/"DISABLED"/"LOCKED"
-        .addValue("status",   user.getStatus().name())
-        .addValue("role", user.getRole().name());
-       return jdbc.update(sql, params);
+        SqlParameterSource params = new BeanPropertySqlParameterSource(user);
+        Number key = simpleJdbcInsert.executeAndReturnKey(params);
+        long userId = key.longValue();
+        user.setUserId(userId);
+       return 1;
     }
 
     @Override
@@ -61,5 +61,12 @@ public class UserJdbcRepository implements UserRepository{
            WHERE user_id = :userId
         """;
         return jdbc.update(sql, Map.of("userId", userId, "status", status));
+    }
+
+    @Override
+    public List<User> findAllByRole(UserRole role){
+        String sql = "SELECT * FROM `users` WHERE role = :role";
+        SqlParameterSource params = new MapSqlParameterSource("role", role.name());
+        return jdbc.query(sql, params, mapper);
     }
 }

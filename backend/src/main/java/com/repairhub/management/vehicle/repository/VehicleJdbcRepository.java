@@ -1,8 +1,12 @@
 package com.repairhub.management.vehicle.repository;
 
 
+import org.springframework.boot.autoconfigure.task.TaskExecutionProperties.Simple;
+import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import com.repairhub.management.vehicle.entity.Vehicle;
@@ -15,21 +19,25 @@ import java.util.Optional;
 @Repository
 public class VehicleJdbcRepository implements VehicleRepository {
     private final NamedParameterJdbcTemplate jdbc;
+    private final SimpleJdbcInsert simpleJdbcInsert;
     private final VehicleRowMapper mapper = new VehicleRowMapper();
 
-    public VehicleJdbcRepository(NamedParameterJdbcTemplate jdbc) {
+    public VehicleJdbcRepository(
+        NamedParameterJdbcTemplate jdbc,
+        SimpleJdbcInsert simpleJdbcInsert) {
         this.jdbc = jdbc;
+        this.simpleJdbcInsert = simpleJdbcInsert
+            .withTableName("vehicle")
+            .usingGeneratedKeyColumns("vehicle_id");
     }
 
     @Override
-    public int insert(Vehicle v) {
-        String sql = """
-            INSERT INTO vehicle
-              (owner_id, brand, model, license_plate, register_date)
-            VALUES
-              (:ownerId, :brand, :model, :licensePlate, :registerDate)
-            """;
-        return jdbc.update(sql, new BeanPropertySqlParameterSource(v));
+    public int insert(Vehicle vehicle) {
+        SqlParameterSource params = new BeanPropertySqlParameterSource(vehicle);
+        Number key = simpleJdbcInsert.executeAndReturnKey(params);
+        long vehicleId = key.longValue();
+        vehicle.setVehicleId(vehicleId);
+        return 1;
     }
 
     @Override
