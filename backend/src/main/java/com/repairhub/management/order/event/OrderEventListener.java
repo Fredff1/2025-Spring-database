@@ -1,19 +1,27 @@
 package com.repairhub.management.order.event;
 
 
+import java.math.BigDecimal;
+
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.repairhub.management.order.entity.OrderAssignment;
+import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.service.OrderService;
+import com.repairhub.management.repair.service.RepairFeeService;
 
 @Component
 public class OrderEventListener {
 
     private final OrderService orderService;
+    private final RepairFeeService repairFeeService;
 
-    public OrderEventListener(OrderService orderService) {
+    public OrderEventListener(
+        OrderService orderService,
+        RepairFeeService repairFeeService) {
+        this.repairFeeService = repairFeeService;
         this.orderService = orderService;
     }
     
@@ -35,5 +43,14 @@ public class OrderEventListener {
             // TODO 进一步处理
         }
         
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void onOrderCompleted(OrderCompletedEvent event) {
+        // 处理订单完成事件
+        RepairOrder order = event.getRepairOrder();
+        BigDecimal fee = repairFeeService.calculateFeeByOrder(order);
+        order.setTotalFee(fee);
+        orderService.getRepairOrderRepository().update(order);
     }
 }

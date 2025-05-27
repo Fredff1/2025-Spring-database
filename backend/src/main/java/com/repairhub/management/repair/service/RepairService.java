@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
+import com.repairhub.management.order.event.OrderCompletedEvent;
 import com.repairhub.management.order.repository.RepairOrderRepository;
 import com.repairhub.management.repair.dto.CreateMaterialUsageDTO;
 import com.repairhub.management.repair.dto.CreateRepairFeedbackDTO;
@@ -23,18 +25,21 @@ public class RepairService {
     private final MaterialUsageRepository materialUsageRepository;
     private final RepairFeedbackRepository feedbackRepository;
     private final RepairOrderRepository repairOrderRepository;
+    private final TransactionalEventPublisher eventPublisher;
 
 
     public RepairService(
         RepairRecordRepository recordRepository,
         MaterialUsageRepository materialUsageRepository,
         RepairFeedbackRepository feedbackRepository,
-        RepairOrderRepository repairOrderRepository
+        RepairOrderRepository repairOrderRepository,
+        TransactionalEventPublisher eventPublisher
     ) {
         this.recordRepository = recordRepository;
         this.materialUsageRepository = materialUsageRepository;
         this.feedbackRepository = feedbackRepository;
         this.repairOrderRepository = repairOrderRepository;
+        this.eventPublisher = eventPublisher;
     }
     
     @Transactional
@@ -62,6 +67,8 @@ public class RepairService {
             repairOrderRepository.findById(dto.getOrderId()).ifPresent(Order -> {
                 Order.setStatus(dto.getOrderStatus());
                 repairOrderRepository.update(Order);
+                OrderCompletedEvent event = new OrderCompletedEvent(this, Order);
+                eventPublisher.publishEvent(event);
             });
         }
         return repairRecord;
