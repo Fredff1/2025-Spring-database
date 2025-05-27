@@ -1,7 +1,9 @@
 package com.repairhub.management.order.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.repair.enums.FaultType;
 
 import lombok.AllArgsConstructor;
@@ -18,7 +20,8 @@ public class RepairOrder {
     private Long userId;
     private Long vehicleId;
     private LocalDateTime submitTime;
-    private String status;
+    private OrderStatus status;
     private String description;
     private FaultType faultType;
+    private BigDecimal totalFee;
 }

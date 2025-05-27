@@ -17,11 +17,15 @@ import com.repairhub.management.auth.service.RepairmanProfileService;
 import com.repairhub.management.order.dto.CreateOrderRequest;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.event.OrderCreatedEvent;
 import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.order.repository.RepairOrderRepository;
 
+import lombok.Getter;
+
 @Service
+@Getter
 public class OrderService {
 
     private final RepairOrderRepository repairOrderRepository;
@@ -47,7 +51,7 @@ public class OrderService {
                 .userId(user.getUserId())
                 .vehicleId(request.getVehicleId())
                 .submitTime(java.time.LocalDateTime.now())
-                .status("PENDING") // 假设初始状态为 PENDING
+                .status(OrderStatus.PENDING) // 假设初始状态为 PENDING
                 .description(request.getProblem())
                 .build();
         repairOrderRepository.insert(order);
@@ -59,6 +63,8 @@ public class OrderService {
     public Optional<RepairOrder> findById(Long orderId) {
         return repairOrderRepository.findById(orderId);
     }
+
+    
 
     public OrderAssignment assignOrder(RepairOrder order){
         //TODO: 实现订单分配逻辑

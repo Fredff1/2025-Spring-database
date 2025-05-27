@@ -47,6 +47,7 @@ CREATE TABLE `repair_order` (
   user_id     BIGINT      NOT NULL,
   vehicle_id  CHAR(17)    NOT NULL,
   description TEXT ,
+  total_fee    DECIMAL(10,2),
   submit_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status      VARCHAR(20) NOT NULL DEFAULT 'PENDING',
   fault_type  VARCHAR(20) NOT NULL DEFAULT 'OTHER',

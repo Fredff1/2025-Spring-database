@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
+import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.repair.enums.FaultType;
 
 public class RepairOrderRowMapper implements RowMapper<RepairOrder> {
@@ -16,9 +17,10 @@ public class RepairOrderRowMapper implements RowMapper<RepairOrder> {
                 .userId(rs.getLong("user_id"))
                 .vehicleId(rs.getLong("vehicle_id"))
                 .submitTime(rs.getTimestamp("submit_time").toLocalDateTime())
-                .status(rs.getString("status"))
+                .status(OrderStatus.valueOf(rs.getString("status")))
                 .description(rs.getString("description"))
                 .faultType(FaultType.valueOf(rs.getString("fault_type")))
+                .totalFee(rs.getBigDecimal("total_fee"))
                 .build();
     }
     

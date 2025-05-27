@@ -15,4 +15,6 @@ public interface LaborFeeLogRepository {
     public Optional<LaborFeeLog> findById(Long LaborFeeLogId);
 
     public List<LaborFeeLog> findAllByRepairOrderId(Long repairOrderId);
+
+    public List<LaborFeeLog> findAllByRepairmanId(Long repairmanId);
 }
