@@ -2,6 +2,8 @@ package com.repairhub.management.order.entity;
 
 import java.time.LocalDateTime;
 
+import com.repairhub.management.repair.enums.FaultType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +20,5 @@ public class RepairOrder {
     private LocalDateTime submitTime;
     private String status;
     private String description;
+    private FaultType faultType;
 }

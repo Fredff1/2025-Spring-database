@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
+import com.repairhub.management.repair.enums.FaultType;
+
 public class RepairOrderRowMapper implements RowMapper<RepairOrder> {
 
     @Override
@@ -16,6 +18,7 @@ public class RepairOrderRowMapper implements RowMapper<RepairOrder> {
                 .submitTime(rs.getTimestamp("submit_time").toLocalDateTime())
                 .status(rs.getString("status"))
                 .description(rs.getString("description"))
+                .faultType(FaultType.valueOf(rs.getString("fault_type")))
                 .build();
     }
     

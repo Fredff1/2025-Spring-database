@@ -1,11 +1,19 @@
 package com.repairhub.management.order.service;
 
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
+import com.repairhub.management.auth.entity.RepairmanProfile;
 import com.repairhub.management.auth.entity.User;
+import com.repairhub.management.auth.service.RepairmanProfileService;
 import com.repairhub.management.order.dto.CreateOrderRequest;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
@@ -18,14 +26,17 @@ public class OrderService {
 
     private final RepairOrderRepository repairOrderRepository;
     private final OrderAssignmentRepository orderAssignmentRepository;
+    private final RepairmanProfileService repairmanProfileService;
     private final TransactionalEventPublisher eventPublisher;
 
     public OrderService(
         RepairOrderRepository repairOrderRepository,
         OrderAssignmentRepository orderAssignmentRepository,
+        RepairmanProfileService repairmanProfileService,
         TransactionalEventPublisher eventPublisher) {
         this.repairOrderRepository = repairOrderRepository;
         this.orderAssignmentRepository = orderAssignmentRepository;
+        this.repairmanProfileService = repairmanProfileService;
         this.eventPublisher = eventPublisher;
     }
 
@@ -45,8 +56,31 @@ public class OrderService {
         return order;
     }
 
+    public Optional<RepairOrder> findById(Long orderId) {
+        return repairOrderRepository.findById(orderId);
+    }
+
     public OrderAssignment assignOrder(RepairOrder order){
         //TODO: 实现订单分配逻辑
-        return null;
+        List<Long> filter = new ArrayList<>();
+        List<OrderAssignment> assignments = orderAssignmentRepository.findByOrderId(order.getOrderId());
+        if (assignments != null && !assignments.isEmpty()) {
+            for (OrderAssignment assignment : assignments) {
+                filter.add(assignment.getRepairmanId());
+            }
+        }
+
+        List<RepairmanProfile> profiles = repairmanProfileService.findAllWithFilter(order.getFaultType(), filter);
+        Random random = new Random();
+        int index = random.nextInt(profiles.size());
+        RepairmanProfile selectedProfile = profiles.get(index);
+        OrderAssignment assignment = OrderAssignment.builder()
+                .orderId(order.getOrderId())
+                .repairmanId(selectedProfile.getUserId())
+                .assignmentTime(LocalDateTime.now())
+                .accepted(null)
+                .actualWorkHour(null)
+                .build();
+        return assignment;
     }
 }

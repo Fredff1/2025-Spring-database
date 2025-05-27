@@ -1,6 +1,10 @@
 package com.repairhub.management.auth.entity;
 
 import java.math.BigDecimal;
+import java.util.List;
+
+import com.repairhub.management.order.entity.OrderAssignment;
+import com.repairhub.management.repair.enums.FaultType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +17,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class RepairmanProfile {
     private Long userId;
-    private String specialty;
+    private FaultType specialty;
     private BigDecimal hourlyMoneyRate;
+
+    private List<OrderAssignment> orderAssignments;
 }

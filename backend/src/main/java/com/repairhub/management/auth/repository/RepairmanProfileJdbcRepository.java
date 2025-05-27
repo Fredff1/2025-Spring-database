@@ -2,6 +2,7 @@ package com.repairhub.management.auth.repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.repairhub.management.auth.entity.RepairmanProfile;
 import com.repairhub.management.auth.entity.RepairmanProfileRowMapper;
+import com.repairhub.management.repair.enums.FaultType;
 
 @Repository
 public class RepairmanProfileJdbcRepository implements RepairmanProfileRepository{
@@ -55,14 +57,14 @@ public class RepairmanProfileJdbcRepository implements RepairmanProfileRepositor
     }
 
     @Override
-    public List<RepairmanProfile> findByUserId(Long userId){
+    public Optional<RepairmanProfile> findByUserId(Long userId){
         String sql = "SELECT user_id, specialty, hourly_money_rate FROM repairman_profile WHERE user_id = :userId";
-        return jdbc.query(sql, Map.of("userId", userId), mapper);
+        return jdbc.query(sql, Map.of("userId", userId), mapper).stream().findFirst();
     }
 
     @Override
-    public List<RepairmanProfile> findBySpecialty(String specialty){
+    public List<RepairmanProfile> findBySpecialty(FaultType specialty){
         String sql = "SELECT user_id, specialty, hourly_money_rate FROM repairman_profile WHERE specialty = :specialty";
-        return jdbc.query(sql, Map.of("specialty", specialty), mapper);
+        return jdbc.query(sql, Map.of("specialty", specialty.name()), mapper);
     }
 }

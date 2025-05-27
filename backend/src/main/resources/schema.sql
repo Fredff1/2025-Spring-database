@@ -22,8 +22,9 @@ CREATE TABLE `users` (
 DROP TABLE IF EXISTS `repairman_profile`;
 CREATE TABLE `repairman_profile` (
   user_id           BIGINT PRIMARY KEY,
-  specialty         VARCHAR(100),
+  specialty         VARCHAR(30),
   hourly_money_rate DECIMAL(10,2),
+  CHECK (specialty IN 'ENGINE','ELECTRICAL','BRAKE','TRANSMISSION','OTHER'),
   CONSTRAINT fk_rm_user FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 
@@ -48,9 +49,11 @@ CREATE TABLE `repair_order` (
   description TEXT ,
   submit_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status      VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+  fault_type  VARCHAR(20) NOT NULL DEFAULT 'OTHER',
   PRIMARY KEY(order_id),
   INDEX idx_order_user(user_id),
   INDEX idx_order_vehicle(vehicle_id),
+  CHECK (fault_type IN 'ENGINE','ELECTRICAL','BRAKE','TRANSMISSION','OTHER'),
   CONSTRAINT fk_order_user    FOREIGN KEY(user_id)    REFERENCES users(user_id),
   CONSTRAINT fk_order_vehicle FOREIGN KEY(vehicle_id) REFERENCES vehicle(vehicle_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
