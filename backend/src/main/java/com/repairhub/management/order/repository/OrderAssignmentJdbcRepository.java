@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.sql.DataSource;
+
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -22,10 +24,10 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
 
     public OrderAssignmentJdbcRepository(
         NamedParameterJdbcTemplate jdbc,
-        SimpleJdbcInsert simpleJdbcInsert
+        DataSource dataSource
     ) {
         this.jdbc = jdbc;
-        this.simpleJdbcInsert = simpleJdbcInsert
+        this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
             .withTableName("order_assignment")
             .usingGeneratedKeyColumns("assignment_id");
     }

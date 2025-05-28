@@ -20,4 +20,6 @@ public class LaborFeeLog {
     private BigDecimal totalHours;
     private BigDecimal totalIncome;
     private LocalDateTime settleTime;
+
+    
 }

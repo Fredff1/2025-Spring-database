@@ -24,12 +24,16 @@ public class RegisterRequestDTO {
     private String password;
 
     @NotNull
+    private String confirmPassword;
+
+    @NotNull
     private UserRole role;
+
+
+    private String email;
 
     private String phone;
 
     private UserRole roles;
-
-
 
 }

@@ -3,6 +3,8 @@ package com.repairhub.management.vehicle.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.repairhub.management.vehicle.dto.CreateVehicleRequest;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,4 +21,14 @@ public class Vehicle {
     private String model;
     private String licensePlate;
     private LocalDate registerDate;
+
+    public static Vehicle from(CreateVehicleRequest request, Long ownerId) {
+        return Vehicle.builder()
+                .ownerId(ownerId)
+                .brand(request.getBrand())
+                .model(request.getModel())
+                .licensePlate(request.getPlateNumber())
+                .registerDate(LocalDate.now())
+                .build();
+    }
 }

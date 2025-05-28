@@ -44,10 +44,13 @@ public class UserService {
         if(userRepository.findByUsername(username).isPresent()){
             throw new DuplicatedUserException("User already exists");
         }
+        if(!createUserDTO.getPassword().equals(createUserDTO.getConfirmPassword())){
+            throw new InvalidPasswordException("Passwords do not match");
+        }
         User user = User.builder()
         .username(createUserDTO.getUsername())
         .password(passwordEncoder.encode(createUserDTO.getPassword()))
-        .email(createUserDTO.getPassword())
+        .email(createUserDTO.getEmail())
         .status(UserStatus.ACTIVE)
         .role(createUserDTO.getRole())
         .phone(createUserDTO.getPhone())

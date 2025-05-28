@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.sql.DataSource;
+
 @Repository
 public class VehicleJdbcRepository implements VehicleRepository {
     private final NamedParameterJdbcTemplate jdbc;
@@ -24,9 +26,9 @@ public class VehicleJdbcRepository implements VehicleRepository {
 
     public VehicleJdbcRepository(
         NamedParameterJdbcTemplate jdbc,
-        SimpleJdbcInsert simpleJdbcInsert) {
+        DataSource dataSource) {
         this.jdbc = jdbc;
-        this.simpleJdbcInsert = simpleJdbcInsert
+        this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
             .withTableName("vehicle")
             .usingGeneratedKeyColumns("vehicle_id");
     }

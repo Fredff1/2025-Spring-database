@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.sql.DataSource;
+
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -13,6 +16,8 @@ import org.springframework.stereotype.Repository;
 import com.repairhub.management.auth.entity.RepairmanProfile;
 import com.repairhub.management.auth.entity.RepairmanProfileRowMapper;
 import com.repairhub.management.repair.enums.FaultType;
+
+
 
 @Repository
 public class RepairmanProfileJdbcRepository implements RepairmanProfileRepository{
@@ -23,19 +28,20 @@ public class RepairmanProfileJdbcRepository implements RepairmanProfileRepositor
 
     public RepairmanProfileJdbcRepository(
         NamedParameterJdbcTemplate jdbc,
-        SimpleJdbcInsert simpleJdbcInsert) {
+        DataSource dataSource) {
         this.jdbc = jdbc;
-        this.simpleJdbcInsert = simpleJdbcInsert
+        this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
             .withTableName("repairman_profile")
-            .usingGeneratedKeyColumns("user_id");
+            .usingColumns("user_id","specialty","hourly_money_rate");
     }
 
     @Override
     public int insert(RepairmanProfile profile){
-        SqlParameterSource params = new BeanPropertySqlParameterSource(profile);
-        Number key = simpleJdbcInsert.executeAndReturnKey(params);
-        long userId = key.longValue();
-        profile.setUserId(userId);
+        MapSqlParameterSource params = new MapSqlParameterSource()
+        .addValue("user_id", profile.getUserId())
+        .addValue("specialty", profile.getSpecialty().name())
+        .addValue("hourly_money_rate", profile.getHourlyMoneyRate());
+        simpleJdbcInsert.execute(params);
         return 1;
     }
 

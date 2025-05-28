@@ -92,18 +92,18 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="维修类型" prop="repairType">
-          <el-select v-model="form.repairType" placeholder="请选择维修类型">
-            <el-option label="常规保养" value="常规保养" />
-            <el-option label="故障维修" value="故障维修" />
-            <el-option label="钣金喷漆" value="钣金喷漆" />
-            <el-option label="轮胎更换" value="轮胎更换" />
-            <el-option label="其他" value="其他" />
+        <el-form-item label="维修类型" prop="faultType">
+          <el-select v-model="form.faultType" placeholder="请选择维修类型">
+            <el-option label="常规保养" value="MAINTENANCE" />
+            <el-option label="故障维修" value="REPAIR" />
+            <el-option label="钣金喷漆" value="PAINT" />
+            <el-option label="轮胎更换" value="TIRE" />
+            <el-option label="其他" value="OTHER" />
           </el-select>
         </el-form-item>
-        <el-form-item label="问题描述" prop="problem">
+        <el-form-item label="问题描述" prop="description">
           <el-input
-            v-model="form.problem"
+            v-model="form.description"
             type="textarea"
             :rows="4"
             placeholder="请详细描述车辆问题"
@@ -172,10 +172,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,  reactive } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { order, vehicle } from '@/api'
+import { getToken } from '@/utils/auth'
 
 // 订单列表
 const orders = ref([])
@@ -194,10 +195,10 @@ const currentOrder = ref(null)
 
 // 创建订单表单
 const formRef = ref(null)
-const form = ref({
+const form = reactive({
   vehicleId: '',
-  repairType: '',
-  problem: ''
+  faultType: '',
+  description: ''
 })
 
 // 评价表单
@@ -260,20 +261,32 @@ const fetchOrders = async () => {
 const fetchVehicles = async () => {
   try {
     const res = await vehicle.getList()
-    vehicles.value = res.list
+    if (Array.isArray(res)) {
+      vehicles.value = res
+    } else if (res.list) {
+      vehicles.value = res.list
+    } else {
+      vehicles.value = []
+    }
   } catch (error) {
     console.error('获取车辆列表失败:', error)
     ElMessage.error('获取车辆列表失败')
+    vehicles.value = []
   }
 }
 
 // 显示创建订单对话框
-const showCreateDialog = () => {
-  form.value = {
-    vehicleId: '',
-    repairType: '',
-    problem: ''
+const showCreateDialog = async () => {
+  // 重置表单
+  form.vehicleId   = '';
+  form.faultType  = '';
+  form.description = '';
+  
+  // 确保车辆列表已加载
+  if (vehicles.value.length === 0) {
+    await fetchVehicles()
   }
+  
   createDialogVisible.value = true
 }
 
@@ -281,19 +294,33 @@ const showCreateDialog = () => {
 const handleCreate = async () => {
   if (!formRef.value) return
   
-  await formRef.value.validate(async (valid) => {
-    if (valid) {
-      try {
-        await order.create(form.value)
-        ElMessage.success('创建成功')
-        createDialogVisible.value = false
-        fetchOrders()
-      } catch (error) {
-        console.error('创建失败:', error)
-        ElMessage.error('创建失败')
-      }
+  try {
+    await formRef.value.validate()
+
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      },
+      body: JSON.stringify(form)
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      ElMessage.success('创建成功')
+      createDialogVisible.value = false
+      fetchOrders()
+    } else {
+      const error = await response.json()
+      ElMessage.error(error.message || '创建失败')
     }
-  })
+  } catch (error) {
+    console.error('创建失败:', error)
+    ElMessage.error('创建失败')
+  } finally {
+
+  }
 }
 
 // 处理取消订单

@@ -1,3 +1,19 @@
+DROP TABLE IF EXISTS `labor_fee_log`;
+
+DROP TABLE IF EXISTS `repairman_profile`;
+
+DROP TABLE IF EXISTS `repair_record`;
+
+DROP TABLE IF EXISTS `material_usage`;
+
+DROP TABLE IF EXISTS `feedback`;
+
+DROP TABLE IF EXISTS `assignment`;
+
+DROP TABLE IF EXISTS `repair_order`;
+
+DROP TABLE IF EXISTS `vehicle`;
+
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
@@ -19,18 +35,17 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4;
 
 
-DROP TABLE IF EXISTS `repairman_profile`;
 CREATE TABLE `repairman_profile` (
   user_id           BIGINT PRIMARY KEY,
   specialty         VARCHAR(30),
   hourly_money_rate DECIMAL(10,2),
-  CHECK (specialty IN 'ENGINE','ELECTRICAL','BRAKE','TRANSMISSION','OTHER'),
+  CHECK (specialty IN ('MAINTENANCE','REPAIR','PAINT','TIRE','OTHER')),
   CONSTRAINT fk_rm_user FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 
-DROP TABLE IF EXISTS `vehicle`;
+
 CREATE TABLE `vehicle` (
-  vehicle_id    CHAR(17)    NOT NULL, AUTO_INCREMENT,
+  vehicle_id    BIGINT    NOT NULL AUTO_INCREMENT,
   owner_id      BIGINT      NOT NULL,
   brand         VARCHAR(100) NOT NULL,
   model         VARCHAR(100) NOT NULL,
@@ -41,11 +56,11 @@ CREATE TABLE `vehicle` (
   CONSTRAINT fk_vehicle_owner FOREIGN KEY(owner_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `repair_order`;
+
 CREATE TABLE `repair_order` (
   order_id    BIGINT      NOT NULL AUTO_INCREMENT,
   user_id     BIGINT      NOT NULL,
-  vehicle_id  CHAR(17)    NOT NULL,
+  vehicle_id  BIGINT    NOT NULL,
   description TEXT ,
   total_fee    DECIMAL(10,2),
   submit_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -54,13 +69,12 @@ CREATE TABLE `repair_order` (
   PRIMARY KEY(order_id),
   INDEX idx_order_user(user_id),
   INDEX idx_order_vehicle(vehicle_id),
-  CHECK (fault_type IN 'ENGINE','ELECTRICAL','BRAKE','TRANSMISSION','OTHER'),
+  CHECK (fault_type IN ('ENGINE','ELECTRICAL','BRAKE','TRANSMISSION','OTHER')),
   CONSTRAINT fk_order_user    FOREIGN KEY(user_id)    REFERENCES users(user_id),
   CONSTRAINT fk_order_vehicle FOREIGN KEY(vehicle_id) REFERENCES vehicle(vehicle_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
-DROP TABLE IF EXISTS `repair_record`;
 CREATE TABLE `repair_record` (
   repair_record_id BIGINT      NOT NULL AUTO_INCREMENT,
   order_id         BIGINT      NOT NULL,
@@ -72,7 +86,7 @@ CREATE TABLE `repair_record` (
   CONSTRAINT fk_rr_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `material_usage`;
+
 CREATE TABLE `material_usage` (
   material_usage_id BIGINT      NOT NULL AUTO_INCREMENT,
   order_id          BIGINT      NOT NULL,
@@ -84,7 +98,7 @@ CREATE TABLE `material_usage` (
   CONSTRAINT fk_mu_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `feedback`;
+
 CREATE TABLE `feedback` (
   feedback_id   BIGINT      NOT NULL AUTO_INCREMENT,
   order_id      BIGINT      NOT NULL,
@@ -99,7 +113,7 @@ CREATE TABLE `feedback` (
   CONSTRAINT fk_fb_user  FOREIGN KEY(user_id)  REFERENCES users(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `assignment`;
+
 CREATE TABLE `assignment` (
   assign_id        BIGINT      NOT NULL AUTO_INCREMENT,
   order_id         BIGINT      NOT NULL,
@@ -114,7 +128,7 @@ CREATE TABLE `assignment` (
   CONSTRAINT fk_asg_tech  FOREIGN KEY(repairman_id) REFERENCES users(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `labor_fee_log`;
+
 CREATE TABLE `labor_fee_log` (
   labor_fee_log_id BIGINT      NOT NULL AUTO_INCREMENT,
   repairman_id    BIGINT      NOT NULL,

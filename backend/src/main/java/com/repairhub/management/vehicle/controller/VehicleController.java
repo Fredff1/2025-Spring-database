@@ -32,6 +32,7 @@ public class VehicleController {
     @GetMapping
     public ResponseEntity<PageResponse<VehicleDTO>> getList(PageRequest request){
         VehicleDTO vehicleDTO = VehicleDTO.builder()
+        .id(1L)
         .createTime(LocalDateTime.now())
         .model("model-x")
         .plateNumber("plate-123456")

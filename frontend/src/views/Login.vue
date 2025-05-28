@@ -93,14 +93,15 @@ const handleLogin = async () => {
       body: JSON.stringify(form.value)
     })
 
-    const data = await response.json()
-    if (data.code === 200) {
+    
+    if (response.ok) {
+      const data = await response.json()
       // 保存token和角色信息
-      setToken(data.data.token)
+      setToken(data.token)
       ElMessage.success('登录成功')
       
       // 根据角色跳转到不同页面
-      switch (data.data.role) {
+      switch (data.role) {
         case 'ADMIN':
           router.push('/admin/dashboard')
           break
@@ -108,14 +109,14 @@ const handleLogin = async () => {
           router.push('/repairman/dashboard')
           break
         case 'CUSTOMER':
-          router.push('/customer/dashboard')
+          router.push('/user/dashboard')
           break
       }
     } else {
       ElMessage.error(data.message || '登录失败')
     }
   } catch (error) {
-    console.error(error)
+    console.log(error)
     ElMessage.error('登录失败')
   } finally {
     loading.value = false

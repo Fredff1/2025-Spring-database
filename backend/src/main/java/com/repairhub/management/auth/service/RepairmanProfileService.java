@@ -3,6 +3,7 @@ package com.repairhub.management.auth.service;
 import java.util.List;
 
 import org.springframework.boot.autoconfigure.pulsar.PulsarProperties.Transaction;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalEventPublisher;
@@ -21,13 +22,13 @@ public class RepairmanProfileService {
     private final UserRepository userRepository;
     private final RepairmanProfileRepository repairmanProfileRepository;
     private final OrderAssignmentRepository orderAssignmentRepository;
-    private final TransactionalEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     public RepairmanProfileService(
         UserRepository userRepository,
         RepairmanProfileRepository repairmanProfileRepository,
         OrderAssignmentRepository orderAssignmentRepository,
-        TransactionalEventPublisher eventPublisher
+        ApplicationEventPublisher eventPublisher
     ) {
         this.userRepository = userRepository;
         this.repairmanProfileRepository = repairmanProfileRepository;

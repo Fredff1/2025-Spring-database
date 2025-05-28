@@ -4,14 +4,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.sql.DataSource;
+
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Repository;
 
 import com.repairhub.management.repair.entity.RepairRecord;
 import com.repairhub.management.repair.entity.RepairRecordRowMapper;
 
+@Repository
 public class RepairRecordJdbcRepository implements RepairRecordRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
@@ -20,9 +24,9 @@ public class RepairRecordJdbcRepository implements RepairRecordRepository {
 
     public RepairRecordJdbcRepository(
         NamedParameterJdbcTemplate jdbcTemplate,
-        SimpleJdbcInsert simpleJdbcInsert) {
+        DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
-        this.simpleJdbcInsert = simpleJdbcInsert
+        this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
             .withTableName("repair_record")
             .usingGeneratedKeyColumns("repair_record_id");
     }

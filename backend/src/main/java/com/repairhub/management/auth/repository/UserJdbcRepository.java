@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.sql.DataSource;
+
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -23,16 +25,24 @@ public class UserJdbcRepository implements UserRepository{
 
     public UserJdbcRepository(
       NamedParameterJdbcTemplate jdbc,
-      SimpleJdbcInsert simpleJdbcInsert) {
+      DataSource dataSource) {
         this.jdbc = jdbc;
-        this.simpleJdbcInsert = simpleJdbcInsert.
+        this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource).
         withTableName("users")
-        .usingGeneratedKeyColumns("user_id");
+        .usingGeneratedKeyColumns("user_id")
+        .usingColumns("username", "password", "email", "phone", "role", "status");
     }
 
     @Override
     public int insert(User user) {
-        SqlParameterSource params = new BeanPropertySqlParameterSource(user);
+        MapSqlParameterSource params = new MapSqlParameterSource()
+        .addValue("username", user.getUsername())
+        .addValue("password", user.getPassword())
+        .addValue("email",    user.getEmail())
+        .addValue("phone",    user.getPhone())
+        .addValue("role",     user.getRole().name())
+        .addValue("status",   user.getStatus().name());
+
         Number key = simpleJdbcInsert.executeAndReturnKey(params);
         long userId = key.longValue();
         user.setUserId(userId);

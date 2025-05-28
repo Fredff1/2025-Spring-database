@@ -2,6 +2,7 @@ package com.repairhub.management.repair.service;
 
 import java.time.LocalDateTime;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalEventPublisher;
@@ -25,7 +26,7 @@ public class RepairService {
     private final MaterialUsageRepository materialUsageRepository;
     private final RepairFeedbackRepository feedbackRepository;
     private final RepairOrderRepository repairOrderRepository;
-    private final TransactionalEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     public RepairService(
@@ -33,7 +34,7 @@ public class RepairService {
         MaterialUsageRepository materialUsageRepository,
         RepairFeedbackRepository feedbackRepository,
         RepairOrderRepository repairOrderRepository,
-        TransactionalEventPublisher eventPublisher
+        ApplicationEventPublisher eventPublisher
     ) {
         this.recordRepository = recordRepository;
         this.materialUsageRepository = materialUsageRepository;

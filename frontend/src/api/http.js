@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getToken, clearToken } from '@/utils/auth';
+import { getToken, removeToken } from '@/utils/auth';
 import { ElMessage } from 'element-plus';
 import router from '@/router';
 
@@ -26,8 +26,12 @@ http.interceptors.response.use(
   response => {
     const res = response.data;
     
-    return res;
+    // 如果响应成功，直接返回数据
+    if (response.status === 200) {
+      return res.data || res;
+    }
     
+    // 如果响应失败，显示错误信息
     ElMessage.error(res.message || '请求失败');
     return Promise.reject(new Error(res.message || '请求失败'));
   },
@@ -36,7 +40,7 @@ http.interceptors.response.use(
     
     if (error.response?.status === 401) {
       if (error.config.headers['Authorization']) {
-        clearToken();
+        removeToken();
         ElMessage.error('登录已过期，请重新登录');
         router.push('/login');
       } else {

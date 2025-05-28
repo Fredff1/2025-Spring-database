@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalEventPublisher;
@@ -31,13 +32,13 @@ public class OrderService {
     private final RepairOrderRepository repairOrderRepository;
     private final OrderAssignmentRepository orderAssignmentRepository;
     private final RepairmanProfileService repairmanProfileService;
-    private final TransactionalEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     public OrderService(
         RepairOrderRepository repairOrderRepository,
         OrderAssignmentRepository orderAssignmentRepository,
         RepairmanProfileService repairmanProfileService,
-        TransactionalEventPublisher eventPublisher) {
+        ApplicationEventPublisher eventPublisher) {
         this.repairOrderRepository = repairOrderRepository;
         this.orderAssignmentRepository = orderAssignmentRepository;
         this.repairmanProfileService = repairmanProfileService;
@@ -51,8 +52,9 @@ public class OrderService {
                 .userId(user.getUserId())
                 .vehicleId(request.getVehicleId())
                 .submitTime(java.time.LocalDateTime.now())
+                .faultType(request.getFaultType())
                 .status(OrderStatus.PENDING) // 假设初始状态为 PENDING
-                .description(request.getProblem())
+                .description(request.getDescription())
                 .build();
         repairOrderRepository.insert(order);
         OrderCreatedEvent event = new OrderCreatedEvent(this, order);
@@ -61,7 +63,22 @@ public class OrderService {
     }
 
     public Optional<RepairOrder> findById(Long orderId) {
-        return repairOrderRepository.findById(orderId);
+        var order = repairOrderRepository.findById(orderId);
+        if(order.isPresent()){
+            List<OrderAssignment> assignments = orderAssignmentRepository.findByOrderId(order.get().getOrderId());
+            if(assignments != null && !assignments.isEmpty()){
+                List<Long> assignedRepairmanIds = new ArrayList<>();
+                for (OrderAssignment assignment : assignments) {
+                    if(assignment.getAccepted()){
+                        assignedRepairmanIds.add(assignment.getRepairmanId());
+                    }
+                }
+                order.get().setAssignedRepairmanIds(assignedRepairmanIds);
+            }
+        }
+        
+        return order;
+
     }
 
     
@@ -72,6 +89,9 @@ public class OrderService {
         List<OrderAssignment> assignments = orderAssignmentRepository.findByOrderId(order.getOrderId());
         if (assignments != null && !assignments.isEmpty()) {
             for (OrderAssignment assignment : assignments) {
+                if(assignment.getAccepted()){
+                    continue;
+                }
                 filter.add(assignment.getRepairmanId());
             }
         }

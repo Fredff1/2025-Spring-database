@@ -9,6 +9,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.service.OrderService;
 import com.repairhub.management.repair.service.RepairFeeService;
 
@@ -37,10 +38,16 @@ public class OrderEventListener {
         if(!assignment.getAccepted()){
             // 如果维修工拒绝了订单分配，则将订单状态改为 PENDING
             orderService.findById(assignment.getOrderId()).ifPresent(order -> {
+                order.setStatus(OrderStatus.PENDING);
+                orderService.getRepairOrderRepository().update(order);
                 orderService.assignOrder(order);
             });
         } else {
-            // TODO 进一步处理
+            orderService.findById(assignment.getOrderId()).ifPresent(order -> {
+                // 如果维修工接受了订单分配，则将订单状态改为 IN_PROGRESS
+                order.setStatus(OrderStatus.PROCESSING);
+                orderService.getRepairOrderRepository().update(order);
+            });
         }
         
     }

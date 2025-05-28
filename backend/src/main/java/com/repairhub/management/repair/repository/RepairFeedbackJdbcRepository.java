@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.sql.DataSource;
+
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -14,7 +16,7 @@ import com.repairhub.management.repair.entity.RepairFeedback;
 import com.repairhub.management.repair.entity.RepairFeedbackRowMapper;
 
 @Repository
-public class RepairFeedbackJdbcRepository {
+public class RepairFeedbackJdbcRepository implements RepairFeedbackRepository{
     
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
@@ -23,13 +25,14 @@ public class RepairFeedbackJdbcRepository {
 
     public RepairFeedbackJdbcRepository(
         NamedParameterJdbcTemplate jdbcTemplate,
-        SimpleJdbcInsert simpleJdbcInsert) {
+        DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
-        this.simpleJdbcInsert = simpleJdbcInsert
+        this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
             .withTableName("feedback")
             .usingGeneratedKeyColumns("feedback_id");
     }
 
+    @Override
     public int insert(RepairFeedback feedback){
         SqlParameterSource params = new BeanPropertySqlParameterSource(feedback);
         Number key = simpleJdbcInsert.executeAndReturnKey(params);
@@ -38,6 +41,7 @@ public class RepairFeedbackJdbcRepository {
         return 1; 
     }
 
+    @Override
     public int update(RepairFeedback feedback){
         String sql = """
             UPDATE feedback
@@ -50,11 +54,13 @@ public class RepairFeedbackJdbcRepository {
         return jdbcTemplate.update(sql, new BeanPropertySqlParameterSource(feedback));
     }
 
+    @Override
     public int delete(Long repairFeedbackId){
         String sql = "DELETE FROM feedback WHERE feedback_id = :feedbackId";
         return jdbcTemplate.update(sql, Map.of("feedbackId", repairFeedbackId));
     }
 
+    @Override
     public Optional<RepairFeedback> findById(Long repairFeedbackId){
         String sql = "SELECT * FROM feedback WHERE feedback_id = :feedbackId";
         return jdbcTemplate.query(sql, Map.of("feedbackId", repairFeedbackId), mapper)
@@ -62,6 +68,7 @@ public class RepairFeedbackJdbcRepository {
                            .findFirst();
     }
 
+    @Override
     public Optional<RepairFeedback> findByRepairOrderId(Long repairOrderId){
         String sql = "SELECT * FROM feedback WHERE repair_order_id = :repairOrderId";
         return jdbcTemplate.query(sql, Map.of("repairOrderId", repairOrderId), mapper)
@@ -69,6 +76,7 @@ public class RepairFeedbackJdbcRepository {
                            .findFirst();
     }
 
+    @Override
     public List<RepairFeedback> findByRepairmanId(Long repairmanId){
         String sql = "SELECT * FROM feedback WHERE repairman_id = :repairmanId";
         return jdbcTemplate.query(sql, Map.of("repairmanId", repairmanId), mapper);
