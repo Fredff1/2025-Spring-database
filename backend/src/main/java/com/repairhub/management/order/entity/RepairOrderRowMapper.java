@@ -17,6 +17,7 @@ public class RepairOrderRowMapper implements RowMapper<RepairOrder> {
                 .userId(rs.getLong("user_id"))
                 .vehicleId(rs.getLong("vehicle_id"))
                 .submitTime(rs.getTimestamp("submit_time").toLocalDateTime())
+                .updateTime(rs.getTimestamp("update_time").toLocalDateTime())
                 .status(OrderStatus.valueOf(rs.getString("status")))
                 .description(rs.getString("description"))
                 .faultType(FaultType.valueOf(rs.getString("fault_type")))

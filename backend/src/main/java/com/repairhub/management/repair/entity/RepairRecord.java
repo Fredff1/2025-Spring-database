@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class RepairRecord {
     private Long recordId;
     private Long orderId;
+    private Long repairmanId;
     private String faultDescription;
     private String repairResult;
     private LocalDateTime completionTime;

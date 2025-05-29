@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -34,7 +35,13 @@ public class RepairFeedbackJdbcRepository implements RepairFeedbackRepository{
 
     @Override
     public int insert(RepairFeedback feedback){
-        SqlParameterSource params = new BeanPropertySqlParameterSource(feedback);
+        SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("order_id", feedback.getOrderId())
+        .addValue("user_id", feedback.getUserId())
+        .addValue("rating", feedback.getRating())
+        .addValue("feed_back_type", feedback.getFeedbackType().name())
+        .addValue("description", feedback.getDescription())
+        .addValue("feedback_time", feedback.getFeedbackTime());
         Number key = simpleJdbcInsert.executeAndReturnKey(params);
         long feedbackId = key.longValue();
         feedback.setFeedbackId(feedbackId);
@@ -69,11 +76,9 @@ public class RepairFeedbackJdbcRepository implements RepairFeedbackRepository{
     }
 
     @Override
-    public Optional<RepairFeedback> findByRepairOrderId(Long repairOrderId){
-        String sql = "SELECT * FROM feedback WHERE repair_order_id = :repairOrderId";
-        return jdbcTemplate.query(sql, Map.of("repairOrderId", repairOrderId), mapper)
-                           .stream()
-                           .findFirst();
+    public List<RepairFeedback> findByRepairOrderId(Long repairOrderId){
+        String sql = "SELECT * FROM feedback WHERE order_id = :order_id";
+        return jdbcTemplate.query(sql, Map.of("order_id", repairOrderId), mapper);
     }
 
     @Override

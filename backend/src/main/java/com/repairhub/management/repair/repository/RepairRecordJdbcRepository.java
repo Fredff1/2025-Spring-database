@@ -71,8 +71,8 @@ public class RepairRecordJdbcRepository implements RepairRecordRepository {
 
     @Override
     public List<RepairRecord> findByRepairOrderId(Long repairOrderId) {
-        String sql = "SELECT * FROM repair_record WHERE repair_order_id = :repairOrderId";
-        return jdbcTemplate.query(sql, Map.of("repairOrderId", repairOrderId), mapper);
+        String sql = "SELECT * FROM repair_record WHERE order_id = :orderId";
+        return jdbcTemplate.query(sql, Map.of("orderId", repairOrderId), mapper);
     }
 
     @Override

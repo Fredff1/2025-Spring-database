@@ -64,6 +64,7 @@ CREATE TABLE `repair_order` (
   description TEXT ,
   total_fee    DECIMAL(10,2),
   submit_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status      VARCHAR(20) NOT NULL DEFAULT 'PENDING',
   fault_type  VARCHAR(20) NOT NULL DEFAULT 'OTHER',
   PRIMARY KEY(order_id),
@@ -78,6 +79,7 @@ CREATE TABLE `repair_order` (
 CREATE TABLE `repair_record` (
   repair_record_id BIGINT      NOT NULL AUTO_INCREMENT,
   order_id         BIGINT      NOT NULL,
+  repairman_id     BIGINT      NOT NULL,
   fault_description TEXT       NOT NULL,
   repair_result     TEXT,
   completion_time   DATETIME,
@@ -93,6 +95,7 @@ CREATE TABLE `material_usage` (
   material_name     VARCHAR(100) NOT NULL,
   quantity          INT         NOT NULL,
   unit_price        DECIMAL(10,2) NOT NULL,
+  create_time        DATETIME      NOT NULL,
   PRIMARY KEY(material_usage_id),
   INDEX idx_mu_order(order_id),
   CONSTRAINT fk_mu_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id)
@@ -103,8 +106,8 @@ CREATE TABLE `feedback` (
   feedback_id   BIGINT      NOT NULL AUTO_INCREMENT,
   order_id      BIGINT      NOT NULL,
   user_id       BIGINT      NOT NULL,
-  repairman_id  BIGINT      NOT NULL,
   rating        INT         NOT NULL,
+  feed_back_type VARCHAR(20) NOT NULL DEFAULT 'GENERAL',
   description   TEXT,
   feedback_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY(feedback_id),

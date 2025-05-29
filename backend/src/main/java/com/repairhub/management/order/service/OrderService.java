@@ -1,6 +1,7 @@
 package com.repairhub.management.order.service;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -58,9 +59,11 @@ public class OrderService {
                 .userId(user.getUserId())
                 .vehicleId(request.getVehicleId())
                 .submitTime(java.time.LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
                 .faultType(request.getFaultType())
                 .status(OrderStatus.PENDING) // 假设初始状态为 PENDING
                 .description(request.getDescription())
+                .totalFee(BigDecimal.valueOf(0L))
                 .build();
         repairOrderRepository.insert(order);
         OrderCreatedEvent event = new OrderCreatedEvent(this, order);

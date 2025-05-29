@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
+import com.repairhub.management.repair.enums.FeedbackType;
+
 public class RepairFeedbackRowMapper implements RowMapper<RepairFeedback> {
 
     @Override
@@ -13,10 +15,10 @@ public class RepairFeedbackRowMapper implements RowMapper<RepairFeedback> {
                 .feedbackId(rs.getLong("feedback_id"))
                 .orderId(rs.getLong("order_id"))
                 .userId(rs.getLong("user_id"))
-                .repairmanId(rs.getLong("repairman_id"))
                 .rating(rs.getInt("rating"))
                 .description(rs.getString("description"))
                 .feedbackTime(rs.getTimestamp("feedback_time").toLocalDateTime())
+                .feedbackType(FeedbackType.valueOf(rs.getString("feed_back_type")))
                 .build();
     }
     

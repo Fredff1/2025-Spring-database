@@ -1,6 +1,7 @@
 package com.repairhub.management.repair.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,4 +18,5 @@ public class MaterialUsage {
     private String materialName;
     private Integer quantity;
     private BigDecimal unitPrice;
+    private LocalDateTime createTime;
 }

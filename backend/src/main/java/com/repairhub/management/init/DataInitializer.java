@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,7 @@ import com.repairhub.management.vehicle.entity.Vehicle;
 import com.repairhub.management.vehicle.repository.VehicleRepository;
 
 @Component
+@Order(5)
 public class DataInitializer implements ApplicationRunner{
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
@@ -114,9 +116,11 @@ public class DataInitializer implements ApplicationRunner{
         .userId(alice.getUserId())
         .vehicleId(1L)
         .submitTime(LocalDateTime.now())
+        .updateTime(LocalDateTime.now())
         .status(OrderStatus.PENDING)
         .description("默认维修任务")
         .faultType(FaultType.MAINTENANCE)
+        .totalFee(BigDecimal.valueOf(0L))
         .build();
         repairOrderRepository.insert(order);
 

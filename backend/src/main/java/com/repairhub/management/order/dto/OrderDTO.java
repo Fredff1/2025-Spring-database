@@ -47,7 +47,8 @@ public class OrderDTO {
             // .isPaid(false) // Assuming initial state is unpaid
             // .isReviewed(false) // Assuming initial state is not reviewed
             .createTime(order.getSubmitTime())
-            // .updateTime(LocalDateTime.now()) // Assuming update time is now
+            .updateTime(order.getUpdateTime()) // Assuming update time is now 
+            // TODO update time
             .build();
         return dto;
     }

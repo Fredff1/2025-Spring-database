@@ -136,7 +136,7 @@ const fetchData = async () => {
     stats.value = statsRes
 
     // 获取最近订单
-    const ordersRes = await user.getOrders({ page: 1, limit: 5 })
+    const ordersRes = await user.getRepairOrders({ page: 1, limit: 5 })
     recentOrders.value = ordersRes.list
     
   } catch (error) {

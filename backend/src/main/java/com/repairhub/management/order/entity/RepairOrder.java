@@ -22,6 +22,7 @@ public class RepairOrder {
     private Long userId;
     private Long vehicleId;
     private LocalDateTime submitTime;
+    private LocalDateTime updateTime;
     private OrderStatus status;
     private String description;
     private FaultType faultType;
@@ -34,6 +35,7 @@ public class RepairOrder {
                 .userId(userId)
                 .vehicleId(request.getVehicleId())
                 .submitTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
                 .status(OrderStatus.PENDING)
                 .description(request.getDescription())
                 .faultType(request.getFaultType())

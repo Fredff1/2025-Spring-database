@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -34,7 +35,12 @@ public class LaborFeeLogJdbcRepository implements LaborFeeLogRepository{
     
     @Override
     public int insert(LaborFeeLog log){
-        SqlParameterSource params = new BeanPropertySqlParameterSource(log);
+        SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("repairman_id", log.getRepairmanId())
+        .addValue("month", log.getMonth().name())
+        .addValue("total_hours", log.getTotalHours())
+        .addValue("total_income", log.getTotalIncome())
+        .addValue("settle_time", log.getSettleTime());
         Number key = simpleJdbcInsert.executeAndReturnKey(params);
         long laborFeeLogId = key.longValue();
         log.setLaborFeeLogId(laborFeeLogId);

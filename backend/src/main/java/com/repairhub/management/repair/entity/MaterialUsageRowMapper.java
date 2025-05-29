@@ -15,6 +15,7 @@ public class MaterialUsageRowMapper implements RowMapper<MaterialUsage> {
                 .materialName(rs.getString("material_name"))
                 .quantity(rs.getInt("quantity"))
                 .unitPrice(rs.getBigDecimal("unit_price"))
+                .createTime(rs.getTimestamp("create_time").toLocalDateTime())
                 .build();
     }
     
