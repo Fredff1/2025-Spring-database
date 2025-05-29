@@ -1,4 +1,4 @@
-package com.repairhub.management.auth.entity;
+package com.repairhub.management.repairman.entity;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

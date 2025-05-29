@@ -31,7 +31,7 @@
       </el-form>
     </el-card>
 
-    <el-card shadow="hover" class="password-card">
+    <!-- <el-card shadow="hover" class="password-card">
       <template #header>
         <div class="card-header">
           <span>修改密码</span>
@@ -74,14 +74,14 @@
           </el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </el-card> -->
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { customer } from '@/api'
+import { user } from '@/api'
 
 const formRef = ref(null)
 const passwordFormRef = ref(null)
@@ -117,26 +117,6 @@ const validateEmail = (rule, value, callback) => {
   }
 }
 
-const validatePass = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请输入新密码'))
-  } else {
-    if (passwordForm.value.confirmPassword !== '') {
-      passwordFormRef.value?.validateField('confirmPassword')
-    }
-    callback()
-  }
-}
-
-const validatePass2 = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请再次输入密码'))
-  } else if (value !== passwordForm.value.newPassword) {
-    callback(new Error('两次输入密码不一致'))
-  } else {
-    callback()
-  }
-}
 
 const rules = {
   name: [
@@ -151,18 +131,7 @@ const rules = {
   ]
 }
 
-const passwordRules = {
-  oldPassword: [
-    { required: true, message: '请输入原密码', trigger: 'blur' }
-  ],
-  newPassword: [
-    { required: true, validator: validatePass, trigger: 'blur' },
-    { min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
-  ],
-  confirmPassword: [
-    { required: true, validator: validatePass2, trigger: 'blur' }
-  ]
-}
+
 
 // 获取用户信息
 const fetchUserInfo = async () => {
@@ -175,50 +144,8 @@ const fetchUserInfo = async () => {
   }
 }
 
-// 提交表单
-const handleSubmit = async () => {
-  if (!formRef.value) return
-  
-  await formRef.value.validate(async (valid) => {
-    if (valid) {
-      loading.value = true
-      try {
-        await customer.updateInfo(form.value)
-        ElMessage.success('保存成功')
-      } catch (error) {
-        console.error('保存失败:', error)
-        ElMessage.error('保存失败')
-      } finally {
-        loading.value = false
-      }
-    }
-  })
-}
 
-// 修改密码
-const handlePasswordChange = async () => {
-  if (!passwordFormRef.value) return
-  
-  await passwordFormRef.value.validate(async (valid) => {
-    if (valid) {
-      passwordLoading.value = true
-      try {
-        await customer.changePassword(passwordForm.value)
-        ElMessage.success('密码修改成功')
-        passwordForm.value = {
-          oldPassword: '',
-          newPassword: '',
-          confirmPassword: ''
-        }
-      } catch (error) {
-        console.error('密码修改失败:', error)
-        ElMessage.error('密码修改失败')
-      } finally {
-        passwordLoading.value = false
-      }
-    }
-  })
-}
+
 
 onMounted(() => {
   fetchUserInfo()

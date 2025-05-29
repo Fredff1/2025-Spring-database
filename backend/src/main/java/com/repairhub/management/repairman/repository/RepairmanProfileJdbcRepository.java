@@ -1,4 +1,4 @@
-package com.repairhub.management.auth.repository;
+package com.repairhub.management.repairman.repository;
 
 import java.util.List;
 import java.util.Map;
@@ -13,9 +13,9 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
-import com.repairhub.management.auth.entity.RepairmanProfile;
-import com.repairhub.management.auth.entity.RepairmanProfileRowMapper;
 import com.repairhub.management.repair.enums.FaultType;
+import com.repairhub.management.repairman.entity.RepairmanProfile;
+import com.repairhub.management.repairman.entity.RepairmanProfileRowMapper;
 
 
 

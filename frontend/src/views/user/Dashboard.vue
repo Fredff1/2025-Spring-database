@@ -83,7 +83,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Van, Tools, Document } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { order } from '@/api'
+import { user } from '@/api'
 
 const router = useRouter()
 
@@ -117,11 +117,11 @@ const goToOrders = () => {
 const fetchData = async () => {
   try {
     // 获取统计数据
-    const statsRes = await order.getStats()
+    const statsRes = await user.getStats()
     stats.value = statsRes
 
     // 获取最近订单
-    const ordersRes = await order.getList({ page: 1, limit: 5 })
+    const ordersRes = await user.getOrders({ page: 1, limit: 5 })
     recentOrders.value = ordersRes.list
   } catch (error) {
     console.error('获取数据失败:', error)

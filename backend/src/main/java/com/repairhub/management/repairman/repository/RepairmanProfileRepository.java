@@ -1,10 +1,10 @@
-package com.repairhub.management.auth.repository;
+package com.repairhub.management.repairman.repository;
 
 import java.util.List;
 import java.util.Optional;
 
-import com.repairhub.management.auth.entity.RepairmanProfile;
 import com.repairhub.management.repair.enums.FaultType;
+import com.repairhub.management.repairman.entity.RepairmanProfile;
 
 public interface RepairmanProfileRepository {
 

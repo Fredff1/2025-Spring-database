@@ -1,5 +1,6 @@
 package com.repairhub.management.order.repository;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -68,9 +69,14 @@ public class RepairOrderJdbcRepository implements RepairOrderRepository{
     }
 
     @Override
-    public Optional<RepairOrder> findByUserIdAndVehicleId(Long userId, Long vehicleId){
+    public List<RepairOrder> findByUserId(Long userId){
+        String sql = "SELECT * FROM repair_order WHERE user_id = :userId";
+        return jdbc.query(sql, Map.of("userId", userId), mapper);
+    }
+
+    @Override
+    public List<RepairOrder> findByUserIdAndVehicleId(Long userId, Long vehicleId){
         String sql = "SELECT * FROM repair_order WHERE user_id = :userId AND vehicle_id = :vehicleId";
-        return jdbc.query(sql, Map.of("userId", userId, "vehicleId", vehicleId), mapper)
-                   .stream().findFirst();
+        return jdbc.query(sql, Map.of("userId", userId, "vehicleId", vehicleId), mapper);
     }
 }

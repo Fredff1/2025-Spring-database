@@ -153,32 +153,28 @@ const router = createRouter({
     // 维修人员路由
     {
       path: '/repairman',
-      component: RepairmanLayout,
+      component: () => import('@/layouts/RepairmanLayout.vue'),
+      meta: { requiresAuth: true, role: 'REPAIRMAN' },
       children: [
         {
-          path: 'dashboard',
+          path: '',
           name: 'RepairmanDashboard',
-          component: RepairmanDashboard
+          component: () => import('@/views/repairman/Dashboard.vue')
+        },
+        {
+          path: 'assignments',
+          name: 'RepairmanAssignments',
+          component: () => import('@/views/repairman/Assignments.vue')
         },
         {
           path: 'orders',
           name: 'RepairmanOrders',
-          component: RepairmanOrders
-        },
-        {
-          path: 'history',
-          name: 'RepairmanHistory',
-          component: RepairmanHistory
-        },
-        {
-          path: 'income',
-          name: 'RepairmanIncome',
-          component: RepairmanIncome
+          component: () => import('@/views/repairman/Orders.vue')
         },
         {
           path: 'profile',
           name: 'RepairmanProfile',
-          component: RepairmanProfile
+          component: () => import('@/views/repairman/Profile.vue')
         }
       ]
     },

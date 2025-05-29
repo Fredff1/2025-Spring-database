@@ -2,8 +2,8 @@ package com.repairhub.management.order.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.repairhub.management.auth.entity.RepairmanProfile;
 import com.repairhub.management.order.entity.OrderAssignment;
+import com.repairhub.management.repairman.entity.RepairmanProfile;
 
 import lombok.Getter;
 import lombok.Setter;

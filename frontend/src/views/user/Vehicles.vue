@@ -94,7 +94,7 @@
 import { ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { vehicle } from '@/api'
+import { user } from '@/api'
 
 // 车辆列表
 const vehicles = ref([])
@@ -145,7 +145,7 @@ const rules = {
 // 获取车辆列表
 const fetchVehicles = async () => {
   try {
-    const res = await vehicle.getList()
+    const res = await user.getVehicles()
     vehicles.value = res.list
   } catch (error) {
     console.error('获取车辆列表失败:', error)

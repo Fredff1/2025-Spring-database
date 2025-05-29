@@ -3,6 +3,7 @@ package com.repairhub.management.order.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -12,9 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
-import com.repairhub.management.auth.entity.RepairmanProfile;
 import com.repairhub.management.auth.entity.User;
-import com.repairhub.management.auth.service.RepairmanProfileService;
 import com.repairhub.management.order.dto.CreateOrderRequest;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
@@ -22,6 +21,8 @@ import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.event.OrderCreatedEvent;
 import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.order.repository.RepairOrderRepository;
+import com.repairhub.management.repairman.entity.RepairmanProfile;
+import com.repairhub.management.repairman.service.RepairmanProfileService;
 
 import lombok.Getter;
 
@@ -108,5 +109,11 @@ public class OrderService {
                 .actualWorkHour(null)
                 .build();
         return assignment;
+    }
+
+    public List<RepairOrder> getOrders(User user){
+        List<RepairOrder> orders = repairOrderRepository.findByUserId(user.getUserId());
+        orders.sort(Comparator.comparing(RepairOrder::getSubmitTime).reversed());
+        return orders;
     }
 }

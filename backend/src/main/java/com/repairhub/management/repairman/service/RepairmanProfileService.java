@@ -1,4 +1,4 @@
-package com.repairhub.management.auth.service;
+package com.repairhub.management.repairman.service;
 
 import java.util.List;
 
@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
-import com.repairhub.management.auth.entity.RepairmanProfile;
-import com.repairhub.management.auth.repository.RepairmanProfileRepository;
 import com.repairhub.management.auth.repository.UserRepository;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.event.AssignmentCopedEvent;
 import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.repair.enums.FaultType;
+import com.repairhub.management.repairman.entity.RepairmanProfile;
+import com.repairhub.management.repairman.repository.RepairmanProfileRepository;
 
 @Service
 public class RepairmanProfileService {

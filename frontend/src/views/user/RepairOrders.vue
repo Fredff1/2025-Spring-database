@@ -175,7 +175,7 @@
 import { ref, onMounted,  reactive } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { order, vehicle } from '@/api'
+import { user} from '@/api'
 import { getToken } from '@/utils/auth'
 
 // 订单列表
@@ -245,7 +245,7 @@ const getStatusType = (status) => {
 // 获取订单列表
 const fetchOrders = async () => {
   try {
-    const res = await order.getList({
+    const res = await user.getOrders({
       page: currentPage.value,
       limit: pageSize.value
     })
@@ -260,7 +260,7 @@ const fetchOrders = async () => {
 // 获取车辆列表
 const fetchVehicles = async () => {
   try {
-    const res = await vehicle.getList()
+    const res = await user.getVehicles()
     if (Array.isArray(res)) {
       vehicles.value = res
     } else if (res.list) {
@@ -297,14 +297,7 @@ const handleCreate = async () => {
   try {
     await formRef.value.validate()
 
-    const response = await fetch('/api/orders', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getToken()}`
-      },
-      body: JSON.stringify(form)
-    })
+    const response = await user.createOrder(form)
 
     if (response.ok) {
       const data = await response.json()

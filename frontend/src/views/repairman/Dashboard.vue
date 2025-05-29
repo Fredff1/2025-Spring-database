@@ -75,6 +75,37 @@
     <!-- 工作区域 -->
     <div class="work-area">
       <el-row :gutter="20">
+        <!-- 任务分配 -->
+        <el-col :span="16">
+          <el-card shadow="hover" class="work-card">
+            <template #header>
+              <div class="card-header">
+                <span>任务分配</span>
+                <el-button type="primary" link @click="handleViewAllAssignments">查看全部</el-button>
+              </div>
+            </template>
+            <el-table :data="assignments" style="width: 100%">
+              <el-table-column prop="orderNumber" label="订单号" width="180" />
+              <el-table-column prop="plateNumber" label="车牌号" width="120" />
+              <el-table-column prop="repairType" label="维修类型" width="120">
+                <template #default="{ row }">
+                  <el-tag :type="getRepairTypeTag(row.repairType)">
+                    {{ getRepairTypeText(row.repairType) }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="problem" label="问题描述" min-width="200" show-overflow-tooltip />
+              <el-table-column prop="assignmentTime" label="分配时间" width="180" />
+              <el-table-column label="操作" width="200" fixed="right">
+                <template #default="{ row }">
+                  <el-button type="success" link @click="handleAcceptAssignment(row)">接受</el-button>
+                  <el-button type="danger" link @click="handleRejectAssignment(row)">拒绝</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+        </el-col>
+
         <!-- 待处理订单 -->
         <el-col :span="16">
           <el-card shadow="hover" class="work-card">
@@ -155,9 +186,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted ,watch} from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowUp } from '@element-plus/icons-vue'
 import { repairman } from '@/api'
 
@@ -185,6 +216,9 @@ const statistics = ref({
   rating: 0
 })
 
+// 任务分配列表
+const assignments = ref([])
+
 // 获取维修类型标签
 const getRepairTypeTag = (type) => {
   const map = {
@@ -208,14 +242,16 @@ const getRepairTypeText = (type) => {
 // 获取数据
 const fetchData = async () => {
   try {
-    const [overviewRes, pendingRes, statisticsRes] = await Promise.all([
+    const [overviewRes, pendingRes, statisticsRes, assignmentsRes] = await Promise.all([
       repairman.getOverview(),
       repairman.getPendingOrders(),
-      repairman.getStatistics({ type: statisticsType.value })
+      repairman.getStatistics({ type: statisticsType.value }),
+      repairman.getAssignments()
     ])
     overview.value = overviewRes
     pendingOrders.value = pendingRes
     statistics.value = statisticsRes
+    assignments.value = assignmentsRes
   } catch (error) {
     console.error('获取数据失败:', error)
     ElMessage.error('获取数据失败')
@@ -232,6 +268,49 @@ const handleStartRepair = async (row) => {
     console.error('操作失败:', error)
     ElMessage.error('操作失败')
   }
+}
+
+// 接受任务分配
+const handleAcceptAssignment = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定接受此任务分配吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    await repairman.acceptAssignment(row.assignmentId)
+    ElMessage.success('已接受任务')
+    fetchData()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('操作失败:', error)
+      ElMessage.error('操作失败')
+    }
+  }
+}
+
+// 拒绝任务分配
+const handleRejectAssignment = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定拒绝此任务分配吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    await repairman.rejectAssignment(row.assignmentId)
+    ElMessage.success('已拒绝任务')
+    fetchData()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('操作失败:', error)
+      ElMessage.error('操作失败')
+    }
+  }
+}
+
+// 查看全部任务分配
+const handleViewAllAssignments = () => {
+  router.push('/repairman/assignments')
 }
 
 // 查看全部订单

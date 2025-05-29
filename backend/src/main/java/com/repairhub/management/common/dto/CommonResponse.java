@@ -14,7 +14,7 @@ public class CommonResponse<T> {
     private String message;
     private T data;
 
-    public CommonResponse<T> toResponse(Integer code,String message,T data){
+    public static<T> CommonResponse<T> toResponse(Integer code,String message,T data){
         CommonResponse<T> commonResponse = new CommonResponse<>();
         commonResponse.setCode(code);
         commonResponse.setData(data);
