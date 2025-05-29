@@ -5,7 +5,10 @@ import java.time.LocalDateTime;
 
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.OrderStatus;
+import com.repairhub.management.repair.enums.FaultType;
 import com.repairhub.management.repair.enums.RepairType;
+import com.repairhub.management.vehicle.entity.Vehicle;
+import com.repairhub.management.vehicle.repository.VehicleRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +24,7 @@ public class OrderDTO {
     private String orderNo;
     private Long vehicleId;
     private String vehiclePlate;
-    private RepairType repairType;
+    private FaultType repairType;
     private String problem;
     private OrderStatus status;
     private BigDecimal amount;
@@ -30,21 +33,23 @@ public class OrderDTO {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
-    public static OrderDTO from(RepairOrder order) {
-        return OrderDTO.builder()
-                .id(order.getOrderId())
-                .orderNo("ORD" + order.getOrderId()) // Example order number generation
-                .vehicleId(order.getVehicleId())
-                .vehiclePlate("Plate" + order.getVehicleId()) // Example vehicle plate generation
-                .repairType(order.getFaultType() != null ? RepairType.valueOf(order.getFaultType().name()) : null)
-                .problem(order.getDescription())
-                .status(order.getStatus())
-                .amount(order.getTotalFee())
-                .isPaid(false) // Assuming initial state is unpaid
-                .isReviewed(false) // Assuming initial state is not reviewed
-                .createTime(order.getSubmitTime())
-                .updateTime(LocalDateTime.now()) // Assuming update time is now
-                .build();
+    public static OrderDTO from(RepairOrder order,VehicleRepository vehicleRepository) {
+        Vehicle vehicle = vehicleRepository.findById(order.getVehicleId()).get();
+        var dto =OrderDTO.builder()
+            .id(order.getOrderId())
+            .orderNo("ORD " + order.getOrderId()) // Example order number generation
+            .vehicleId(order.getVehicleId())
+            .vehiclePlate(vehicle.getLicensePlate()) // Example vehicle plate generation
+            .repairType(order.getFaultType())
+            .problem(order.getDescription())
+            .status(order.getStatus())
+            .amount(order.getTotalFee())
+            // .isPaid(false) // Assuming initial state is unpaid
+            // .isReviewed(false) // Assuming initial state is not reviewed
+            .createTime(order.getSubmitTime())
+            // .updateTime(LocalDateTime.now()) // Assuming update time is now
+            .build();
+        return dto;
     }
 
     public static OrderDTO toDefault(){
@@ -54,7 +59,7 @@ public class OrderDTO {
         .vehicleId(1L)
         .status(OrderStatus.PENDING)
         .problem("no")
-        .repairType(RepairType.ACCIDENT)
+        .repairType(FaultType.MAINTENANCE)
         .vehiclePlate("default")
         .amount(BigDecimal.valueOf(10))
         .isPaid(false)

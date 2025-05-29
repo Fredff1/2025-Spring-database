@@ -33,13 +33,13 @@
             <el-icon><tools /></el-icon>
             <span>维修订单</span>
           </el-menu-item>
-          <el-menu-item index="/repairman/history">
+          <el-menu-item index="/repairman/assignments">
             <el-icon><document /></el-icon>
-            <span>维修历史</span>
+            <span>待处理任务</span>
           </el-menu-item>
-          <el-menu-item index="/repairman/income">
+          <el-menu-item index="/repairman/profile">
             <el-icon><money /></el-icon>
-            <span>收入统计</span>
+            <span>概览</span>
           </el-menu-item>
         </el-menu>
       </aside>
@@ -63,6 +63,8 @@ import {
   ArrowDown
 } from '@element-plus/icons-vue'
 
+import { logout } from '@/utils/auth'
+
 const router = useRouter()
 const route = useRoute()
 const userStore = useAuthStore()
@@ -75,7 +77,7 @@ const goToProfile = () => {
 }
 
 const handleLogout = async () => {
-  await userStore.logout()
+  await logout()
   router.push('/login')
 }
 </script>

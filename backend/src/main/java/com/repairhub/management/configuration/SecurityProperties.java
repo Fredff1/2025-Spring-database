@@ -14,5 +14,5 @@ public class SecurityProperties {
     private List<String> whitelist;
     private List<String> adminAllowedList;
     private List<String> userAllowedList;
-
+    private List<String> repairmanAllowedList;
 }

@@ -35,17 +35,15 @@ public class VehicleController {
         .id(1L)
         .createTime(LocalDateTime.now())
         .model("model-x")
-        .plateNumber("plate-123456")
-        .updateTime(LocalDateTime.now())
+        .licensePlate("plate-123456")
         .brand("HAH")
-        .year(2024)
         .vin("vin-default")
         .build();
         List<VehicleDTO> resultList = new ArrayList<>();
         resultList.add(vehicleDTO);
         PageResponse<VehicleDTO> pageResponse = PageResponse.<VehicleDTO>builder()
         .list(resultList)
-        .total(10L).build();
+        .total(10).build();
         return new ResponseEntity<>(pageResponse,HttpStatus.OK);
     }
     

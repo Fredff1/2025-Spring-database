@@ -1,5 +1,6 @@
 package com.repairhub.management.repair.repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -78,6 +79,20 @@ public class RepairRecordJdbcRepository implements RepairRecordRepository {
     public List<RepairRecord> findByRepairmanId(Long repairmanId) {
         String sql = "SELECT * FROM repair_record WHERE repairman_id = :repairmanId";
         return jdbcTemplate.query(sql, Map.of("repairmanId", repairmanId), mapper);
+    }
+
+    @Override
+    public int countByUserId(Long userId) {
+        String sql = """
+                    SELECT COUNT(*) FROM repair_record r 
+                    JOIN repair_order o ON r.order_id = o.order_id 
+                    WHERE o.user_id = :userId
+                    """;
+        return jdbcTemplate.queryForObject(
+            sql,
+            Collections.singletonMap("userId", userId),
+            Integer.class
+        );
     }
     
 }

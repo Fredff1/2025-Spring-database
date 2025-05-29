@@ -24,4 +24,6 @@ public interface VehicleRepository {
     List<Vehicle> findByModel(String model);
     /** 按车牌号查询 */
     Optional<Vehicle> findByLicensePlate(String licensePlate);
+
+    int countByUserId(Long userId);
 }

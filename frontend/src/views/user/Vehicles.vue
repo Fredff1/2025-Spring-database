@@ -11,17 +11,17 @@
     <!-- 车辆列表 -->
     <el-card shadow="hover">
       <el-table :data="vehicles" style="width: 100%">
-        <el-table-column prop="plateNumber" label="车牌号" width="120" />
+        <el-table-column prop="licensePlate" label="车牌号" width="120" />
         <el-table-column prop="brand" label="品牌" width="120" />
         <el-table-column prop="model" label="型号" width="120" />
-        <el-table-column prop="year" label="年份" width="100" />
+        <!-- <el-table-column prop="year" label="年份" width="100" />
         <el-table-column prop="color" label="颜色" width="100" />
         <el-table-column prop="mileage" label="里程数" width="120">
           <template #default="{ row }">
             {{ row.mileage }} km
           </template>
         </el-table-column>
-        <el-table-column prop="vin" label="VIN码" width="180" />
+        <el-table-column prop="vin" label="VIN码" width="180" /> -->
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -43,8 +43,8 @@
         :rules="rules"
         label-width="100px"
       >
-        <el-form-item label="车牌号" prop="plateNumber">
-          <el-input v-model="form.plateNumber" placeholder="请输入车牌号" />
+        <el-form-item label="车牌号" prop="licensePlate">
+          <el-input v-model="form.licensePlate" placeholder="请输入车牌号" />
         </el-form-item>
         <el-form-item label="品牌" prop="brand">
           <el-input v-model="form.brand" placeholder="请输入品牌" />
@@ -52,18 +52,18 @@
         <el-form-item label="型号" prop="model">
           <el-input v-model="form.model" placeholder="请输入型号" />
         </el-form-item>
-        <el-form-item label="年份" prop="year">
+        <!-- <el-form-item label="年份" prop="year">
           <el-input-number v-model="form.year" :min="1900" :max="new Date().getFullYear()" />
         </el-form-item>
         <el-form-item label="颜色" prop="color">
           <el-input v-model="form.color" placeholder="请输入颜色" />
-        </el-form-item>
-        <el-form-item label="里程数" prop="mileage">
+        </el-form-item> -->
+        <!-- <el-form-item label="里程数" prop="mileage">
           <el-input-number v-model="form.mileage" :min="0" :step="1000" />
-        </el-form-item>
-        <el-form-item label="VIN码" prop="vin">
+        </el-form-item> -->
+        <!-- <el-form-item label="VIN码" prop="vin">
           <el-input v-model="form.vin" placeholder="请输入VIN码" />
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -108,7 +108,7 @@ const currentVehicle = ref(null)
 // 表单
 const formRef = ref(null)
 const form = ref({
-  plateNumber: '',
+  licensePlate: '',
   brand: '',
   model: '',
   year: new Date().getFullYear(),
@@ -119,7 +119,7 @@ const form = ref({
 
 // 表单验证规则
 const rules = {
-  plateNumber: [
+  licensePlate: [
     { required: true, message: '请输入车牌号', trigger: 'blur' }
   ],
   brand: [
@@ -128,18 +128,18 @@ const rules = {
   model: [
     { required: true, message: '请输入型号', trigger: 'blur' }
   ],
-  year: [
-    { required: true, message: '请选择年份', trigger: 'change' }
-  ],
-  color: [
-    { required: true, message: '请输入颜色', trigger: 'blur' }
-  ],
-  mileage: [
-    { required: true, message: '请输入里程数', trigger: 'change' }
-  ],
-  vin: [
-    { required: true, message: '请输入VIN码', trigger: 'blur' }
-  ]
+  // year: [
+  //   { required: true, message: '请选择年份', trigger: 'change' }
+  // ],
+  // color: [
+  //   { required: true, message: '请输入颜色', trigger: 'blur' }
+  // ],
+  // mileage: [
+  //   { required: true, message: '请输入里程数', trigger: 'change' }
+  // ],
+  // vin: [
+  //   { required: true, message: '请输入VIN码', trigger: 'blur' }
+  // ]
 }
 
 // 获取车辆列表
@@ -147,6 +147,7 @@ const fetchVehicles = async () => {
   try {
     const res = await user.getVehicles()
     vehicles.value = res.list
+    console.log(res)
   } catch (error) {
     console.error('获取车辆列表失败:', error)
     ElMessage.error('获取车辆列表失败')
@@ -157,7 +158,7 @@ const fetchVehicles = async () => {
 const showAddDialog = () => {
   isEdit.value = false
   form.value = {
-    plateNumber: '',
+    licensePlate: '',
     brand: '',
     model: '',
     year: new Date().getFullYear(),

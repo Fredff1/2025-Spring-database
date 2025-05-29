@@ -26,14 +26,7 @@ http.interceptors.response.use(
   response => {
     const res = response.data;
     
-    // 如果响应成功，直接返回数据
-    if (response.status === 200) {
-      return res.data || res;
-    }
-    
-    // 如果响应失败，显示错误信息
-    ElMessage.error(res.message || '请求失败');
-    return Promise.reject(new Error(res.message || '请求失败'));
+    return res.data || res;
   },
   error => {
     console.error('Response error:', error);

@@ -12,5 +12,5 @@ public interface RepairOrderRepository {
     public Optional<RepairOrder> findById(Long orderId);
     public List<RepairOrder> findByUserId(Long userId);
     public List<RepairOrder> findByUserIdAndVehicleId(Long userId, Long vehicleId);
-
+    public int countByUserId(Long userId);
 }

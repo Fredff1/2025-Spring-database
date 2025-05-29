@@ -39,13 +39,7 @@ public class User implements UserDetails{
     private List<RepairOrder> repairOrders;
     private List<RepairRecord> repairRecords;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_" + role.name())
-        );
-    }
-
+   
     @Override
     public String getPassword() {
         return password;
@@ -75,5 +69,11 @@ public class User implements UserDetails{
     @Override
     public boolean isEnabled() {
         return status == UserStatus.ACTIVE;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // 直接把枚举 UserRole 当作 GrantedAuthority
+        return Collections.singletonList(role);
     }
 }

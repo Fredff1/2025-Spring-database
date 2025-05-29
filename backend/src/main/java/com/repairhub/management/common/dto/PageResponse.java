@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PageResponse<T> {
     private List<T> list;
-    private Long total;
+    private int total;
 }

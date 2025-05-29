@@ -1,5 +1,6 @@
 package com.repairhub.management.order.repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -78,5 +79,15 @@ public class RepairOrderJdbcRepository implements RepairOrderRepository{
     public List<RepairOrder> findByUserIdAndVehicleId(Long userId, Long vehicleId){
         String sql = "SELECT * FROM repair_order WHERE user_id = :userId AND vehicle_id = :vehicleId";
         return jdbc.query(sql, Map.of("userId", userId, "vehicleId", vehicleId), mapper);
+    }
+
+    @Override
+    public int countByUserId(Long userId){
+        String sql = "SELECT COUNT(*) FROM repair_order WHERE user_id = :userId";
+        return jdbc.queryForObject(
+            sql,
+            Collections.singletonMap("userId", userId),
+            Integer.class
+        );
     }
 }

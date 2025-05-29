@@ -91,7 +91,7 @@
           </div>
         </el-card>
 
-        <el-card shadow="hover" class="password-card">
+        <!-- <el-card shadow="hover" class="password-card">
           <template #header>
             <div class="card-header">
               <span>修改密码</span>
@@ -133,7 +133,7 @@
               </el-button>
             </el-form-item>
           </el-form>
-        </el-card>
+        </el-card> -->
       </el-col>
     </el-row>
   </div>

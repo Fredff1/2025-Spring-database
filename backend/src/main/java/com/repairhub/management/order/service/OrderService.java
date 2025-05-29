@@ -15,6 +15,7 @@ import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.order.dto.CreateOrderRequest;
+import com.repairhub.management.order.dto.OrderDTO;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.OrderStatus;
@@ -23,6 +24,7 @@ import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.order.repository.RepairOrderRepository;
 import com.repairhub.management.repairman.entity.RepairmanProfile;
 import com.repairhub.management.repairman.service.RepairmanProfileService;
+import com.repairhub.management.vehicle.repository.VehicleRepository;
 
 import lombok.Getter;
 
@@ -34,15 +36,18 @@ public class OrderService {
     private final OrderAssignmentRepository orderAssignmentRepository;
     private final RepairmanProfileService repairmanProfileService;
     private final ApplicationEventPublisher eventPublisher;
+    private final VehicleRepository vehicleRepository;
 
     public OrderService(
         RepairOrderRepository repairOrderRepository,
         OrderAssignmentRepository orderAssignmentRepository,
         RepairmanProfileService repairmanProfileService,
+        VehicleRepository vehicleRepository,
         ApplicationEventPublisher eventPublisher) {
         this.repairOrderRepository = repairOrderRepository;
         this.orderAssignmentRepository = orderAssignmentRepository;
         this.repairmanProfileService = repairmanProfileService;
+        this.vehicleRepository = vehicleRepository;
         this.eventPublisher = eventPublisher;
     }
 
@@ -82,7 +87,9 @@ public class OrderService {
 
     }
 
-    
+    public OrderDTO toDTO(RepairOrder order){
+        return OrderDTO.from(order, vehicleRepository);
+    }
 
     public OrderAssignment assignOrder(RepairOrder order){
         //TODO: 实现订单分配逻辑
@@ -98,6 +105,9 @@ public class OrderService {
         }
 
         List<RepairmanProfile> profiles = repairmanProfileService.findAllWithFilter(order.getFaultType(), filter);
+        if(profiles.isEmpty()){
+            profiles = repairmanProfileService.findAllWithFilter(null, List.of());
+        }
         Random random = new Random();
         int index = random.nextInt(profiles.size());
         RepairmanProfile selectedProfile = profiles.get(index);
@@ -108,6 +118,7 @@ public class OrderService {
                 .accepted(null)
                 .actualWorkHour(null)
                 .build();
+        orderAssignmentRepository.insert(assignment);
         return assignment;
     }
 

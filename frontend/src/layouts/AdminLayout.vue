@@ -87,6 +87,7 @@ import {
   Setting,
   ArrowDown
 } from '@element-plus/icons-vue'
+import { logout } from '@/utils/auth'
 
 const router = useRouter()
 const route = useRoute()
@@ -100,7 +101,7 @@ const goToProfile = () => {
 }
 
 const handleLogout = async () => {
-  await userStore.logout()
+  await logout()
   router.push('/login')
 }
 </script>

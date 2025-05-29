@@ -69,7 +69,7 @@ CREATE TABLE `repair_order` (
   PRIMARY KEY(order_id),
   INDEX idx_order_user(user_id),
   INDEX idx_order_vehicle(vehicle_id),
-  CHECK (fault_type IN ('ENGINE','ELECTRICAL','BRAKE','TRANSMISSION','OTHER')),
+  CHECK (fault_type IN ('MAINTENANCE','REPAIR','PAINT','TIRE','OTHER')),
   CONSTRAINT fk_order_user    FOREIGN KEY(user_id)    REFERENCES users(user_id),
   CONSTRAINT fk_order_vehicle FOREIGN KEY(vehicle_id) REFERENCES vehicle(vehicle_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

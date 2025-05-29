@@ -11,22 +11,26 @@
     <!-- 订单列表 -->
     <el-card shadow="hover">
       <el-table :data="orders" style="width: 100%">
-        <el-table-column prop="orderNo" label="订单号" width="180" />
-        <el-table-column prop="vehiclePlate" label="车牌号" width="120" />
-        <el-table-column prop="repairType" label="维修类型" width="120" />
-        <el-table-column prop="problem" label="问题描述" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="orderNo" label="订单号" width="120" />
+        <el-table-column prop="vehiclePlate" label="车牌号" width="100" />
+        <el-table-column label="维修类型" width="150">
+        <template #default="{ row }">
+          {{ getRepairTypeText(row.repairType) }}
+        </template>
+      </el-table-column>
+        <el-table-column prop="problem" label="问题描述" min-width="120" show-overflow-tooltip />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">{{ row.status }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180" />
-        <el-table-column prop="amount" label="金额" width="120">
+        <el-table-column prop="createTime" label="创建时间" width="140" />
+        <el-table-column prop="amount" label="金额" width="100">
           <template #default="{ row }">
             ¥{{ row.amount?.toFixed(2) || '-' }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <el-button
               v-if="row.status === '待处理'"
@@ -82,12 +86,12 @@
         :rules="rules"
         label-width="100px"
       >
-        <el-form-item label="选择车辆" prop="vehicleId">
+        <el-form-item label="选择车辆" prop="vehiclePlate">
           <el-select v-model="form.vehicleId" placeholder="请选择车辆">
             <el-option
               v-for="item in vehicles"
-              :key="item.id"
-              :label="item.plateNumber"
+              :key="item.licensePlate"
+              :label="item.licensePlate"
               :value="item.id"
             />
           </el-select>
@@ -249,6 +253,7 @@ const fetchOrders = async () => {
       page: currentPage.value,
       limit: pageSize.value
     })
+    console.log(res)
     orders.value = res.list
     total.value = res.total
   } catch (error) {
@@ -275,6 +280,17 @@ const fetchVehicles = async () => {
   }
 }
 
+const getRepairTypeText = (type) => {
+  const map = {
+    MAINTENANCE: '常规保养',
+    REPAIR: '故障维修',
+    PAINT: '钣金喷漆',
+    TIRE: '轮胎更换',
+    OTHER: '其他'
+  }
+  return map[type] || type
+}
+
 // 显示创建订单对话框
 const showCreateDialog = async () => {
   // 重置表单
@@ -299,15 +315,10 @@ const handleCreate = async () => {
 
     const response = await user.createOrder(form)
 
-    if (response.ok) {
-      const data = await response.json()
-      ElMessage.success('创建成功')
-      createDialogVisible.value = false
-      fetchOrders()
-    } else {
-      const error = await response.json()
-      ElMessage.error(error.message || '创建失败')
-    }
+    ElMessage.success('创建成功')
+    createDialogVisible.value = false
+    fetchOrders()
+    
   } catch (error) {
     console.error('创建失败:', error)
     ElMessage.error('创建失败')

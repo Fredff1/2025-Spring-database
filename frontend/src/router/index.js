@@ -16,6 +16,7 @@ import Register from '@/views/Register.vue';
 import UserDashboard from '@/views/user/Dashboard.vue';
 import UserVehicles from '@/views/user/Vehicles.vue';
 import UserRepairOrders from '@/views/user/RepairOrders.vue';
+import UserRepairHistory from '@/views/user/RepairHistory.vue';
 import UserProfile from '@/views/user/Profile.vue';
 
 // 管理员页面
@@ -36,6 +37,7 @@ import RepairmanOrders from '@/views/repairman/Orders.vue';
 import RepairmanHistory from '@/views/repairman/History.vue';
 import RepairmanIncome from '@/views/repairman/Income.vue';
 import RepairmanProfile from '@/views/repairman/Profile.vue';
+import RepairmanAssignment from '@/views/repairman/Assignments.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -85,6 +87,11 @@ const router = createRouter({
           path: 'repair-orders',
           name: 'UserRepairOrders',
           component: UserRepairOrders
+        },
+        {
+          path: 'repair-history',
+          name: 'UserRepairHistory',
+          component: UserRepairHistory
         },
         {
           path: 'profile',
@@ -157,24 +164,24 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'REPAIRMAN' },
       children: [
         {
-          path: '',
+          path: 'dashboard',
           name: 'RepairmanDashboard',
-          component: () => import('@/views/repairman/Dashboard.vue')
+          component: RepairmanDashboard
         },
         {
           path: 'assignments',
           name: 'RepairmanAssignments',
-          component: () => import('@/views/repairman/Assignments.vue')
+          component:RepairmanAssignment
         },
         {
           path: 'orders',
           name: 'RepairmanOrders',
-          component: () => import('@/views/repairman/Orders.vue')
+          component: RepairmanOrders
         },
         {
           path: 'profile',
           name: 'RepairmanProfile',
-          component: () => import('@/views/repairman/Profile.vue')
+          component: RepairmanProfile
         }
       ]
     },

@@ -13,8 +13,10 @@ import com.repairhub.management.auth.domain.enums.UserRole;
 import com.repairhub.management.auth.domain.enums.UserStatus;
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.repository.UserRepository;
+import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.OrderStatus;
+import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.order.repository.RepairOrderRepository;
 import com.repairhub.management.repair.enums.FaultType;
 import com.repairhub.management.repair.enums.RepairType;
@@ -29,6 +31,7 @@ public class DataInitializer implements ApplicationRunner{
     private final UserRepository userRepository;
     private final RepairmanProfileRepository repairmanProfileRepository;
     private final RepairOrderRepository repairOrderRepository;
+    private final OrderAssignmentRepository orderAssignmentRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(
@@ -36,11 +39,13 @@ public class DataInitializer implements ApplicationRunner{
         RepairmanProfileRepository repairmanProfileRepository,
         VehicleRepository vehicleRepository,
         RepairOrderRepository repairOrderRepository,
+        OrderAssignmentRepository orderAssignmentRepository,
         PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.repairmanProfileRepository = repairmanProfileRepository;
         this.vehicleRepository = vehicleRepository;
         this.repairOrderRepository = repairOrderRepository;
+        this.orderAssignmentRepository = orderAssignmentRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -113,6 +118,16 @@ public class DataInitializer implements ApplicationRunner{
         .description("默认维修任务")
         .faultType(FaultType.MAINTENANCE)
         .build();
-        
+        repairOrderRepository.insert(order);
+
+        OrderAssignment assignment = OrderAssignment.builder()
+        .orderId(order.getOrderId())
+        .repairmanId(repairman.getUserId())
+        .assignmentTime(LocalDateTime.now())
+        .accepted(false)
+        .build();
+        orderAssignmentRepository.insert(assignment);
+
     }
+    
 }

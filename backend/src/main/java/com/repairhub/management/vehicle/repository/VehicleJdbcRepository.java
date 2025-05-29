@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.repairhub.management.vehicle.entity.Vehicle;
 import com.repairhub.management.vehicle.entity.VehicleRowMapper;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -98,5 +99,15 @@ public class VehicleJdbcRepository implements VehicleRepository {
         String sql = "SELECT * FROM vehicle WHERE license_plate = :licensePlate";
         return jdbc.query(sql, Map.of("licensePlate", licensePlate), mapper)
                    .stream().findFirst();
+    }
+
+    @Override
+    public int countByUserId(Long userId){
+        String sql = "SELECT COUNT(*) FROM vehicle WHERE owner_id = :userId";
+        return jdbc.queryForObject(
+            sql,
+            Collections.singletonMap("userId", userId),
+            Integer.class
+        );
     }
 }

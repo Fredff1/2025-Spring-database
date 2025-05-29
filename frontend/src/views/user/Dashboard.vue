@@ -10,7 +10,7 @@
             <template #header>
               <div class="card-header">
                 <span>我的车辆</span>
-                <el-icon><van /></el-icon>
+                <el-icon><Van /></el-icon>
               </div>
             </template>
             <div class="card-content">
@@ -24,7 +24,7 @@
             <template #header>
               <div class="card-header">
                 <span>维修订单</span>
-                <el-icon><tools /></el-icon>
+                <el-icon><Tools /></el-icon>
               </div>
             </template>
             <div class="card-content">
@@ -38,7 +38,7 @@
             <template #header>
               <div class="card-header">
                 <span>维修历史</span>
-                <el-icon><document /></el-icon>
+                <el-icon><Document /></el-icon>
               </div>
             </template>
             <div class="card-content">
@@ -61,7 +61,11 @@
       <el-table :data="recentOrders" style="width: 100%">
         <el-table-column prop="orderNo" label="订单号" width="180" />
         <el-table-column prop="vehiclePlate" label="车牌号" width="120" />
-        <el-table-column prop="repairType" label="维修类型" width="120" />
+        <el-table-column label="维修类型" width="120">
+          <template #default="{ row }">
+            {{ getRepairTypeText(row.repairType) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">{{ row.status }}</el-tag>
@@ -69,9 +73,9 @@
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="180" />
         <el-table-column prop="amount" label="金额" width="120">
-          <template #default="{ row }">
+          <!-- <template #default="{ row }">
             ¥{{ row.amount.toFixed(2) }}
-          </template>
+          </template> -->
         </el-table-column>
       </el-table>
     </el-card>
@@ -113,6 +117,17 @@ const goToOrders = () => {
   router.push('/user/repair-orders')
 }
 
+const getRepairTypeText = (type) => {
+  const map = {
+    MAINTENANCE: '常规保养',
+    REPAIR: '故障维修',
+    PAINT: '钣金喷漆',
+    TIRE: '轮胎更换',
+    OTHER: '其他'
+  }
+  return map[type] || type
+}
+
 // 获取数据
 const fetchData = async () => {
   try {
@@ -123,6 +138,7 @@ const fetchData = async () => {
     // 获取最近订单
     const ordersRes = await user.getOrders({ page: 1, limit: 5 })
     recentOrders.value = ordersRes.list
+    
   } catch (error) {
     console.error('获取数据失败:', error)
     ElMessage.error('获取数据失败')
@@ -151,7 +167,7 @@ onMounted(() => {
 }
 
 .stat-card {
-  height: 160px;
+  height: 240px;
 }
 
 .card-header {

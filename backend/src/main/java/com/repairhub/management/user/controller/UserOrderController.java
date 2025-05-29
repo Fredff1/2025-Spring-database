@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.common.dto.CommonResponse;
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.dto.CreateOrderRequest;
 import com.repairhub.management.order.dto.OrderDTO;
 import com.repairhub.management.order.entity.RepairOrder;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class UserOrderController {
 
     private final OrderService orderService;
+    
 
     public UserOrderController(
         OrderService orderService
@@ -38,15 +40,16 @@ public class UserOrderController {
     
 
     @GetMapping()
-    public ResponseEntity<List<OrderDTO>> getOrders(
+    public ResponseEntity<PageResponse<OrderDTO>> getOrders(
         @RequestParam(defaultValue = "1")   int page,
         @RequestParam(defaultValue = "5")   int limit,
         @AuthenticationPrincipal User user
     ) {
         List<RepairOrder> orders = orderService.getOrders(user);
         var pagedOrders = PageUtils.paginate(orders, page, limit);
-        List<OrderDTO> dtos = pagedOrders.stream().map(order -> OrderDTO.from(order)).collect(Collectors.toList());
-        return new ResponseEntity<>(dtos,HttpStatus.OK);
+        List<OrderDTO> dtos = pagedOrders.stream().map(order -> orderService.toDTO(order)).collect(Collectors.toList());
+        PageResponse<OrderDTO> resp = new PageResponse<OrderDTO>(dtos, orders.size());
+        return new ResponseEntity<>(resp,HttpStatus.OK);
     }
 
     @PostMapping()

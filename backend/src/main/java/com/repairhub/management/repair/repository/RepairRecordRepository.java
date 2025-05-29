@@ -17,4 +17,7 @@ public interface RepairRecordRepository {
     public List<RepairRecord> findByRepairOrderId(Long repairOrderId);
 
     public List<RepairRecord> findByRepairmanId(Long repairmanId);
-}
+
+    public int countByUserId(Long userId);
+}   
+

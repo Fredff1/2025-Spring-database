@@ -44,7 +44,7 @@ public class OrderController {
         resultList.add(order);
         PageResponse<OrderDTO> pageResponse = PageResponse.<OrderDTO>builder()
         .list(resultList)
-        .total(10L).build();
+        .total(10).build();
         return new ResponseEntity<>(pageResponse,HttpStatus.OK);
     }
     
@@ -57,7 +57,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderDTO> create(@RequestBody CreateOrderRequest request,@AuthenticationPrincipal User user){
         var order = orderService.createOrder(user, request);
-        OrderDTO orderDTO = OrderDTO.from(order);
+        OrderDTO orderDTO = null;
         return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
     }
     

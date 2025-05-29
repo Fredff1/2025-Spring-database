@@ -1,7 +1,14 @@
 package com.repairhub.management.auth.domain.enums;
 
-public enum UserRole {
+import org.springframework.security.core.GrantedAuthority;
+
+public enum UserRole implements GrantedAuthority{
     CUSTOMER,
     REPAIRMAN,
-    ADMIN
+    ADMIN;
+
+    @Override
+    public String getAuthority() {
+        return "ROLE_" + name();
+    }
 }

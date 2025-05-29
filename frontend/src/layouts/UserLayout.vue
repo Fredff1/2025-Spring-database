@@ -37,10 +37,10 @@
             <el-icon><tools /></el-icon>
             <span>维修订单</span>
           </el-menu-item>
-          <!-- <el-menu-item index="/user/repair-history">
+          <el-menu-item index="/user/repair-history">
             <el-icon><document /></el-icon>
-            <span>维修历史</span>
-          </el-menu-item> -->
+            <span>维修记录</span>
+          </el-menu-item>
         </el-menu>
       </aside>
       
@@ -56,6 +56,7 @@ import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { HomeFilled, Van, Tools, Document, ArrowDown } from '@element-plus/icons-vue'
+import { logout } from '@/utils/auth'
 
 const router = useRouter()
 const route = useRoute()
@@ -69,7 +70,7 @@ const goToProfile = () => {
 }
 
 const handleLogout = async () => {
-  await userStore.logout()
+  await logout()
   router.push('/login')
 }
 </script>
