@@ -25,7 +25,10 @@ import com.repairhub.management.repair.repository.MaterialUsageRepository;
 import com.repairhub.management.repair.repository.RepairFeedbackRepository;
 import com.repairhub.management.repair.repository.RepairRecordRepository;
 
+import lombok.Getter;
+
 @Service
+@Getter
 public class RepairService {
 
     private final UserRepository userRepository;
@@ -106,6 +109,11 @@ public class RepairService {
     public List<RepairFeedback> getRepairFeedbacks(Long orderId){
         List<RepairFeedback> feedbacks = feedbackRepository.findByRepairOrderId(orderId);
         return feedbacks;
+    }
+
+    public List<MaterialUsage> getMaterialUsages(Long orderId){
+        List<MaterialUsage> materialUsages = materialUsageRepository.findByRepairOrderId(orderId);
+        return materialUsages;
     }
 
     public RepairRecordDTO convertRecordToDTO(RepairRecord record){

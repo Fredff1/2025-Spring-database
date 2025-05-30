@@ -4,38 +4,6 @@
       <h2 class="page-title">任务分配</h2>
     </div>
 
-    <!-- 搜索栏 -->
-    <el-card shadow="hover" class="search-card">
-      <el-form :inline="true" :model="searchForm">
-        <el-form-item label="订单号">
-          <el-input v-model="searchForm.orderNumber" placeholder="请输入订单号" />
-        </el-form-item>
-        <el-form-item label="车牌号">
-          <el-input v-model="searchForm.plateNumber" placeholder="请输入车牌号" />
-        </el-form-item>
-        <el-form-item label="维修类型">
-          <el-select v-model="searchForm.repairType" placeholder="请选择维修类型">
-            <el-option label="全部" value="" />
-            <el-option label="常规保养" value="maintenance" />
-            <el-option label="故障维修" value="repair" />
-            <el-option label="事故维修" value="accident" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="请选择状态">
-            <el-option label="全部" value="" />
-            <el-option label="待接受" value="pending" />
-            <el-option label="已接受" value="accepted" />
-            <el-option label="已拒绝" value="rejected" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
-
     <!-- 任务分配列表 -->
     <el-card shadow="hover">
       <el-table :data="assignments" style="width: 100%">
@@ -50,17 +18,17 @@
         </el-table-column>
         <el-table-column prop="problem" label="问题描述" min-width="200" show-overflow-tooltip />
         <el-table-column prop="assignmentTime" label="分配时间" width="180" />
-        <el-table-column prop="accepted" label="状态" width="100">
+        <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="getAssignmentStatusTag(row.accepted)">
-              {{ getAssignmentStatusText(row.accepted) }}
+            <el-tag :type="getAssignmentStatusTag(row.status)">
+              {{ getAssignmentStatusText(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button
-              v-if="row.accepted === null"
+              v-if="row.status === 'PENDING'"
               type="success"
               link
               @click="handleAcceptAssignment(row)"
@@ -68,7 +36,7 @@
               接受
             </el-button>
             <el-button
-              v-if="row.accepted === null"
+              v-if="row.status === 'PENDING'"
               type="danger"
               link
               @click="handleRejectAssignment(row)"
@@ -76,7 +44,7 @@
               拒绝
             </el-button>
             <el-button
-              v-if="row.accepted === true"
+              v-if="row.status === 'ACCEPTED'"
               type="primary"
               link
               @click="handleStartRepair(row)"
@@ -108,14 +76,6 @@ import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { repairman } from '@/api'
 
-// 搜索表单
-const searchForm = ref({
-  orderNumber: '',
-  plateNumber: '',
-  repairType: '',
-  status: ''
-})
-
 // 任务分配列表
 const assignments = ref([])
 const currentPage = ref(1)
@@ -125,9 +85,9 @@ const total = ref(0)
 // 获取维修类型标签
 const getRepairTypeTag = (type) => {
   const map = {
-    maintenance: 'info',
-    repair: 'warning',
-    accident: 'danger'
+    MAINTENANCE: 'info',
+    REPAIR: 'warning',
+    ACCIDENT: 'danger'
   }
   return map[type] || 'info'
 }
@@ -135,23 +95,33 @@ const getRepairTypeTag = (type) => {
 // 获取维修类型文本
 const getRepairTypeText = (type) => {
   const map = {
-    maintenance: '常规保养',
-    repair: '故障维修',
-    accident: '事故维修'
+    MAINTENANCE: '常规保养',
+    REPAIR: '故障维修',
+    ACCIDENT: '事故维修'
   }
   return map[type] || type
 }
 
 // 获取任务分配状态标签
-const getAssignmentStatusTag = (accepted) => {
-  if (accepted === null) return 'warning'
-  return accepted ? 'success' : 'danger'
+const getAssignmentStatusTag = (status) => {
+  const map = {
+    PENDING: 'warning',
+    ACCEPTED: 'success',
+    REJECTED: 'danger',
+    CANCELED: 'danger',
+  }
+  return map[status] || status
 }
 
 // 获取任务分配状态文本
-const getAssignmentStatusText = (accepted) => {
-  if (accepted === null) return '待接受'
-  return accepted ? '已接受' : '已拒绝'
+const getAssignmentStatusText = (status) => {
+  const map = {
+    PENDING: '常规保养',
+    ACCEPTED: '故障维修',
+    REJECTED: '事故维修',
+    CANCELED: '已取消',
+  }
+  return map[status] || status
 }
 
 // 获取数据
@@ -159,8 +129,7 @@ const fetchData = async () => {
   try {
     const res = await repairman.getAssignments({
       page: currentPage.value,
-      limit: pageSize.value,
-      ...searchForm.value
+      limit: pageSize.value
     })
     assignments.value = res.list
     total.value = res.total
@@ -168,23 +137,6 @@ const fetchData = async () => {
     console.error('获取数据失败:', error)
     ElMessage.error('获取数据失败')
   }
-}
-
-// 搜索
-const handleSearch = () => {
-  currentPage.value = 1
-  fetchData()
-}
-
-// 重置搜索
-const resetSearch = () => {
-  searchForm.value = {
-    orderNumber: '',
-    plateNumber: '',
-    repairType: '',
-    status: ''
-  }
-  handleSearch()
 }
 
 // 接受任务分配
@@ -260,21 +212,19 @@ onMounted(() => {
 }
 
 .page-header {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .page-title {
-  margin: 0;
   font-size: 24px;
-  font-weight: 500;
-}
-
-.search-card {
-  margin-bottom: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
 }
 
 .pagination {
   margin-top: 20px;
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
 }
 </style> 

@@ -3,6 +3,8 @@ package com.repairhub.management.order.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.repairhub.management.order.enums.AssignmentStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +19,6 @@ public class OrderAssignment {
     private Long orderId;
     private Long repairmanId;
     private LocalDateTime assignmentTime;
-    private Boolean accepted;
+    private AssignmentStatus status;
     private BigDecimal actualWorkHour;
 }

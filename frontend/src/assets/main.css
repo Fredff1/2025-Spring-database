@@ -1,4 +1,3 @@
-/* 布局类 */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -29,7 +28,7 @@
   gap: var(--spacing-md);
 }
 
-/* 间距类 */
+
 .mt-sm { margin-top: var(--spacing-sm); }
 .mt-md { margin-top: var(--spacing-md); }
 .mt-lg { margin-top: var(--spacing-lg); }
@@ -37,7 +36,6 @@
 .mb-md { margin-bottom: var(--spacing-md); }
 .mb-lg { margin-bottom: var(--spacing-lg); }
 
-/* 文本类 */
 .text-sm { font-size: 12px; }
 .text-md { font-size: 14px; }
 .text-lg { font-size: 16px; }
@@ -51,7 +49,6 @@
 .text-center { text-align: center; }
 .text-right { text-align: right; }
 
-/* 按钮类 */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -161,7 +158,6 @@
   color: var(--info);
 }
 
-/* 加载状态 */
 .loading {
   display: inline-block;
   width: 1em;
@@ -178,7 +174,6 @@
   }
 }
 
-/* 响应式 */
 @media (max-width: 768px) {
   .container {
     padding: 0 var(--spacing-sm);

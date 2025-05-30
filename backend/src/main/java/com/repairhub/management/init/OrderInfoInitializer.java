@@ -1,5 +1,6 @@
 package com.repairhub.management.init;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.springframework.boot.ApplicationArguments;
@@ -7,9 +8,11 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.repairhub.management.repair.entity.MaterialUsage;
 import com.repairhub.management.repair.entity.RepairFeedback;
 import com.repairhub.management.repair.entity.RepairRecord;
 import com.repairhub.management.repair.enums.FeedbackType;
+import com.repairhub.management.repair.repository.MaterialUsageRepository;
 import com.repairhub.management.repair.repository.RepairFeedbackRepository;
 import com.repairhub.management.repair.repository.RepairRecordRepository;
 
@@ -19,13 +22,16 @@ public class OrderInfoInitializer implements ApplicationRunner{
 
     private final RepairFeedbackRepository feedbackRepository;
     private final RepairRecordRepository recordRepository;
+    private final MaterialUsageRepository materialUsageRepository;
 
     public OrderInfoInitializer(
         RepairFeedbackRepository feedbackRepository,
-        RepairRecordRepository recordRepository
+        RepairRecordRepository recordRepository,
+        MaterialUsageRepository materialUsageRepository
     ){
         this.feedbackRepository = feedbackRepository;
         this.recordRepository = recordRepository;
+        this.materialUsageRepository = materialUsageRepository;
     }
     
     @Override
@@ -39,6 +45,24 @@ public class OrderInfoInitializer implements ApplicationRunner{
         .feedbackTime(LocalDateTime.now())
         .build();
         feedbackRepository.insert(feedback);
+        RepairFeedback feedback_1 = RepairFeedback.builder()
+        .orderId(1L)
+        .userId(1L)
+        .rating(2)
+        .feedbackType(FeedbackType.URGENT)
+        .description("后续维修太慢了！")
+        .feedbackTime(LocalDateTime.now())
+        .build();
+        feedbackRepository.insert(feedback_1);
+        RepairFeedback feedback_2 = RepairFeedback.builder()
+        .orderId(1L)
+        .userId(1L)
+        .rating(4)
+        .feedbackType(FeedbackType.GENERAL)
+        .description("维修总体表现还可以")
+        .feedbackTime(LocalDateTime.now())
+        .build();
+        feedbackRepository.insert(feedback_2);
         RepairRecord record = RepairRecord.builder()
         .orderId(1L)
         .repairmanId(2L)
@@ -47,6 +71,24 @@ public class OrderInfoInitializer implements ApplicationRunner{
         .completionTime(LocalDateTime.now())
         .build();
         recordRepository.insert(record);
+        RepairRecord record_1 = RepairRecord.builder()
+        .orderId(1L)
+        .repairmanId(2L)
+        .faultDescription("用太久了需要修复")
+        .repairResult("中期修理完成")
+        .completionTime(LocalDateTime.now())
+        .build();
+        recordRepository.insert(record_1);
+        MaterialUsage materialUsage = MaterialUsage.builder()
+        .orderId(1L)
+        .materialName("喷漆(瓶装)")
+        .quantity(1)
+        .unitPrice(BigDecimal.valueOf(100L))
+        .createTime(LocalDateTime.now())
+        .build();
+        materialUsageRepository.insert(materialUsage);
+        
+
     }
 
 }

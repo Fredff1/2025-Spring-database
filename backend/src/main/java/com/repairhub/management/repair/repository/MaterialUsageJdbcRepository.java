@@ -28,7 +28,7 @@ public class MaterialUsageJdbcRepository implements MaterialUsageRepository {
         this.jdbcTemplate = jdbcTemplate;
         this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
             .withTableName("material_usage")
-            .usingGeneratedKeyColumns("material_id");
+            .usingGeneratedKeyColumns("material_usage_id");
     }
     
     @Override

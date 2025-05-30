@@ -37,10 +37,10 @@
             <el-icon><tools /></el-icon>
             <span>维修订单</span>
           </el-menu-item>
-          <el-menu-item index="/user/repair-history">
+          <!-- <el-menu-item index="/user/repair-history">
             <el-icon><document /></el-icon>
             <span>维修记录</span>
-          </el-menu-item>
+          </el-menu-item> -->
         </el-menu>
       </aside>
       

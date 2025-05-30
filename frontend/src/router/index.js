@@ -191,7 +191,6 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
-  // 这里可以添加路由守卫逻辑，比如权限验证等
   next()
 });
 

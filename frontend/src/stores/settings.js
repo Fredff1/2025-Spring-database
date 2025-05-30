@@ -3,13 +3,12 @@ import { ref } from 'vue'
 import { admin } from '@/api'
 
 export const useSettingsStore = defineStore('settings', () => {
-  // 状态
+
   const basicSettings = ref({})
   const repairSettings = ref({})
   const inventorySettings = ref({})
   const notificationSettings = ref({})
 
-  // 方法
   const fetchSettings = async () => {
     try {
       const [basic, repair, inventory, notification] = await Promise.all([
@@ -73,12 +72,12 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   return {
-    // 状态
+
     basicSettings,
     repairSettings,
     inventorySettings,
     notificationSettings,
-    // 方法
+
     fetchSettings,
     updateBasicSettings,
     updateRepairSettings,

@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useAppStore = defineStore('app', () => {
-  // 状态
   const sidebar = ref({
     opened: localStorage.getItem('sidebarStatus') ? !!+localStorage.getItem('sidebarStatus') : true,
     withoutAnimation: false
@@ -11,7 +10,6 @@ export const useAppStore = defineStore('app', () => {
   const size = ref(localStorage.getItem('size') || 'default')
   const theme = ref(localStorage.getItem('theme') || 'light')
 
-  // 方法
   const toggleSidebar = () => {
     sidebar.value.opened = !sidebar.value.opened
     sidebar.value.withoutAnimation = false
@@ -43,12 +41,11 @@ export const useAppStore = defineStore('app', () => {
   }
 
   return {
-    // 状态
     sidebar,
     device,
     size,
     theme,
-    // 方法
+
     toggleSidebar,
     closeSidebar,
     toggleDevice,

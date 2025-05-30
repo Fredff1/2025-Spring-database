@@ -16,6 +16,7 @@ import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.repository.UserRepository;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.enums.AssignmentStatus;
 import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.order.repository.RepairOrderRepository;
@@ -128,7 +129,7 @@ public class DataInitializer implements ApplicationRunner{
         .orderId(order.getOrderId())
         .repairmanId(repairman.getUserId())
         .assignmentTime(LocalDateTime.now())
-        .accepted(false)
+        .status(AssignmentStatus.PENDING)
         .build();
         orderAssignmentRepository.insert(assignment);
 

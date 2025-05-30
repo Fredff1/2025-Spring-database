@@ -39,8 +39,8 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
         SqlParameterSource params = new MapSqlParameterSource()
         .addValue("order_id", orderAssignment.getOrderId())
         .addValue("repairman_id", orderAssignment.getRepairmanId())
-        .addValue("assigned_time", orderAssignment.getAssignmentTime())
-        .addValue("accepted", orderAssignment.getAccepted())
+        .addValue("assignment_time", orderAssignment.getAssignmentTime())
+        .addValue("assignment_status", orderAssignment.getStatus().name())
         .addValue("actual_work_hours", orderAssignment.getActualWorkHour());
         Number key = simpleJdbcInsert.executeAndReturnKey(params);
         long assignmentId = key.longValue();
@@ -52,13 +52,24 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
     @Override
     public int update(OrderAssignment orderAssignment){
         String sql = """
-            UPDATE assignment
-               SET repairman_id    = :repairmanId,
-                   assignment_time = :assignmentTime,
-                   status          = :status
-             WHERE assignment_id = :assignmentId
-            """;
-        return jdbc.update(sql, new BeanPropertySqlParameterSource(orderAssignment));
+        UPDATE assignment
+        SET order_id           = :orderId,
+            repairman_id       = :repairmanId,
+            assignment_time    = :assignmentTime,
+            assignment_status  = :status,
+            actual_work_hours  = :actualWorkHours
+        WHERE assignment_id      = :assignmentId
+        """;
+
+        SqlParameterSource params = new MapSqlParameterSource()
+            .addValue("orderId",           orderAssignment.getOrderId())
+            .addValue("repairmanId",       orderAssignment.getRepairmanId())
+            .addValue("assignmentTime",    orderAssignment.getAssignmentTime())
+            .addValue("status",            orderAssignment.getStatus().name())
+            .addValue("actualWorkHours",   orderAssignment.getActualWorkHour())
+            .addValue("assignmentId",      orderAssignment.getAssignmentId());
+
+        return jdbc.update(sql, params);
     }
 
     // 删除订单分配记录

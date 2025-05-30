@@ -5,23 +5,19 @@ import { useAuthStore } from './auth'
 export const usePermissionStore = defineStore('permission', () => {
   const authStore = useAuthStore()
   
-  // 状态
   const routes = ref([])
   const addRoutes = ref([])
 
-  // 计算属性
   const hasPermission = computed(() => {
     return (permission) => {
-      // 如果没有指定权限要求，则允许访问
       if (!permission) return true
       
-      // 如果未登录，返回 false
       if (!authStore.isAuthenticated) return false
       
       const role = authStore.role
       switch (role) {
         case 'admin':
-          return true // 管理员拥有所有权限
+          return true 
         case 'repairman':
           return [
             'view_orders',
@@ -44,9 +40,7 @@ export const usePermissionStore = defineStore('permission', () => {
     }
   })
 
-  // 方法
   const generateRoutes = () => {
-    // 生成所有路由，不区分角色
     const allRoutes = [
       {
         path: '/admin',
@@ -178,12 +172,9 @@ export const usePermissionStore = defineStore('permission', () => {
   }
 
   return {
-    // 状态
     routes,
     addRoutes,
-    // 计算属性
     hasPermission,
-    // 方法
     generateRoutes,
     resetRoutes
   }

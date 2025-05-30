@@ -118,13 +118,13 @@ CREATE TABLE `feedback` (
 
 
 CREATE TABLE `assignment` (
-  assign_id        BIGINT      NOT NULL AUTO_INCREMENT,
+  assignment_id        BIGINT      NOT NULL AUTO_INCREMENT,
   order_id         BIGINT      NOT NULL,
   repairman_id    BIGINT      NOT NULL,
-  assigned_time    DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  accepted         BOOLEAN     DEFAULT FALSE,
+  assignment_time    DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  assignment_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
   actual_work_hours DECIMAL(5,2),
-  PRIMARY KEY(assign_id),
+  PRIMARY KEY(assignment_id),
   INDEX idx_asg_order(order_id),
   INDEX idx_asg_tech(repairman_id),
   CONSTRAINT fk_asg_order FOREIGN KEY(order_id)      REFERENCES repair_order(order_id),

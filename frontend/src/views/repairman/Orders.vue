@@ -4,53 +4,11 @@
       <h2 class="page-title">订单管理</h2>
     </div>
 
-    <!-- 搜索表单 -->
-    <el-card shadow="hover" class="search-card">
-      <el-form :model="searchForm" inline>
-        <el-form-item label="订单号">
-          <el-input v-model="searchForm.orderNumber" placeholder="请输入订单号" clearable />
-        </el-form-item>
-        <el-form-item label="车牌号">
-          <el-input v-model="searchForm.plateNumber" placeholder="请输入车牌号" clearable />
-        </el-form-item>
-        <el-form-item label="维修类型">
-          <el-select v-model="searchForm.repairType" placeholder="请选择维修类型" clearable>
-            <el-option label="常规保养" value="maintenance" />
-            <el-option label="故障维修" value="repair" />
-            <el-option label="事故维修" value="accident" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="请选择状态" clearable>
-            <el-option label="待处理" value="pending" />
-            <el-option label="维修中" value="repairing" />
-            <el-option label="待确认" value="confirming" />
-            <el-option label="已完成" value="completed" />
-            <el-option label="已取消" value="cancelled" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="时间范围">
-          <el-date-picker
-            v-model="searchForm.dateRange"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            value-format="YYYY-MM-DD"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
-
     <!-- 订单列表 -->
     <el-card shadow="hover" class="table-card">
       <el-table :data="orders" style="width: 100%" v-loading="loading">
-        <el-table-column prop="orderNumber" label="订单号" width="180" />
-        <el-table-column prop="plateNumber" label="车牌号" width="120" />
+        <el-table-column prop="orderNo" label="订单号" width="180" />
+        <el-table-column prop="vehiclePlate" label="车牌号" width="120" />
         <el-table-column prop="repairType" label="维修类型" width="120">
           <template #default="{ row }">
             <el-tag :type="getRepairTypeTag(row.repairType)">
@@ -76,7 +34,7 @@
           <template #default="{ row }">
             <el-button type="primary" link @click="handleView(row)">查看</el-button>
             <el-button
-              v-if="row.status === 'pending'"
+              v-if="row.status === 'PENDING'"
               type="success"
               link
               @click="handleStartRepair(row)"
@@ -84,7 +42,7 @@
               开始维修
             </el-button>
             <el-button
-              v-if="row.status === 'repairing'"
+              v-if="row.status === 'PROCESSING'"
               type="warning"
               link
               @click="handleComplete(row)"
@@ -117,8 +75,8 @@
       destroy-on-close
     >
       <el-descriptions :column="2" border>
-        <el-descriptions-item label="订单号">{{ currentOrder.orderNumber }}</el-descriptions-item>
-        <el-descriptions-item label="车牌号">{{ currentOrder.plateNumber }}</el-descriptions-item>
+        <el-descriptions-item label="订单号">{{ currentOrder.orderNo }}</el-descriptions-item>
+        <el-descriptions-item label="车牌号">{{ currentOrder.vehiclePlate }}</el-descriptions-item>
         <el-descriptions-item label="维修类型">
           {{ getRepairTypeText(currentOrder.repairType) }}
         </el-descriptions-item>
@@ -130,17 +88,27 @@
         <el-descriptions-item label="问题描述" :span="2">
           {{ currentOrder.problem }}
         </el-descriptions-item>
-        <el-descriptions-item label="维修方案" :span="2">
-          {{ currentOrder.solution }}
+        <el-descriptions-item label="维修记录" :span="2">
+          <el-timeline>
+            <el-timeline-item
+              v-for="record in repairRecords"
+              :key="record.recordId"
+              :timestamp="record.createTime"
+              :type="record.status === '已完成' ? 'success' : 'primary'"
+            >
+              <h4>{{ record.faultDescription }}</h4>
+              <p>维修结果: {{ record.repairResult }}</p>
+              <p>状态: {{ record.status }}</p>
+            </el-timeline-item>
+          </el-timeline>
         </el-descriptions-item>
-        <el-descriptions-item label="使用配件" :span="2">
-          <el-table :data="currentOrder.parts" style="width: 100%">
-            <el-table-column prop="name" label="配件名称" />
-            <el-table-column prop="specification" label="规格" />
+        <el-descriptions-item label="使用材料" :span="2">
+          <el-table :data="materialUsages" style="width: 100%">
+            <el-table-column prop="materialName" label="材料名称" />
             <el-table-column prop="quantity" label="数量" width="100" />
-            <el-table-column prop="price" label="单价" width="120">
+            <el-table-column prop="unitPrice" label="单价" width="120">
               <template #default="{ row }">
-                ¥{{ row.price.toFixed(2) }}
+                ¥{{ row.unitPrice.toFixed(2) }}
               </template>
             </el-table-column>
           </el-table>
@@ -167,17 +135,25 @@
         :rules="completeRules"
         label-width="100px"
       >
-        <el-form-item label="维修方案" prop="solution">
+        <el-form-item label="故障描述" prop="faultDescription">
           <el-input
-            v-model="completeForm.solution"
+            v-model="completeForm.faultDescription"
             type="textarea"
             :rows="4"
-            placeholder="请输入维修方案"
+            placeholder="请输入故障描述"
           />
         </el-form-item>
-        <el-form-item label="使用配件" prop="parts">
-          <el-table :data="completeForm.parts" style="width: 100%">
-            <el-table-column label="配件名称" prop="name" />
+        <el-form-item label="维修结果" prop="repairResult">
+          <el-input
+            v-model="completeForm.repairResult"
+            type="textarea"
+            :rows="4"
+            placeholder="请输入维修结果"
+          />
+        </el-form-item>
+        <el-form-item label="使用材料" prop="materials">
+          <el-table :data="completeForm.materials" style="width: 100%">
+            <el-table-column label="材料名称" prop="materialName" />
             <el-table-column label="数量" width="120">
               <template #default="{ row }">
                 <el-input-number v-model="row.quantity" :min="1" :max="999" />
@@ -185,15 +161,15 @@
             </el-table-column>
             <el-table-column label="操作" width="80">
               <template #default="{ $index }">
-                <el-button type="danger" link @click="handleRemovePart($index)">
+                <el-button type="danger" link @click="handleRemoveMaterial($index)">
                   删除
                 </el-button>
               </template>
             </el-table-column>
           </el-table>
-          <div class="add-part">
-            <el-button type="primary" link @click="handleAddPart">
-              添加配件
+          <div class="add-material">
+            <el-button type="primary" link @click="handleAddMaterial">
+              添加材料
             </el-button>
           </div>
         </el-form-item>
@@ -207,18 +183,9 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { repairman } from '@/api'
-
-// 搜索表单
-const searchForm = reactive({
-  orderNumber: '',
-  plateNumber: '',
-  repairType: '',
-  status: '',
-  dateRange: []
-})
 
 // 订单列表数据
 const loading = ref(false)
@@ -230,26 +197,32 @@ const total = ref(0)
 // 查看订单详情
 const viewDialogVisible = ref(false)
 const currentOrder = ref({})
+const repairRecords = ref([])
+const materialUsages = ref([])
 
 // 完成维修
 const completeDialogVisible = ref(false)
 const completeFormRef = ref(null)
 const completeForm = reactive({
-  solution: '',
-  parts: []
+  faultDescription: '',
+  repairResult: '',
+  materials: []
 })
 const completeRules = {
-  solution: [
-    { required: true, message: '请输入维修方案', trigger: 'blur' }
+  faultDescription: [
+    { required: true, message: '请输入故障描述', trigger: 'blur' }
+  ],
+  repairResult: [
+    { required: true, message: '请输入维修结果', trigger: 'blur' }
   ]
 }
 
 // 获取维修类型标签
 const getRepairTypeTag = (type) => {
   const map = {
-    maintenance: 'info',
-    repair: 'warning',
-    accident: 'danger'
+    MAINTENANCE: 'info',
+    REPAIR: 'warning',
+    ACCIDENT: 'danger'
   }
   return map[type] || 'info'
 }
@@ -257,9 +230,9 @@ const getRepairTypeTag = (type) => {
 // 获取维修类型文本
 const getRepairTypeText = (type) => {
   const map = {
-    maintenance: '常规保养',
-    repair: '故障维修',
-    accident: '事故维修'
+    MAINTENANCE: '常规保养',
+    REPAIR: '故障维修',
+    ACCIDENT: '事故维修'
   }
   return map[type] || type
 }
@@ -267,11 +240,10 @@ const getRepairTypeText = (type) => {
 // 获取状态标签
 const getStatusTag = (status) => {
   const map = {
-    pending: 'info',
-    repairing: 'warning',
-    confirming: 'primary',
-    completed: 'success',
-    cancelled: 'danger'
+    PENDING: 'info',
+    PROCESSING: 'warning',
+    COMPLETED: 'success',
+    CANCELLED: 'danger'
   }
   return map[status] || 'info'
 }
@@ -279,11 +251,10 @@ const getStatusTag = (status) => {
 // 获取状态文本
 const getStatusText = (status) => {
   const map = {
-    pending: '待处理',
-    repairing: '维修中',
-    confirming: '待确认',
-    completed: '已完成',
-    cancelled: '已取消'
+    PENDING: '待处理',
+    PROCESSING: '维修中',
+    COMPLETED: '已完成',
+    CANCELLED: '已取消'
   }
   return map[status] || status
 }
@@ -292,14 +263,10 @@ const getStatusText = (status) => {
 const fetchOrders = async () => {
   loading.value = true
   try {
-    const params = {
+    const res = await repairman.getOrders({
       page: currentPage.value,
-      pageSize: pageSize.value,
-      ...searchForm,
-      startDate: searchForm.dateRange?.[0],
-      endDate: searchForm.dateRange?.[1]
-    }
-    const res = await repairman.getOrders(params)
+      limit: pageSize.value
+    })
     orders.value = res.list
     total.value = res.total
   } catch (error) {
@@ -310,36 +277,17 @@ const fetchOrders = async () => {
   }
 }
 
-// 搜索
-const handleSearch = () => {
-  currentPage.value = 1
-  fetchOrders()
-}
-
-// 重置搜索
-const handleReset = () => {
-  Object.keys(searchForm).forEach(key => {
-    searchForm[key] = ''
-  })
-  handleSearch()
-}
-
-// 分页
-const handleSizeChange = (val) => {
-  pageSize.value = val
-  fetchOrders()
-}
-
-const handleCurrentChange = (val) => {
-  currentPage.value = val
-  fetchOrders()
-}
-
 // 查看订单详情
 const handleView = async (row) => {
   try {
-    const res = await repairman.getOrderDetail(row.id)
-    currentOrder.value = res
+    const [orderRes, recordsRes, materialsRes] = await Promise.all([
+      repairman.getOrderDetail(row.id),
+      repairman.getRepairRecords(row.id),
+      repairman.getMaterialUsages(row.id)
+    ])
+    currentOrder.value = orderRes
+    repairRecords.value = recordsRes
+    materialUsages.value = materialsRes
     viewDialogVisible.value = true
   } catch (error) {
     console.error('获取订单详情失败:', error)
@@ -362,23 +310,24 @@ const handleStartRepair = async (row) => {
 // 完成维修
 const handleComplete = (row) => {
   currentOrder.value = row
-  completeForm.solution = ''
-  completeForm.parts = []
+  completeForm.faultDescription = ''
+  completeForm.repairResult = ''
+  completeForm.materials = []
   completeDialogVisible.value = true
 }
 
-// 添加配件
-const handleAddPart = () => {
-  completeForm.parts.push({
-    name: '',
+// 添加材料
+const handleAddMaterial = () => {
+  completeForm.materials.push({
+    materialName: '',
     quantity: 1,
-    price: 0
+    unitPrice: 0
   })
 }
 
-// 删除配件
-const handleRemovePart = (index) => {
-  completeForm.parts.splice(index, 1)
+// 删除材料
+const handleRemoveMaterial = (index) => {
+  completeForm.materials.splice(index, 1)
 }
 
 // 提交完成维修
@@ -399,8 +348,20 @@ const handleCompleteSubmit = async () => {
   })
 }
 
-// 初始化
-fetchOrders()
+// 分页
+const handleSizeChange = (val) => {
+  pageSize.value = val
+  fetchOrders()
+}
+
+const handleCurrentChange = (val) => {
+  currentPage.value = val
+  fetchOrders()
+}
+
+onMounted(() => {
+  fetchOrders()
+})
 </script>
 
 <style scoped>
@@ -419,10 +380,6 @@ fetchOrders()
   margin: 0;
 }
 
-.search-card {
-  margin-bottom: 24px;
-}
-
 .table-card {
   margin-bottom: 24px;
 }
@@ -433,7 +390,7 @@ fetchOrders()
   justify-content: flex-end;
 }
 
-.add-part {
+.add-material {
   margin-top: 10px;
   text-align: center;
 }

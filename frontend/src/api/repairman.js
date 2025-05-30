@@ -2,13 +2,18 @@ import http from './http'
 
 // 维修人员认证
 export const updateProfile = data => http.put('/repairman/profile', data)
+export const getProfile = () => http.get('/repairman/profile')
 
 
 // 维修人员订单管理
-export const getOrders = params => http.get('/repairman/orders', { params })
-export const getOrderDetail = id => http.get(`/repairman/orders/${id}`)
+export const getOrders = params => http.get('/repairman/repair-orders', { params })
+export const getOrderDetail = id => http.get(`/repairman/repair-orders/${id}`)
 export const startRepair = id => http.post(`/repairman/orders/${id}/start`)
 export const completeRepair = (id, data) => http.post(`/repairman/orders/${id}/complete`, data)
+
+export const getRepairRecords = orderId => http.get(`/repairman/repair-orders/${orderId}/records`);
+export const getMaterialUsages = orderId => http.get(`/repairman/repair-orders/${orderId}/materials`);
+export const getFeedbackList = orderId => http.get(`/repairman/repair-orders/${orderId}/feedback`);
 
 // 维修人员任务分配
 export const getAssignments = params => http.get('/repairman/assignments', { params })

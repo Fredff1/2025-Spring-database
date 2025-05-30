@@ -1,6 +1,6 @@
 import http from './http'
 
-// 管理员认证
+
 export const getProfile = () => http.get('/admin/profile')
 
 

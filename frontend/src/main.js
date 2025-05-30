@@ -8,8 +8,6 @@ import '@/styles/reset.scss';
 import '@/styles/variables.scss';
 import './assets/main.css';
 
-// mock 数据
-import '@/mock/mock';
 
 const app = createApp(App);
 app.use(createPinia());

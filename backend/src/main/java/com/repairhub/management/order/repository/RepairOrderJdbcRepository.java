@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -48,12 +49,25 @@ public class RepairOrderJdbcRepository implements RepairOrderRepository{
                 UPDATE repair_order
                    SET user_id      = :userId,
                        vehicle_id   = :vehicleId,
+                       total_fee    = :totalFee,
+                       update_time  = :updateTime,
                        submit_time  = :submitTime,
                        status       = :status,
+                       fault_type   = :faultType,
                        description  = :description
                  WHERE order_id = :orderId
                 """;
-        return jdbc.update(sql, new BeanPropertySqlParameterSource(order));
+        SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("orderId", order.getOrderId())
+        .addValue("userId", order.getUserId())
+        .addValue("vehicleId", order.getVehicleId())
+        .addValue("totalFee", order.getTotalFee())
+        .addValue("updateTime", order.getUpdateTime())
+        .addValue("submitTime", order.getSubmitTime())
+        .addValue("status", order.getStatus().name())
+        .addValue("faultType", order.getFaultType().name())
+        .addValue("description", order.getDescription());
+        return jdbc.update(sql, params);
     }
 
     @Override

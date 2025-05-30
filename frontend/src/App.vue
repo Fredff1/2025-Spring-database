@@ -10,12 +10,9 @@ export default {
 
 <style>
 :root {
-  /* 主题色 */
   --primary: #1890ff;
   --primary-dark: #096dd9;
   --primary-light: #e6f7ff;
-  
-  /* 功能色 */
   --success: #52c41a;
   --success-light: #f6ffed;
   --warning: #faad14;
@@ -25,7 +22,6 @@ export default {
   --info: #1890ff;
   --info-light: #e6f7ff;
   
-  /* 中性色 */
   --text-primary: #262626;
   --text-secondary: #595959;
   --text-disabled: #bfbfbf;
@@ -34,7 +30,6 @@ export default {
   --background-light: #fafafa;
   --disabled: #f5f5f5;
   
-  /* 间距 */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;

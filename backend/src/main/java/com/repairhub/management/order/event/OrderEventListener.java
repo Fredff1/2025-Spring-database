@@ -35,7 +35,7 @@ public class OrderEventListener {
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void onAssignmentCoped(AssignmentCopedEvent event) {
         OrderAssignment assignment = event.getOrderAssignment();
-        if(!assignment.getAccepted()){
+        if(!assignment.getStatus().isAccepted()){
             // 如果维修工拒绝了订单分配，则将订单状态改为 PENDING
             orderService.findById(assignment.getOrderId()).ifPresent(order -> {
                 order.setStatus(OrderStatus.PENDING);

@@ -19,6 +19,7 @@ import com.repairhub.management.order.dto.CreateOrderRequest;
 import com.repairhub.management.order.dto.OrderDTO;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.enums.AssignmentStatus;
 import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.event.OrderCreatedEvent;
 import com.repairhub.management.order.repository.OrderAssignmentRepository;
@@ -78,7 +79,7 @@ public class OrderService {
             if(assignments != null && !assignments.isEmpty()){
                 List<Long> assignedRepairmanIds = new ArrayList<>();
                 for (OrderAssignment assignment : assignments) {
-                    if(assignment.getAccepted()){
+                    if(assignment.getStatus().isAccepted()){
                         assignedRepairmanIds.add(assignment.getRepairmanId());
                     }
                 }
@@ -100,7 +101,7 @@ public class OrderService {
         List<OrderAssignment> assignments = orderAssignmentRepository.findByOrderId(order.getOrderId());
         if (assignments != null && !assignments.isEmpty()) {
             for (OrderAssignment assignment : assignments) {
-                if(assignment.getAccepted()){
+                if(assignment.getStatus().isAccepted()){
                     continue;
                 }
                 filter.add(assignment.getRepairmanId());
@@ -118,7 +119,7 @@ public class OrderService {
                 .orderId(order.getOrderId())
                 .repairmanId(selectedProfile.getUserId())
                 .assignmentTime(LocalDateTime.now())
-                .accepted(null)
+                .status(AssignmentStatus.PENDING)
                 .actualWorkHour(null)
                 .build();
         orderAssignmentRepository.insert(assignment);

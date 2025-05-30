@@ -7,6 +7,7 @@ import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.repair.enums.FaultType;
 import com.repairhub.management.repair.enums.RepairType;
+import com.repairhub.management.utils.OrderUtil;
 import com.repairhub.management.vehicle.entity.Vehicle;
 import com.repairhub.management.vehicle.repository.VehicleRepository;
 
@@ -37,7 +38,7 @@ public class OrderDTO {
         Vehicle vehicle = vehicleRepository.findById(order.getVehicleId()).get();
         var dto =OrderDTO.builder()
             .id(order.getOrderId())
-            .orderNo("ORD " + order.getOrderId()) // Example order number generation
+            .orderNo(OrderUtil.getOrderNumber(order.getOrderId())) // Example order number generation
             .vehicleId(order.getVehicleId())
             .vehiclePlate(vehicle.getLicensePlate()) // Example vehicle plate generation
             .repairType(order.getFaultType())
