@@ -49,7 +49,7 @@
               link
               @click="handleStartRepair(row)"
             >
-              开始维修
+              查看详情
             </el-button>
           </template>
         </el-table-column>
@@ -75,12 +75,14 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { repairman } from '@/api'
+import { useRouter } from 'vue-router'
 
 // 任务分配列表
 const assignments = ref([])
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+const router = useRouter()
 
 // 获取维修类型标签
 const getRepairTypeTag = (type) => {
@@ -179,14 +181,15 @@ const handleRejectAssignment = async (row) => {
 
 // 开始维修
 const handleStartRepair = async (row) => {
-  try {
-    await repairman.startRepair(row.orderId)
-    ElMessage.success('已开始维修')
-    fetchData()
-  } catch (error) {
-    console.error('操作失败:', error)
-    ElMessage.error('操作失败')
-  }
+  router.push('/repairman/orders')
+  // try {
+  //   await repairman.startRepair(row.orderId)
+  //   ElMessage.success('已开始维修')
+  //   fetchData()
+  // } catch (error) {
+  //   console.error('操作失败:', error)
+  //   ElMessage.error('操作失败')
+  // }
 }
 
 // 分页大小改变

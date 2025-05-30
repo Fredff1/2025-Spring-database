@@ -1,4 +1,4 @@
-package com.repairhub.management.repair.entity;
+package com.repairhub.management.repair.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,14 +13,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LaborFeeLog {
+public class LaborFeeLogDTO {
     private Long LaborFeeLogId;
     private Long orderId;
     private Long repairmanId;
     private Month month;
+    private BigDecimal hourlyMoneyRate;
     private BigDecimal totalHours;
     private BigDecimal totalIncome;
     private LocalDateTime settleTime;
 
-    
 }

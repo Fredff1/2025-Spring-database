@@ -10,8 +10,11 @@ import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.repository.UserRepository;
-import com.repairhub.management.order.event.OrderCompletedEvent;
+import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.event.OrderDealtEvent;
 import com.repairhub.management.order.repository.RepairOrderRepository;
+import com.repairhub.management.order.service.OrderService;
+import com.repairhub.management.repair.dto.CreateLaborFeeLogDTO;
 import com.repairhub.management.repair.dto.CreateMaterialUsageDTO;
 import com.repairhub.management.repair.dto.CreateRepairFeedbackDTO;
 import com.repairhub.management.repair.dto.CreateRepairRecordDTO;
@@ -21,9 +24,12 @@ import com.repairhub.management.repair.dto.RepairRecordDTO;
 import com.repairhub.management.repair.entity.MaterialUsage;
 import com.repairhub.management.repair.entity.RepairFeedback;
 import com.repairhub.management.repair.entity.RepairRecord;
+import com.repairhub.management.repair.repository.LaborFeeLogRepository;
 import com.repairhub.management.repair.repository.MaterialUsageRepository;
 import com.repairhub.management.repair.repository.RepairFeedbackRepository;
 import com.repairhub.management.repair.repository.RepairRecordRepository;
+import com.repairhub.management.repairman.entity.RepairmanProfile;
+import com.repairhub.management.repairman.repository.RepairmanProfileRepository;
 
 import lombok.Getter;
 
@@ -32,26 +38,32 @@ import lombok.Getter;
 public class RepairService {
 
     private final UserRepository userRepository;
+    private final RepairmanProfileRepository profileRepository;
     private final RepairRecordRepository recordRepository;
     private final MaterialUsageRepository materialUsageRepository;
     private final RepairFeedbackRepository feedbackRepository;
     private final RepairOrderRepository repairOrderRepository;
+    private final OrderService orderService;
     private final ApplicationEventPublisher eventPublisher;
 
 
     public RepairService(
         UserRepository userRepository,
+        RepairmanProfileRepository profileRepository,
         RepairRecordRepository recordRepository,
         MaterialUsageRepository materialUsageRepository,
         RepairFeedbackRepository feedbackRepository,
         RepairOrderRepository repairOrderRepository,
+        OrderService orderService,
         ApplicationEventPublisher eventPublisher
     ) { 
         this.userRepository = userRepository;
+        this.profileRepository = profileRepository;
         this.recordRepository = recordRepository;
         this.materialUsageRepository = materialUsageRepository;
         this.feedbackRepository = feedbackRepository;
         this.repairOrderRepository = repairOrderRepository;
+        this.orderService = orderService;
         this.eventPublisher = eventPublisher;
     }
     
@@ -62,26 +74,47 @@ public class RepairService {
             .materialName(dto.getMaterialName())
             .quantity(dto.getQuantity())
             .unitPrice(dto.getUnitPrice())
+            .createTime(LocalDateTime.now())
             .build();
         materialUsageRepository.insert(materialUsage);
         return materialUsage;
     }
 
     @Transactional
-    public RepairRecord submitRepairRecord(CreateRepairRecordDTO dto){
+    public RepairRecord submitRepairRecord(CreateRepairRecordDTO dto,User repairman){
+        
         RepairRecord repairRecord = RepairRecord.builder()
             .orderId(dto.getOrderId())
+            .repairmanId(repairman.getUserId())
             .faultDescription(dto.getFaultDescription())
             .repairResult(dto.getRepairResult())
             .completionTime(LocalDateTime.now())
+            .actualWorkHour(dto.getActualWorkHour())
+            .orderStatus(dto.getStatus())
             .build();
         recordRepository.insert(repairRecord);
-        if(dto.getOrderStatus() != null) {
+
+        for(CreateMaterialUsageDTO usageDto:dto.getMaterials()){
+            MaterialUsage materialUsage = MaterialUsage.builder()
+            .orderId(usageDto.getOrderId())
+            .materialName(usageDto.getMaterialName())
+            .quantity(usageDto.getQuantity())
+            .unitPrice(usageDto.getUnitPrice())
+            .createTime(LocalDateTime.now())
+            .build();
+            materialUsageRepository.insert(materialUsage);
+        }
+        RepairmanProfile profile = profileRepository.findByUserId(repairman.getUserId()).get();
+        CreateLaborFeeLogDTO createLaborFeeLogDTO = CreateLaborFeeLogDTO.from
+        (dto.getOrderId(), repairman.getUserId(), dto.getActualWorkHour(), profile.getHourlyMoneyRate());
+        
+
+        if(dto.getStatus() != null) {
             repairOrderRepository.findById(dto.getOrderId()).ifPresent(order -> {
-                order.setStatus(dto.getOrderStatus());
+                order.setStatus(dto.getStatus());
                 order.setUpdateTime(LocalDateTime.now());
                 repairOrderRepository.update(order);
-                OrderCompletedEvent event = new OrderCompletedEvent(this, order);
+                OrderDealtEvent event = new OrderDealtEvent(this, order,createLaborFeeLogDTO);
                 eventPublisher.publishEvent(event);
             });
         }
@@ -94,6 +127,7 @@ public class RepairService {
             .orderId(dto.getOrderId())
             .userId(user.getUserId())
             .rating(dto.getRating())
+            .feedbackType(dto.getFeedbackType())
             .description(dto.getDescription())
             .feedbackTime(LocalDateTime.now())
             .build();

@@ -8,6 +8,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.repair.entity.MaterialUsage;
 import com.repairhub.management.repair.entity.RepairFeedback;
 import com.repairhub.management.repair.entity.RepairRecord;
@@ -69,6 +70,8 @@ public class OrderInfoInitializer implements ApplicationRunner{
         .faultDescription("用太久了需要修复")
         .repairResult("初期修理一切顺利")
         .completionTime(LocalDateTime.now())
+        .orderStatus(OrderStatus.PROCESSING)
+        .actualWorkHour(BigDecimal.valueOf(2L))
         .build();
         recordRepository.insert(record);
         RepairRecord record_1 = RepairRecord.builder()
@@ -76,7 +79,9 @@ public class OrderInfoInitializer implements ApplicationRunner{
         .repairmanId(2L)
         .faultDescription("用太久了需要修复")
         .repairResult("中期修理完成")
+        .orderStatus(OrderStatus.PROCESSING)
         .completionTime(LocalDateTime.now())
+        .actualWorkHour(BigDecimal.valueOf(2L))
         .build();
         recordRepository.insert(record_1);
         MaterialUsage materialUsage = MaterialUsage.builder()

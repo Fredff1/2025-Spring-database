@@ -20,5 +20,4 @@ public class OrderAssignment {
     private Long repairmanId;
     private LocalDateTime assignmentTime;
     private AssignmentStatus status;
-    private BigDecimal actualWorkHour;
 }

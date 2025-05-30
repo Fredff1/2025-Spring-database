@@ -54,6 +54,7 @@ public class RepairOrderJdbcRepository implements RepairOrderRepository{
                        submit_time  = :submitTime,
                        status       = :status,
                        fault_type   = :faultType,
+                       is_paid      = :isPaid,
                        description  = :description
                  WHERE order_id = :orderId
                 """;
@@ -66,6 +67,7 @@ public class RepairOrderJdbcRepository implements RepairOrderRepository{
         .addValue("submitTime", order.getSubmitTime())
         .addValue("status", order.getStatus().name())
         .addValue("faultType", order.getFaultType().name())
+        .addValue("isPaid", order.getIsPaid())
         .addValue("description", order.getDescription());
         return jdbc.update(sql, params);
     }

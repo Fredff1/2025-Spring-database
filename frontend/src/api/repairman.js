@@ -8,8 +8,9 @@ export const getProfile = () => http.get('/repairman/profile')
 // 维修人员订单管理
 export const getOrders = params => http.get('/repairman/repair-orders', { params })
 export const getOrderDetail = id => http.get(`/repairman/repair-orders/${id}`)
-export const startRepair = id => http.post(`/repairman/orders/${id}/start`)
-export const completeRepair = (id, data) => http.post(`/repairman/orders/${id}/complete`, data)
+//export const startRepair = id => http.post(`/repairman/orders/${id}/start`)
+//export const completeRepair = (id, data) => http.post(`/repairman/orders/${id}/complete`, data)
+export const submitRepairRecord = data => http.post('/repairman/repair-orders/records',data)
 
 export const getRepairRecords = orderId => http.get(`/repairman/repair-orders/${orderId}/records`);
 export const getMaterialUsages = orderId => http.get(`/repairman/repair-orders/${orderId}/materials`);

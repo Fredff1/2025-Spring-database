@@ -33,21 +33,21 @@
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleView(row)">查看</el-button>
-            <el-button
+            <!-- <el-button
               v-if="row.status === 'PENDING'"
               type="success"
               link
               @click="handleStartRepair(row)"
             >
               开始维修
-            </el-button>
+            </el-button> -->
             <el-button
               v-if="row.status === 'PROCESSING'"
               type="warning"
               link
-              @click="handleComplete(row)"
+              @click="handleSubmitRecord(row)"
             >
-              完成维修
+              提交记录
             </el-button>
           </template>
         </el-table-column>
@@ -98,7 +98,9 @@
             >
               <h4>{{ record.faultDescription }}</h4>
               <p>维修结果: {{ record.repairResult }}</p>
-              <p>状态: {{ record.status }}</p>
+              <p>状态: {{ getStatusText(record.status) }}</p>
+              <p>维修时长：{{ record.actualWorkingHour }}h</p>
+              <p>维修人员：{{ record.repairmanName }}</p>
             </el-timeline-item>
           </el-timeline>
         </el-descriptions-item>
@@ -122,22 +124,29 @@
       </el-descriptions>
     </el-dialog>
 
-    <!-- 完成维修对话框 -->
+    <!-- 提交维修记录对话框 -->
     <el-dialog
-      v-model="completeDialogVisible"
-      title="完成维修"
-      width="500px"
+      v-model="recordDialogVisible"
+      title="提交维修记录"
+      width="600px"
       destroy-on-close
     >
       <el-form
-        ref="completeFormRef"
-        :model="completeForm"
-        :rules="completeRules"
+        ref="recordFormRef"
+        :model="recordForm"
+        :rules="recordRules"
         label-width="100px"
       >
+        <el-form-item label="订单状态" prop="status">
+          <el-select v-model="recordForm.status" placeholder="请选择订单状态">
+            <el-option label="维修中" value="PROCESSING" />
+            <el-option label="已完成" value="COMPLETED" />
+            <el-option label="已取消" value="CANCELLED" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="故障描述" prop="faultDescription">
           <el-input
-            v-model="completeForm.faultDescription"
+            v-model="recordForm.faultDescription"
             type="textarea"
             :rows="4"
             placeholder="请输入故障描述"
@@ -145,28 +154,43 @@
         </el-form-item>
         <el-form-item label="维修结果" prop="repairResult">
           <el-input
-            v-model="completeForm.repairResult"
+            v-model="recordForm.repairResult"
             type="textarea"
             :rows="4"
             placeholder="请输入维修结果"
           />
         </el-form-item>
+        <el-form-item label="工作时长(小时)" prop="actualWorkHour">
+          <el-input
+            v-model="recordForm.actualWorkHour"
+            :rows="1"
+            placeholder="请输入工作时长(小时)"
+          />
+        </el-form-item>
         <el-form-item label="使用材料" prop="materials">
-          <el-table :data="completeForm.materials" style="width: 100%">
-            <el-table-column label="材料名称" prop="materialName" />
-            <el-table-column label="数量" width="120">
-              <template #default="{ row }">
-                <el-input-number v-model="row.quantity" :min="1" :max="999" />
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="80">
-              <template #default="{ $index }">
-                <el-button type="danger" link @click="handleRemoveMaterial($index)">
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+          <div class="materials-list">
+            <div v-for="(material, index) in recordForm.materials" :key="index" class="material-item">
+              <el-row :gutter="10">
+                <el-col :span="6">
+                  <el-input v-model="material.materialName" placeholder="材料名称" />
+                </el-col>
+                <el-col :span="6">
+                  <el-input v-model="material.quantity" placeholder="数量" />
+                </el-col>
+                <el-col :span="6">
+                  <el-input 
+                    v-model="material.unitPrice" 
+                    placeholder="单价(￥)"
+                  />
+                </el-col>
+                <el-col :span="2">
+                  <el-button type="danger" link @click="handleRemoveMaterial(index)">
+                    删除
+                  </el-button>
+                </el-col>
+              </el-row>
+            </div>
+          </div>
           <div class="add-material">
             <el-button type="primary" link @click="handleAddMaterial">
               添加材料
@@ -175,8 +199,8 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="completeDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleCompleteSubmit">确定</el-button>
+        <el-button @click="recordDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleRecordSubmit">提交记录</el-button>
       </template>
     </el-dialog>
   </div>
@@ -200,21 +224,28 @@ const currentOrder = ref({})
 const repairRecords = ref([])
 const materialUsages = ref([])
 
-// 完成维修
-const completeDialogVisible = ref(false)
-const completeFormRef = ref(null)
-const completeForm = reactive({
+// 提交维修记录
+const recordDialogVisible = ref(false)
+const recordFormRef = ref(null)
+const recordForm = reactive({
+  status: 'PROCESSING',
   faultDescription: '',
   repairResult: '',
   materials: []
 })
-const completeRules = {
+const recordRules = {
+  status: [
+    { required: true, message: '请选择订单状态', trigger: 'change' }
+  ],
   faultDescription: [
     { required: true, message: '请输入故障描述', trigger: 'blur' }
   ],
   repairResult: [
     { required: true, message: '请输入维修结果', trigger: 'blur' }
-  ]
+  ],
+  actualWorkHour: [
+    { required: true, message: '请输入维修时长', trigger: 'blur' }
+  ],
 }
 
 // 获取维修类型标签
@@ -296,49 +327,61 @@ const handleView = async (row) => {
 }
 
 // 开始维修
-const handleStartRepair = async (row) => {
-  try {
-    await repairman.startRepair(row.id)
-    ElMessage.success('已开始维修')
-    fetchOrders()
-  } catch (error) {
-    console.error('操作失败:', error)
-    ElMessage.error('操作失败')
-  }
-}
+// const handleStartRepair = async (row) => {
+//   try {
+//     await repairman.startRepair(row.id)
+//     ElMessage.success('已开始维修')
+//     fetchOrders()
+//   } catch (error) {
+//     console.error('操作失败:', error)
+//     ElMessage.error('操作失败')
+//   }
+// }
 
-// 完成维修
-const handleComplete = (row) => {
+// 提交维修记录
+const handleSubmitRecord = (row) => {
   currentOrder.value = row
-  completeForm.faultDescription = ''
-  completeForm.repairResult = ''
-  completeForm.materials = []
-  completeDialogVisible.value = true
+  recordForm.status = 'PROCESSING'
+  recordForm.actualWorkHour = null
+  recordForm.faultDescription = ''
+  recordForm.repairResult = ''
+  recordForm.materials = []
+  recordDialogVisible.value = true
 }
 
 // 添加材料
 const handleAddMaterial = () => {
-  completeForm.materials.push({
+  recordForm.materials.push({
     materialName: '',
-    quantity: 1,
-    unitPrice: 0
+    quantity: null,
+    unitPrice: null,
+    orderId: currentOrder.value.id,
   })
 }
 
 // 删除材料
 const handleRemoveMaterial = (index) => {
-  completeForm.materials.splice(index, 1)
+  recordForm.materials.splice(index, 1)
 }
 
-// 提交完成维修
-const handleCompleteSubmit = async () => {
-  if (!completeFormRef.value) return
-  await completeFormRef.value.validate(async (valid) => {
+// 提交维修记录
+const handleRecordSubmit = async () => {
+  if (!recordFormRef.value) return
+  await recordFormRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        await repairman.completeRepair(currentOrder.value.id, completeForm)
-        ElMessage.success('维修完成')
-        completeDialogVisible.value = false
+        
+        const recordSubmitData = {
+          orderId: currentOrder.value.id,
+          status: recordForm.status,
+          faultDescription: recordForm.faultDescription,
+          repairResult: recordForm.repairResult,
+          materials: recordForm.materials,
+          actualWorkHour: recordForm.actualWorkHour
+        };
+        await repairman.submitRepairRecord(recordSubmitData)
+        ElMessage.success('维修记录提交成功')
+        recordDialogVisible.value = false
         fetchOrders()
       } catch (error) {
         console.error('操作失败:', error)
@@ -393,5 +436,20 @@ onMounted(() => {
 .add-material {
   margin-top: 10px;
   text-align: center;
+}
+
+.materials-list {
+  margin-bottom: 10px;
+}
+
+.material-item {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
+}
+
+.material-item:hover {
+  background-color: #f5f7fa;
 }
 </style> 

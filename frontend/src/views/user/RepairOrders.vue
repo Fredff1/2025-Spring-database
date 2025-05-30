@@ -21,7 +21,7 @@
         <el-table-column prop="problem" label="问题描述" min-width="120" show-overflow-tooltip />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)">{{ row.status }}</el-tag>
+            <el-tag :type="getStatusType(row.status)">{{ getStatusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="140" />
@@ -33,7 +33,7 @@
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <el-button
-              v-if="row.status === '待处理'"
+              v-if="row.status === 'PENDING'"
               type="danger"
               link
               @click="handleCancel(row)"
@@ -41,7 +41,7 @@
               取消
             </el-button>
             <el-button
-              v-if="row.status === '已完成' && !row.isPaid"
+              v-if="row.status === 'COMPLETED' && !row.isPaid"
               type="primary"
               link
               @click="handlePay(row)"
@@ -49,20 +49,11 @@
               支付
             </el-button>
             <el-button
-              v-if="row.status === '已完成' && row.isPaid && !row.isReviewed"
-              type="success"
-              link
-              @click="handleReview(row)"
-            >
-              评价
-            </el-button>
-            <el-button
-              v-if="row.status === '处理中'"
               type="warning"
               link
-              @click="handleUrge(row)"
+              @click="handleFeedback(row)"
             >
-              催单
+              反馈
             </el-button>
             <el-button
               type="primary"
@@ -155,39 +146,6 @@
         </span>
       </template>
     </el-dialog>
-
-    <!-- 评价对话框 -->
-    <el-dialog
-      v-model="reviewDialogVisible"
-      title="服务评价"
-      width="400px"
-    >
-      <el-form
-        ref="reviewFormRef"
-        :model="reviewForm"
-        :rules="reviewRules"
-        label-width="80px"
-      >
-        <el-form-item label="评分" prop="rating">
-          <el-rate v-model="reviewForm.rating" />
-        </el-form-item>
-        <el-form-item label="评价" prop="comment">
-          <el-input
-            v-model="reviewForm.comment"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入您的评价"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="reviewDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitReview">提交评价</el-button>
-        </span>
-      </template>
-    </el-dialog>
-
     <!-- 查看详情对话框 -->
     <el-dialog
       v-model="viewDialogVisible"
@@ -205,7 +163,7 @@
             </el-descriptions-item>
             <el-descriptions-item label="状态">
               <el-tag :type="getStatusType(currentOrder?.status)">
-                {{ currentOrder?.status }}
+                {{ getStatusText(currentOrder?.status) }}
               </el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="创建时间">{{ currentOrder?.createTime }}</el-descriptions-item>
@@ -235,7 +193,7 @@
                     <div class="record-header">
                       <span><strong>维修人员:{{record.repairmanName}}</strong> </span>
                       <el-tag :type="getStatusType(record.status)" size="small">
-                        {{ record.status }}
+                        {{ getStatusText(record.status) }}
                       </el-tag>
                     </div>
                   </template>
@@ -308,7 +266,7 @@
     <!-- 反馈对话框 -->
     <el-dialog
       v-model="feedbackDialogVisible"
-      :title="feedbackForm.type === 'URGENT' ? '催单反馈' : '服务评价'"
+      title="订单反馈"
       width="500px"
     >
       <el-form
@@ -317,14 +275,14 @@
         :rules="feedbackRules"
         label-width="100px"
       >
-        <el-form-item label="反馈类型" prop="type">
-          <el-radio-group v-model="feedbackForm.type">
-            <el-radio label="RATING">评分反馈</el-radio>
-            <el-radio label="URGENT">催单反馈</el-radio>
-            <el-radio label="GENERAL">一般反馈</el-radio>
-          </el-radio-group>
+        <el-form-item label="反馈类型" prop="feedbackType">
+          <el-select v-model="feedbackForm.feedbackType" placeholder="请选择反馈类型">
+            <el-option label="评分反馈" value="RATING" />
+            <el-option label="催单反馈" value="URGENT" />
+            <el-option label="一般反馈" value="GENERAL" />
+          </el-select>
         </el-form-item>
-        <el-form-item v-if="feedbackForm.type === 'RATING'" label="服务评分" prop="rating">
+        <el-form-item v-if="feedbackForm.feedbackType === 'RATING'" label="服务评分" prop="rating">
           <el-rate
             v-model="feedbackForm.rating"
             show-score
@@ -336,14 +294,14 @@
             v-model="feedbackForm.description"
             type="textarea"
             :rows="4"
-            :placeholder="getFeedbackPlaceholder(feedbackForm.type)"
+            :placeholder="getFeedbackPlaceholder(feedbackForm.feedbackType)"
           />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="feedbackDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleFeedbackSubmit">提交</el-button>
+          <el-button type="primary" @click="submitFeedback">提交反馈</el-button>
         </span>
       </template>
     </el-dialog>
@@ -353,7 +311,7 @@
 <script setup>
 import { ref, onMounted,  reactive } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage ,ElMessageBox} from 'element-plus'
 import { user} from '@/api'
 import { getToken } from '@/utils/auth'
 
@@ -386,17 +344,13 @@ const form = reactive({
   description: ''
 })
 
-// 评价表单
-const reviewFormRef = ref(null)
-const reviewForm = ref({
-  rating: 5,
-  comment: ''
-})
+
 
 // 反馈表单
 const feedbackFormRef = ref(null)
 const feedbackForm = reactive({
-  type: 'RATING',
+  orderId: null,
+  feedbackType: '',
   rating: 5,
   description: ''
 })
@@ -426,7 +380,7 @@ const reviewRules = {
 
 // 反馈表单验证规则
 const feedbackRules = {
-  type: [
+  feedbackType: [
     { required: true, message: '请选择反馈类型', trigger: 'change' }
   ],
   rating: [
@@ -434,19 +388,30 @@ const feedbackRules = {
   ],
   description: [
     { required: true, message: '请输入反馈内容', trigger: 'blur' },
-    { min: 5, message: '反馈内容至少5个字符', trigger: 'blur' }
+    { min: 5, max: 500, message: '反馈内容长度在 5 到 500 个字符之间', trigger: 'blur' }
   ]
 }
 
-// 获取状态标签类型
+
+
 const getStatusType = (status) => {
-  const types = {
-    '待处理': 'info',
-    '处理中': 'warning',
-    '已完成': 'success',
-    '已取消': 'danger'
+  const map = {
+    PENDING: 'warning',
+    PROCESSING: 'success',
+    COMPLETED: 'success',
+    CANCELLED: 'danger',
   }
-  return types[status] || 'info'
+  return map[status] || status
+}
+
+const getStatusText = (status) => {
+  const map = {
+    PENDING: '待处理',
+    PROCESSING: '维修中',
+    COMPLETED: '已完成',
+    CANCELLED: '已取消'
+  }
+  return map[status] || status
 }
 
 // 获取订单列表
@@ -533,12 +498,26 @@ const handleCreate = async () => {
 // 处理取消订单
 const handleCancel = async (row) => {
   try {
-    await order.cancel(row.id)
+    // 弹出确认对话框
+    await ElMessageBox.confirm(
+      `你确定要取消订单 ${row.orderNo} 吗？`,
+      '确认取消',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '再想想',
+        type: 'warning',
+      }
+    )
+    // 如果用户点了「确定」，继续下面的取消逻辑
+    await user.cancelOrder(row.id)
     ElMessage.success('取消成功')
     fetchOrders()
-  } catch (error) {
-    console.error('取消失败:', error)
-    ElMessage.error('取消失败')
+  } catch (err) {
+    // 如果用户点「取消」，err 会是一个取消的异常，我们不需要做任何处理
+    if (err !== 'cancel') {
+      console.error('取消失败:', err)
+      ElMessage.error('取消失败')
+    }
   }
 }
 
@@ -551,7 +530,7 @@ const handlePay = (row) => {
 // 确认支付
 const confirmPay = async () => {
   try {
-    await order.pay(currentOrder.value.id)
+    await user.payOrder(currentOrder.value.id)
     ElMessage.success('支付成功')
     payDialogVisible.value = false
     fetchOrders()
@@ -561,34 +540,6 @@ const confirmPay = async () => {
   }
 }
 
-// 处理评价
-const handleReview = (row) => {
-  currentOrder.value = row
-  reviewForm.value = {
-    rating: 5,
-    comment: ''
-  }
-  reviewDialogVisible.value = true
-}
-
-// 提交评价
-const submitReview = async () => {
-  if (!reviewFormRef.value) return
-  
-  await reviewFormRef.value.validate(async (valid) => {
-    if (valid) {
-      try {
-        await order.review(currentOrder.value.id, reviewForm.value)
-        ElMessage.success('评价成功')
-        reviewDialogVisible.value = false
-        fetchOrders()
-      } catch (error) {
-        console.error('评价失败:', error)
-        ElMessage.error('评价失败')
-      }
-    }
-  })
-}
 
 // 分页处理
 const handleSizeChange = (val) => {
@@ -599,16 +550,6 @@ const handleSizeChange = (val) => {
 const handleCurrentChange = (val) => {
   currentPage.value = val
   fetchOrders()
-}
-
-// 获取反馈内容占位符
-const getFeedbackPlaceholder = (type) => {
-  const placeholders = {
-    RATING: '请输入您的评价内容',
-    URGENT: '请描述您需要催单的原因',
-    GENERAL: '请输入您的反馈内容'
-  }
-  return placeholders[type] || '请输入反馈内容'
 }
 
 // 获取反馈类型标签
@@ -666,31 +607,49 @@ const handleView = async (row) => {
   }
 }
 
-// 催单
-const handleUrge = (row) => {
+// 获取反馈内容占位符
+const getFeedbackPlaceholder = (type) => {
+  const placeholders = {
+    RATING: '请输入您的评价内容',
+    URGENT: '请描述您需要催单的原因',
+    GENERAL: '请输入您的反馈内容'
+  }
+  return placeholders[type] || '请输入反馈内容'
+}
+
+// 处理反馈
+const handleFeedback = (row) => {
   currentOrder.value = row
-  feedbackForm.type = 'URGENT'
-  feedbackForm.rating = null
+  feedbackForm.orderId = row.id
+  feedbackForm.feedbackType = ''
+  feedbackForm.rating = 5
   feedbackForm.description = ''
   feedbackDialogVisible.value = true
 }
 
 // 提交反馈
-const handleFeedbackSubmit = async () => {
+const submitFeedback = async () => {
   if (!feedbackFormRef.value) return
   await feedbackFormRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        await user.submitFeedback({
-          orderId: currentOrder.value.id,
-          ...feedbackForm
-        })
-        ElMessage.success(feedbackForm.type === 'URGENT' ? '催单反馈已提交' : '评价成功')
+        const submitData = {
+          orderId: feedbackForm.orderId,
+          feedbackType: feedbackForm.feedbackType,
+          rating: feedbackForm.feedbackType === 'RATING' ? feedbackForm.rating : null,
+          description: feedbackForm.description
+        }
+        await user.submitFeedback(submitData)
+        ElMessage.success('反馈提交成功')
         feedbackDialogVisible.value = false
-        fetchOrders()
+        // 刷新反馈列表
+        if (viewDialogVisible.value) {
+          const feedbacks = await user.getFeedbackList(currentOrder.value.id)
+          feedbackList.value = feedbacks
+        }
       } catch (error) {
-        console.error('提交失败:', error)
-        ElMessage.error('提交失败')
+        console.error('提交反馈失败:', error)
+        ElMessage.error('提交反馈失败')
       }
     }
   })

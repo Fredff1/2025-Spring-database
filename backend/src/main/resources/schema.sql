@@ -40,7 +40,7 @@ CREATE TABLE `repairman_profile` (
   specialty         VARCHAR(30),
   hourly_money_rate DECIMAL(10,2),
   CHECK (specialty IN ('MAINTENANCE','REPAIR','PAINT','TIRE','OTHER')),
-  CONSTRAINT fk_rm_user FOREIGN KEY(user_id) REFERENCES users(user_id)
+  CONSTRAINT fk_rm_user FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 
@@ -67,12 +67,13 @@ CREATE TABLE `repair_order` (
   update_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status      VARCHAR(20) NOT NULL DEFAULT 'PENDING',
   fault_type  VARCHAR(20) NOT NULL DEFAULT 'OTHER',
+  is_paid     BOOLEAN     NOT NULL DEFAULT FALSE,
   PRIMARY KEY(order_id),
   INDEX idx_order_user(user_id),
   INDEX idx_order_vehicle(vehicle_id),
   CHECK (fault_type IN ('MAINTENANCE','REPAIR','PAINT','TIRE','OTHER')),
-  CONSTRAINT fk_order_user    FOREIGN KEY(user_id)    REFERENCES users(user_id),
-  CONSTRAINT fk_order_vehicle FOREIGN KEY(vehicle_id) REFERENCES vehicle(vehicle_id)
+  CONSTRAINT fk_order_user    FOREIGN KEY(user_id)    REFERENCES users(user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_order_vehicle FOREIGN KEY(vehicle_id) REFERENCES vehicle(vehicle_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -82,10 +83,12 @@ CREATE TABLE `repair_record` (
   repairman_id     BIGINT      NOT NULL,
   fault_description TEXT       NOT NULL,
   repair_result     TEXT,
+  order_status      VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+  actual_work_hours DECIMAL(5,2),
   completion_time   DATETIME,
   PRIMARY KEY(repair_record_id),
   INDEX idx_rr_order(order_id),
-  CONSTRAINT fk_rr_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id)
+  CONSTRAINT fk_rr_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -98,7 +101,7 @@ CREATE TABLE `material_usage` (
   create_time        DATETIME      NOT NULL,
   PRIMARY KEY(material_usage_id),
   INDEX idx_mu_order(order_id),
-  CONSTRAINT fk_mu_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id)
+  CONSTRAINT fk_mu_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -106,14 +109,14 @@ CREATE TABLE `feedback` (
   feedback_id   BIGINT      NOT NULL AUTO_INCREMENT,
   order_id      BIGINT      NOT NULL,
   user_id       BIGINT      NOT NULL,
-  rating        INT         NOT NULL,
+  rating        INT         ,
   feed_back_type VARCHAR(20) NOT NULL DEFAULT 'GENERAL',
   description   TEXT,
   feedback_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY(feedback_id),
   INDEX idx_fb_order(order_id),
-  CONSTRAINT fk_fb_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id),
-  CONSTRAINT fk_fb_user  FOREIGN KEY(user_id)  REFERENCES users(user_id)
+  CONSTRAINT fk_fb_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id) ON DELETE CASCADE,
+  CONSTRAINT fk_fb_user  FOREIGN KEY(user_id)  REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -123,17 +126,18 @@ CREATE TABLE `assignment` (
   repairman_id    BIGINT      NOT NULL,
   assignment_time    DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   assignment_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
-  actual_work_hours DECIMAL(5,2),
+
   PRIMARY KEY(assignment_id),
   INDEX idx_asg_order(order_id),
   INDEX idx_asg_tech(repairman_id),
-  CONSTRAINT fk_asg_order FOREIGN KEY(order_id)      REFERENCES repair_order(order_id),
-  CONSTRAINT fk_asg_tech  FOREIGN KEY(repairman_id) REFERENCES users(user_id)
+  CONSTRAINT fk_asg_order FOREIGN KEY(order_id)      REFERENCES repair_order(order_id) ON DELETE CASCADE,
+  CONSTRAINT fk_asg_tech  FOREIGN KEY(repairman_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `labor_fee_log` (
   labor_fee_log_id BIGINT      NOT NULL AUTO_INCREMENT,
+  order_id         BIGINT      NOT NULL,
   repairman_id    BIGINT      NOT NULL,
   month            VARCHAR(7)  NOT NULL,
   total_hours      DECIMAL(7,2) NOT NULL,
@@ -141,5 +145,5 @@ CREATE TABLE `labor_fee_log` (
   settle_time      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY(labor_fee_log_id),
   INDEX idx_lf_tech(repairman_id),
-  CONSTRAINT fk_lf_tech FOREIGN KEY(repairman_id) REFERENCES users(user_id)
+  CONSTRAINT fk_lf_tech FOREIGN KEY(repairman_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

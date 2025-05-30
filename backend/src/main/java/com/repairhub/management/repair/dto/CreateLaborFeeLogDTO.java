@@ -13,8 +13,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CreateLaborFeeLogDTO {
-    private Month month;
+    private Long orderId;
     private Long repairmanId;
     private BigDecimal totalHours;
     private BigDecimal totalIncome;
+
+    public static CreateLaborFeeLogDTO from(
+        Long orderId,
+        Long repairmanId,
+        BigDecimal totalHours,
+        BigDecimal hourlyMoneyRate
+    ){
+        CreateLaborFeeLogDTO dto = CreateLaborFeeLogDTO.builder()
+        .orderId(orderId)
+        .repairmanId(repairmanId)
+        .totalHours(totalHours)
+        .totalIncome(hourlyMoneyRate.multiply(totalHours))
+        .build();
+        return dto;
+    }
 }

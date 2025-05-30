@@ -27,6 +27,7 @@ public class RepairOrder {
     private String description;
     private FaultType faultType;
     private BigDecimal totalFee;
+    private Boolean isPaid;
 
     private List<Long> assignedRepairmanIds;
 
@@ -40,6 +41,7 @@ public class RepairOrder {
                 .description(request.getDescription())
                 .faultType(request.getFaultType())
                 .totalFee(BigDecimal.ZERO) // Initial total fee is zero
+                .isPaid(false)
                 .build();
     }
 }

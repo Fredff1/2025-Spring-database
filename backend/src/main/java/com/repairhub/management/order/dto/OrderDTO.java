@@ -30,7 +30,6 @@ public class OrderDTO {
     private OrderStatus status;
     private BigDecimal amount;
     private Boolean isPaid;
-    private Boolean isReviewed;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
@@ -45,6 +44,7 @@ public class OrderDTO {
             .problem(order.getDescription())
             .status(order.getStatus())
             .amount(order.getTotalFee())
+            .isPaid(order.getIsPaid())
             // .isPaid(false) // Assuming initial state is unpaid
             // .isReviewed(false) // Assuming initial state is not reviewed
             .createTime(order.getSubmitTime())
@@ -65,7 +65,6 @@ public class OrderDTO {
         .vehiclePlate("default")
         .amount(BigDecimal.valueOf(10))
         .isPaid(false)
-        .isReviewed(false)
         .createTime(LocalDateTime.now())
         .updateTime(LocalDateTime.now())
         .build();

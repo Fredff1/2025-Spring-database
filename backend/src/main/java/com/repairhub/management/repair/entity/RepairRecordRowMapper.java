@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
+import com.repairhub.management.order.enums.OrderStatus;
+
 public class RepairRecordRowMapper implements RowMapper<RepairRecord> {
 
     @Override
@@ -16,6 +18,8 @@ public class RepairRecordRowMapper implements RowMapper<RepairRecord> {
             .repairResult(rs.getString("repair_result"))
             .completionTime(rs.getTimestamp("completion_time").toLocalDateTime())
             .repairmanId(rs.getLong("repairman_id"))
+            .actualWorkHour(rs.getBigDecimal("actual_work_hours"))
+            .orderStatus(OrderStatus.valueOf(rs.getString("order_status")))
             .build();
     }
     

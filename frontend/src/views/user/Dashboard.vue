@@ -68,7 +68,7 @@
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)">{{ row.status }}</el-tag>
+            <el-tag :type="getStatusType(row.status)">{{ getStatusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="180" />
@@ -101,16 +101,6 @@ const stats = ref({
 // 最近订单
 const recentOrders = ref([])
 
-// 获取状态标签类型
-const getStatusType = (status) => {
-  const types = {
-    '待处理': 'info',
-    '处理中': 'warning',
-    '已完成': 'success',
-    '已取消': 'danger'
-  }
-  return types[status] || 'info'
-}
 
 // 跳转到订单页面
 const goToOrders = () => {
@@ -126,6 +116,26 @@ const getRepairTypeText = (type) => {
     OTHER: '其他'
   }
   return map[type] || type
+}
+
+const getStatusType = (status) => {
+  const map = {
+    PENDING: 'warning',
+    PROCESSING: 'success',
+    COMPLETED: 'success',
+    CANCELLED: 'danger',
+  }
+  return map[status] || status
+}
+
+const getStatusText = (status) => {
+  const map = {
+    PENDING: '待处理',
+    PROCESSING: '维修中',
+    COMPLETED: '已完成',
+    CANCELLED: '已取消'
+  }
+  return map[status] || status
 }
 
 // 获取数据

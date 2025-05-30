@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -34,7 +35,14 @@ public class RepairRecordJdbcRepository implements RepairRecordRepository {
     // Implement the methods from RepairRecordRepository interface
     @Override
     public int insert(RepairRecord repairRecord) {
-        SqlParameterSource params = new BeanPropertySqlParameterSource(repairRecord);
+        SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("order_id", repairRecord.getOrderId())
+        .addValue("repairman_id", repairRecord.getRepairmanId())
+        .addValue("fault_description", repairRecord.getFaultDescription())
+        .addValue("repair_result", repairRecord.getRepairResult())
+        .addValue("actual_work_hours", repairRecord.getActualWorkHour())
+        .addValue("completion_time", repairRecord.getCompletionTime())
+        .addValue("order_status", repairRecord.getOrderStatus());
         Number key = simpleJdbcInsert.executeAndReturnKey(params);
         long repairRecordId = key.longValue();
         repairRecord.setRecordId(repairRecordId);
@@ -45,13 +53,25 @@ public class RepairRecordJdbcRepository implements RepairRecordRepository {
     public int update(RepairRecord repairRecord) {
         String sql = """
             UPDATE repair_record
-                SET repair_order_id = :repairOrderId,
-                     repairman_id     = :repairmanId,
-                     fault_type       = :faultType,
-                     description      = :description,
-                     status           = :status
+                SET  order_id = :orderId,
+                     repairman_id       = :repairmanId,
+                     fault_description  = :faultDescription,
+                     repair_result      = :repairResult,
+                     actual_work_hours  = :actualWorkingHours
+                     completion_time    = :completionTime
+                     order_status       = :orderStatus
+            WHERE repair_record_id = :repairRecordId
                 """;
-        return jdbcTemplate.update(sql, new BeanPropertySqlParameterSource(repairRecord));
+        MapSqlParameterSource source = new MapSqlParameterSource()
+        .addValue("orderId", repairRecord.getOrderId())
+        .addValue("repairmanId", repairRecord.getRepairmanId())
+        .addValue("faultDescription", repairRecord.getFaultDescription())
+        .addValue("repairResult", repairRecord.getRepairResult())
+        .addValue("actualWorkingHours", repairRecord.getActualWorkHour())
+        .addValue("completionTime", repairRecord.getCompletionTime())
+        .addValue("orderStatus", repairRecord.getOrderStatus())
+        .addValue("repairRecordId", repairRecord.getRecordId());
+        return jdbcTemplate.update(sql, source);
     }
 
     @Override

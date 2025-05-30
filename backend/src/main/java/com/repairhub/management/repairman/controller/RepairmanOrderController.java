@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.repairhub.management.auth.entity.User;
+import com.repairhub.management.common.dto.CommonResponse;
 import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.dto.OrderDTO;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.service.OrderService;
+import com.repairhub.management.repair.dto.CreateMaterialUsageDTO;
+import com.repairhub.management.repair.dto.CreateRepairRecordDTO;
 import com.repairhub.management.repair.dto.MaterialUsageDTO;
 import com.repairhub.management.repair.dto.RepairFeedbackDTO;
 import com.repairhub.management.repair.dto.RepairRecordDTO;
@@ -27,6 +30,9 @@ import com.repairhub.management.repairman.service.RepairmanProfileService;
 import com.repairhub.management.utils.PageUtils;
 
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -83,6 +89,17 @@ public class RepairmanOrderController {
         .collect(Collectors.toList());
         return new ResponseEntity<>(dtos,HttpStatus.OK);
     }
+
+    @PostMapping("/records")
+    public ResponseEntity<CommonResponse<Boolean>> submitRepairRecord(
+        @RequestBody CreateRepairRecordDTO request,
+        @AuthenticationPrincipal User repairman
+        ) {
+        repairService.submitRepairRecord(request,repairman);
+        CommonResponse<Boolean> resp = new CommonResponse<Boolean>(201, "Submit success", true);
+        return new ResponseEntity<>(resp,HttpStatus.CREATED);
+    }
+    
 
     @GetMapping("/{orderId}/materials")
     public ResponseEntity<List<MaterialUsageDTO>> getRepairMaterials(

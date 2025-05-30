@@ -1,5 +1,6 @@
 package com.repairhub.management.repair.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.repairhub.management.auth.entity.User;
@@ -27,6 +28,7 @@ public class RepairRecordDTO {
     private String faultDescription;  // 故障描述
     private String repairResult;  // 维修结果
     private String status;  // 维修状态：待处理、处理中、已完成
+    private BigDecimal actualWorkingHour;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
@@ -34,7 +36,6 @@ public class RepairRecordDTO {
         RepairRecord record,
         UserRepository userRepository,
         RepairOrderRepository orderRepository){
-        RepairOrder order = orderRepository.findById(record.getOrderId()).get();
         User repairman = userRepository.findById(record.getRepairmanId()).get();
         RepairRecordDTO dto = RepairRecordDTO.builder()
         .recordId(record.getRecordId())
@@ -43,9 +44,10 @@ public class RepairRecordDTO {
         .repairmanName(repairman.getUsername())
         .faultDescription(record.getFaultDescription())
         .repairResult(record.getRepairResult())
-        .status(order.getStatus().name())
+        .status(record.getOrderStatus().name())
         .createTime(record.getCompletionTime())
         .updateTime(record.getCompletionTime())
+        .actualWorkingHour(record.getActualWorkHour())
         .build();
         return dto;
     }

@@ -2,6 +2,7 @@ package com.repairhub.management.repair.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -31,7 +32,8 @@ public class RepairFeeService {
     public LaborFeeLog createLaborFeeLog(CreateLaborFeeLogDTO dto) {
         LaborFeeLog laborFeeLog = LaborFeeLog.builder()
             .repairmanId(dto.getRepairmanId())
-            .month(dto.getMonth())
+            .orderId(dto.getOrderId())
+            .month(LocalDateTime.now().getMonth())
             .totalHours(dto.getTotalHours())
             .totalIncome(dto.getTotalIncome())
             .settleTime(LocalDateTime.now())

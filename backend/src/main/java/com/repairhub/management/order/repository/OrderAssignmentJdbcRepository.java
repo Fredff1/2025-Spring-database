@@ -40,8 +40,7 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
         .addValue("order_id", orderAssignment.getOrderId())
         .addValue("repairman_id", orderAssignment.getRepairmanId())
         .addValue("assignment_time", orderAssignment.getAssignmentTime())
-        .addValue("assignment_status", orderAssignment.getStatus().name())
-        .addValue("actual_work_hours", orderAssignment.getActualWorkHour());
+        .addValue("assignment_status", orderAssignment.getStatus().name());
         Number key = simpleJdbcInsert.executeAndReturnKey(params);
         long assignmentId = key.longValue();
         orderAssignment.setAssignmentId(assignmentId);
@@ -56,8 +55,7 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
         SET order_id           = :orderId,
             repairman_id       = :repairmanId,
             assignment_time    = :assignmentTime,
-            assignment_status  = :status,
-            actual_work_hours  = :actualWorkHours
+            assignment_status  = :status
         WHERE assignment_id      = :assignmentId
         """;
 
@@ -66,7 +64,6 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
             .addValue("repairmanId",       orderAssignment.getRepairmanId())
             .addValue("assignmentTime",    orderAssignment.getAssignmentTime())
             .addValue("status",            orderAssignment.getStatus().name())
-            .addValue("actualWorkHours",   orderAssignment.getActualWorkHour())
             .addValue("assignmentId",      orderAssignment.getAssignmentId());
 
         return jdbc.update(sql, params);

@@ -21,6 +21,7 @@ import com.repairhub.management.order.dto.OrderDTO;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.repository.RepairOrderRepository;
 import com.repairhub.management.order.service.OrderService;
+import com.repairhub.management.repair.dto.CreateRepairFeedbackDTO;
 import com.repairhub.management.repair.dto.MaterialUsageDTO;
 import com.repairhub.management.repair.dto.RepairFeedbackDTO;
 import com.repairhub.management.repair.dto.RepairRecordDTO;
@@ -69,8 +70,29 @@ public class UserOrderController {
         //TODO: process POST request
         orderService.createOrder(user, request);
         var resp = CommonResponse.toResponse(201, "Success", "Creation success");
-         return new ResponseEntity<>(resp,HttpStatus.CREATED);
+        return new ResponseEntity<>(resp,HttpStatus.CREATED);
     }
+
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<CommonResponse<String>> cancelOrder(
+        @PathVariable Long orderId) {
+        
+        orderService.cancelOrder(orderId);
+        var resp = CommonResponse.toResponse(201, "Success", "Creation success");
+        return new ResponseEntity<>(resp,HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{orderId}/pay")
+    public ResponseEntity<CommonResponse<String>> payOrder(
+        @PathVariable Long orderId
+        ) {
+        RepairOrder order = orderService.findById(orderId).get();
+        order.setIsPaid(true);
+        orderService.updateRepairOrder(order);
+        var resp = CommonResponse.toResponse(201, "Success", "Creation success");
+        return new ResponseEntity<>(resp,HttpStatus.CREATED);
+    }
+    
 
     @GetMapping("/{orderId}/records")
     public ResponseEntity<List<RepairRecordDTO>> getRepairRecords(
@@ -104,6 +126,17 @@ public class UserOrderController {
         .collect(Collectors.toList());
         return new ResponseEntity<>(dtos,HttpStatus.OK);
     }
+
+    @PostMapping("/feedback")
+    public ResponseEntity<CommonResponse<String>> submitFeedback(
+        @RequestBody CreateRepairFeedbackDTO request,
+        @AuthenticationPrincipal User user
+        ) {
+        repairService.submitRepairFeedback(request, user);
+        var resp = CommonResponse.toResponse(201, "Success", "Creation success");
+        return new ResponseEntity<>(resp,HttpStatus.CREATED);
+    }
+    
     
     
 }

@@ -222,9 +222,9 @@ const assignments = ref([])
 // 获取维修类型标签
 const getRepairTypeTag = (type) => {
   const map = {
-    maintenance: 'info',
-    repair: 'warning',
-    accident: 'danger'
+    MAINTENANCE: 'info',
+    REPAIR: 'warning',
+    ACCIDENT: 'danger'
   }
   return map[type] || 'info'
 }
@@ -232,9 +232,9 @@ const getRepairTypeTag = (type) => {
 // 获取维修类型文本
 const getRepairTypeText = (type) => {
   const map = {
-    maintenance: '常规保养',
-    repair: '故障维修',
-    accident: '事故维修'
+    MAINTENANCE: '常规保养',
+    REPAIR: '故障维修',
+    ACCIDENT: '事故维修'
   }
   return map[type] || type
 }

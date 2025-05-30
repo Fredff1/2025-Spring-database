@@ -72,6 +72,11 @@ public class OrderService {
         return order;
     }
 
+    @Transactional
+    public void cancelOrder(Long orderId){
+        repairOrderRepository.deleteById(orderId);
+    }
+
     public Optional<RepairOrder> findById(Long orderId) {
         var order = repairOrderRepository.findById(orderId);
         if(order.isPresent()){
@@ -88,7 +93,10 @@ public class OrderService {
         }
         
         return order;
+    }
 
+    public void updateRepairOrder(RepairOrder order){
+        repairOrderRepository.update(order);
     }
 
     public OrderDTO toDTO(RepairOrder order){
@@ -120,7 +128,6 @@ public class OrderService {
                 .repairmanId(selectedProfile.getUserId())
                 .assignmentTime(LocalDateTime.now())
                 .status(AssignmentStatus.PENDING)
-                .actualWorkHour(null)
                 .build();
         orderAssignmentRepository.insert(assignment);
         return assignment;

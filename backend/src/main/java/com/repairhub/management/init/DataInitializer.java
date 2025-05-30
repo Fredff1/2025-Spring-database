@@ -122,6 +122,7 @@ public class DataInitializer implements ApplicationRunner{
         .description("默认维修任务")
         .faultType(FaultType.MAINTENANCE)
         .totalFee(BigDecimal.valueOf(0L))
+        .isPaid(false)
         .build();
         repairOrderRepository.insert(order);
 

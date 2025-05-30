@@ -44,11 +44,11 @@ public class MaterialUsageJdbcRepository implements MaterialUsageRepository {
     public int update(MaterialUsage materialUsage){
         String sql = """
             UPDATE material_usage
-                SET material_usage_id = :materialId,
                 order_id = :orderId,
                 material_name = :materialName,
                 quantity = :quantity,
                 unit_price = :unitPrice,
+            WHERE material_usage_id = :materialId
                 """;
         return jdbcTemplate.update(sql, new BeanPropertySqlParameterSource(materialUsage));
     }

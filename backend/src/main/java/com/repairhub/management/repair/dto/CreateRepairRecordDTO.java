@@ -1,5 +1,8 @@
 package com.repairhub.management.repair.dto;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import com.repairhub.management.order.enums.OrderStatus;
 
 import lombok.AllArgsConstructor;
@@ -15,5 +18,7 @@ public class CreateRepairRecordDTO {
     private Long orderId;
     private String faultDescription;
     private String repairResult;
-    private OrderStatus orderStatus;
+    private OrderStatus status;
+    private BigDecimal actualWorkHour;
+    private List<CreateMaterialUsageDTO> materials;
 }

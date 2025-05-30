@@ -13,6 +13,7 @@ public class LaborFeeLogRowMapper implements RowMapper<LaborFeeLog> {
         return LaborFeeLog.builder()
                 .LaborFeeLogId(rs.getLong("labor_fee_log_id"))
                 .repairmanId(rs.getLong("repairman_id"))
+                .orderId(rs.getLong("order_id"))
                 .month(Month.valueOf(rs.getString("month").toUpperCase()))
                 .totalHours(rs.getBigDecimal("total_hours"))
                 .totalIncome(rs.getBigDecimal("total_income"))

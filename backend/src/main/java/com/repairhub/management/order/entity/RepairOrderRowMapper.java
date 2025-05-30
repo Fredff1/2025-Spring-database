@@ -22,6 +22,7 @@ public class RepairOrderRowMapper implements RowMapper<RepairOrder> {
                 .description(rs.getString("description"))
                 .faultType(FaultType.valueOf(rs.getString("fault_type")))
                 .totalFee(rs.getBigDecimal("total_fee"))
+                .isPaid(rs.getBoolean("is_paid"))
                 .build();
     }
     
