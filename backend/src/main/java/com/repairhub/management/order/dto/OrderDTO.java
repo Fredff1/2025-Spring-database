@@ -3,10 +3,10 @@ package com.repairhub.management.order.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.repair.enums.FaultType;
-import com.repairhub.management.repair.enums.RepairType;
 import com.repairhub.management.utils.OrderUtil;
 import com.repairhub.management.vehicle.entity.Vehicle;
 import com.repairhub.management.vehicle.repository.VehicleRepository;
@@ -32,8 +32,12 @@ public class OrderDTO {
     private Boolean isPaid;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+    private String customerName;
 
-    public static OrderDTO from(RepairOrder order,VehicleRepository vehicleRepository) {
+    public static OrderDTO from(
+        RepairOrder order,
+        VehicleRepository vehicleRepository,
+        User customer) {
         Vehicle vehicle = vehicleRepository.findById(order.getVehicleId()).get();
         var dto =OrderDTO.builder()
             .id(order.getOrderId())
@@ -45,11 +49,9 @@ public class OrderDTO {
             .status(order.getStatus())
             .amount(order.getTotalFee())
             .isPaid(order.getIsPaid())
-            // .isPaid(false) // Assuming initial state is unpaid
-            // .isReviewed(false) // Assuming initial state is not reviewed
+            .customerName(customer.getUsername())
             .createTime(order.getSubmitTime())
-            .updateTime(order.getUpdateTime()) // Assuming update time is now 
-            // TODO update time
+            .updateTime(order.getUpdateTime()) 
             .build();
         return dto;
     }

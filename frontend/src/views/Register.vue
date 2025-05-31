@@ -38,8 +38,8 @@
 
         <el-form-item label="角色" prop="role">
           <el-select v-model="form.role" placeholder="请选择角色">
-            <el-option label="管理员" value="ADMIN" />
-            <el-option label="维修人员" value="REPAIRMAN" />
+            <!-- <el-option label="管理员" value="ADMIN" />
+            <el-option label="维修人员" value="REPAIRMAN" /> -->
             <el-option label="客户" value="CUSTOMER" />
           </el-select>
         </el-form-item>
@@ -56,6 +56,8 @@
           <el-button type="primary" native-type="submit" :loading="loading">
             注册
           </el-button>
+        </el-form-item>
+        <el-form-item>
           <el-button @click="$router.push('/login')">
             已有账号？去登录
           </el-button>
@@ -150,12 +152,8 @@ const handleRegister = async () => {
     })
 
     const data = await response.json()
-    if (data.code === 200) {
-      ElMessage.success('注册成功')
-      router.push('/login')
-    } else {
-      ElMessage.error(data.message || '注册失败')
-    }
+    ElMessage.success('注册成功')
+    router.push('/login')
   } catch (error) {
     console.error(error)
     ElMessage.error('注册失败')

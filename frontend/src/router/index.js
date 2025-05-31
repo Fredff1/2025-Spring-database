@@ -24,10 +24,8 @@ import AdminUsers from '@/views/admin/Users.vue';
 import AdminRepairmen from '@/views/admin/Repairmen.vue';
 import AdminVehicles from '@/views/admin/Vehicles.vue';
 import AdminOrders from '@/views/admin/Orders.vue';
-import AdminInventory from '@/views/admin/Inventory.vue';
-import AdminFinance from '@/views/admin/Finance.vue';
 import AdminStatistics from '@/views/admin/Statistics.vue';
-import AdminSettings from '@/views/admin/Settings.vue';
+import AdminAssignment from '@/views/admin/Assignments.vue';
 import AdminProfile from '@/views/admin/Profile.vue';
 
 // 维修人员页面
@@ -124,24 +122,14 @@ const router = createRouter({
           component: AdminOrders
         },
         {
-          path: 'inventory',
-          name: 'AdminInventory',
-          component: AdminInventory
-        },
-        {
-          path: 'finance',
-          name: 'AdminFinance',
-          component: AdminFinance
-        },
-        {
           path: 'statistics',
           name: 'AdminStatistics',
           component: AdminStatistics
         },
         {
-          path: 'settings',
-          name: 'AdminSettings',
-          component: AdminSettings
+          path: 'assignments',
+          name: 'AdminAssignment',
+          component: AdminAssignment
         },
         {
           path: 'profile',

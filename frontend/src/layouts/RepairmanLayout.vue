@@ -35,7 +35,7 @@
           </el-menu-item>
           <el-menu-item index="/repairman/assignments">
             <el-icon><document /></el-icon>
-            <span>待处理任务</span>
+            <span>任务分配</span>
           </el-menu-item>
           <el-menu-item index="/repairman/income">
             <el-icon><data-analysis /></el-icon>

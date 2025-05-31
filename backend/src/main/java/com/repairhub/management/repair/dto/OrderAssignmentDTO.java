@@ -2,6 +2,7 @@ package com.repairhub.management.repair.dto;
 
 import java.time.LocalDateTime;
 
+import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.AssignmentStatus;
@@ -27,11 +28,13 @@ public class OrderAssignmentDTO {
     private String problem;
     private LocalDateTime assignmentTime;
     private AssignmentStatus status;
+    private String repairmanName;
 
     public static OrderAssignmentDTO from(
         OrderAssignment assignment,
         RepairOrder order,
-        Vehicle vehicle
+        Vehicle vehicle,
+        User repairman
     ){
         OrderAssignmentDTO dto = OrderAssignmentDTO
         .builder()
@@ -43,6 +46,7 @@ public class OrderAssignmentDTO {
         .problem(order.getDescription())
         .assignmentTime(assignment.getAssignmentTime())
         .status(assignment.getStatus())
+        .repairmanName(repairman.getUsername())
         .build();
         return dto;
     }

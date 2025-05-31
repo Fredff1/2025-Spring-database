@@ -7,7 +7,6 @@ import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.common.dto.CommonResponse;
 import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.utils.PageUtils;
-import com.repairhub.management.vehicle.controller.VehicleController;
 import com.repairhub.management.vehicle.dto.CreateVehicleRequest;
 import com.repairhub.management.vehicle.dto.UpdateVehicleRequest;
 import com.repairhub.management.vehicle.dto.VehicleDTO;
@@ -82,7 +81,7 @@ public class UserVehicleController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     
     }
-    
+
     @DeleteMapping("/{vehicleId}")
     public ResponseEntity<CommonResponse<Boolean>> deleteVehicle(
         @PathVariable Long vehicleId,

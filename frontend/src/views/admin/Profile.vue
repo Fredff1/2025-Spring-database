@@ -19,7 +19,7 @@
       </el-descriptions>
     </el-card>
 
-    <el-card shadow="hover" class="password-card">
+    <!-- <el-card shadow="hover" class="password-card">
       <template #header>
         <div class="card-header">
           <span>修改密码</span>
@@ -62,7 +62,7 @@
           </el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </el-card> -->
   </div>
 </template>
 
@@ -184,7 +184,7 @@ const formatDateTime = (datetime) => {
 // 获取用户信息
 const fetchUserInfo = async () => {
   try {
-    const res = await admin.getInfo()
+    const res = await admin.getProfile()
     Object.assign(form, res)
   } catch (error) {
     console.error('获取用户信息失败:', error)

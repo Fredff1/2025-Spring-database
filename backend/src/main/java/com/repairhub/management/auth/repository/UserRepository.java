@@ -11,6 +11,7 @@ public interface UserRepository {
     Optional<User> findById(Long userId);
     Optional<User> findByUsername(String username);
     List<User> findAllByRole(UserRole role);
+    List<User> findAll();
     int updateStatus(Long userId, String status);
 
 }

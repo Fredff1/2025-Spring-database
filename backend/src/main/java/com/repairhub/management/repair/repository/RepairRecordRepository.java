@@ -18,6 +18,8 @@ public interface RepairRecordRepository {
 
     public List<RepairRecord> findByRepairmanId(Long repairmanId);
 
+    public List<RepairRecord> findAll();
+
     public int countByUserId(Long userId);
 }   
 

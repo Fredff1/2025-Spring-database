@@ -97,4 +97,10 @@ public class LaborFeeLogJdbcRepository implements LaborFeeLogRepository{
         String sql = "SELECT * FROM labor_fee_log WHERE repairman_id = :repairmanId";
         return jdbcTemplate.query(sql, Map.of("repairmanId", repairmanId), mapper);
     }
+
+    @Override
+    public List<LaborFeeLog> findAll(){
+        String sql = "SELECT * FROM labor_fee_log";
+        return jdbcTemplate.query(sql, mapper);
+    }
 }

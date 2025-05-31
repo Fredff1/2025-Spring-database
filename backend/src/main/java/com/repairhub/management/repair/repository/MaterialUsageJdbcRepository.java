@@ -78,5 +78,11 @@ public class MaterialUsageJdbcRepository implements MaterialUsageRepository {
         String sql = "SELECT * FROM material_usage WHERE repairman_id = :repairmanId";
         return jdbcTemplate.query(sql, Map.of("repairmanId", repairmanId), mapper);
     }
+
+    @Override
+    public List<MaterialUsage> findAll(){
+        String sql = "SELECT * FROM material_usage";
+        return jdbcTemplate.query(sql, mapper);
+    }
    
 }

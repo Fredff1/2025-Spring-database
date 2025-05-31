@@ -2,14 +2,12 @@
   <div class="users">
     <div class="page-header">
       <h2 class="page-title">用户管理</h2>
-      <el-button type="primary" @click="showAddDialog">
-        <el-icon><plus /></el-icon>
-        添加用户
-      </el-button>
+      <!-- <el-button type="primary" @click="handleAdd">添加用户</el-button> -->
+       <!--暂时不支持增删改-->
     </div>
 
     <!-- 搜索栏 -->
-    <el-card shadow="hover" class="search-card">
+    <!-- <el-card shadow="hover" class="search-card">
       <el-form :inline="true" :model="searchForm">
         <el-form-item label="用户名">
           <el-input v-model="searchForm.username" placeholder="请输入用户名" />
@@ -25,56 +23,59 @@
           <el-button @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </el-card> -->
 
     <!-- 用户列表 -->
     <el-card shadow="hover">
-      <el-table :data="users" style="width: 100%">
+      <el-table :data="users" style="width: 100%" v-loading="loading">
+        <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="username" label="用户名" width="120" />
-        <el-table-column prop="name" label="姓名" width="120" />
         <el-table-column prop="phone" label="手机号" width="120" />
         <el-table-column prop="email" label="邮箱" width="180" />
-        <el-table-column prop="createTime" label="创建时间" width="180" />
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="userStatus" label="状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
-              {{ row.status === 'active' ? '正常' : '禁用' }}
+            <el-tag :type="getUserStatusType(row.userStatus)">
+              {{ getUserStatusText(row.userStatus) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column prop="createTime" label="创建时间" width="180">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
-            <el-button
-              :type="row.status === 'active' ? 'danger' : 'success'"
-              link
-              @click="handleToggleStatus(row)"
-            >
-              {{ row.status === 'active' ? '禁用' : '启用' }}
-            </el-button>
-            <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+            {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
+        <el-table-column prop="updateTime" label="更新时间" width="180">
+          <template #default="{ row }">
+            {{ formatDateTime(row.updateTime) }}
+          </template>
+        </el-table-column>
+        <!-- <el-table-column label="操作" fixed="right" width="150">
+          <template #default="{ row }">
+            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+            <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+          </template>
+        </el-table-column> -->
+        <!--暂时不支持增删改-->
       </el-table>
 
       <!-- 分页 -->
-      <div class="pagination">
+      <div class="pagination-container">
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
-          :total="total"
           :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next"
+          :total="total"
+          layout="total, sizes, prev, pager, next, jumper"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
       </div>
     </el-card>
 
-    <!-- 添加/编辑用户对话框 -->
+    <!-- 用户表单对话框 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="isEdit ? '编辑用户' : '添加用户'"
+      :title="dialogType === 'add' ? '添加用户' : '编辑用户'"
       width="500px"
     >
       <el-form
@@ -84,13 +85,7 @@
         label-width="100px"
       >
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" :disabled="isEdit" />
-        </el-form-item>
-        <el-form-item label="密码" prop="password" v-if="!isEdit">
-          <el-input v-model="form.password" type="password" show-password />
-        </el-form-item>
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="form.name" />
+          <el-input v-model="form.username" />
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
           <el-input v-model="form.phone" />
@@ -98,26 +93,20 @@
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="form.email" />
         </el-form-item>
+        <el-form-item label="状态" prop="userStatus">
+          <el-select v-model="form.userStatus" placeholder="请选择状态">
+            <el-option label="正常" value="ACTIVE" />
+            <el-option label="未激活" value="INACTIVE" />
+            <el-option label="已封禁" value="BLOCKED" />
+          </el-select>
+        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit">确定</el-button>
-        </span>
-      </template>
-    </el-dialog>
-
-    <!-- 删除确认对话框 -->
-    <el-dialog
-      v-model="deleteDialogVisible"
-      title="确认删除"
-      width="400px"
-    >
-      <p>确定要删除该用户吗？此操作不可恢复。</p>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="deleteDialogVisible = false">取消</el-button>
-          <el-button type="danger" @click="confirmDelete">确定</el-button>
+          <el-button type="primary" @click="handleSubmit" :loading="submitting">
+            确定
+          </el-button>
         </span>
       </template>
     </el-dialog>
@@ -125,38 +114,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { admin } from '@/api'
+import dayjs from 'dayjs'
 
-// 搜索表单
-const searchForm = ref({
-  username: '',
-  name: '',
-  phone: ''
-})
-
-// 用户列表
+// 表格数据
+const loading = ref(false)
 const users = ref([])
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-// 对话框控制
+// 对话框相关
 const dialogVisible = ref(false)
-const deleteDialogVisible = ref(false)
-const isEdit = ref(false)
-const currentUser = ref(null)
-
-// 表单
+const dialogType = ref('add')
+const submitting = ref(false)
 const formRef = ref(null)
-const form = ref({
+
+// 表单数据
+const form = reactive({
   username: '',
-  password: '',
-  name: '',
   phone: '',
-  email: ''
+  email: '',
+  userStatus: 'ACTIVE'
 })
 
 // 表单验证规则
@@ -181,114 +162,101 @@ const rules = {
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
   ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
-  ],
-  name: [
-    { required: true, message: '请输入姓名', trigger: 'blur' }
-  ],
   phone: [
     { required: true, message: '请输入手机号', trigger: 'blur' },
     { validator: validatePhone, trigger: 'blur' }
   ],
   email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
     { validator: validateEmail, trigger: 'blur' }
+  ],
+  userStatus: [
+    { required: true, message: '请选择状态', trigger: 'change' }
   ]
+}
+
+// 获取用户状态类型
+const getUserStatusType = (status) => {
+  const map = {
+    ACTIVE: 'success',
+    INACTIVE: 'info',
+    BLOCKED: 'danger'
+  }
+  return map[status] || 'info'
+}
+
+// 获取用户状态文本
+const getUserStatusText = (status) => {
+  const map = {
+    ACTIVE: '正常',
+    INACTIVE: '未激活',
+    BLOCKED: '已封禁'
+  }
+  return map[status] || status
+}
+
+// 格式化日期时间
+const formatDateTime = (datetime) => {
+  if (!datetime) return '-'
+  return dayjs(datetime).format('YYYY-MM-DD HH:mm:ss')
 }
 
 // 获取用户列表
 const fetchUsers = async () => {
+  loading.value = true
   try {
-    const res = await admin.getUsers({
+    const params = {
       page: currentPage.value,
-      limit: pageSize.value,
-      ...searchForm.value
-    })
-    users.value = res.list
-    total.value = res.total
+      limit: pageSize.value
+    }
+    const res = await admin.getUsers(params)
+    users.value = res.list || []
+    total.value = res.total || 0
   } catch (error) {
     console.error('获取用户列表失败:', error)
     ElMessage.error('获取用户列表失败')
+  } finally {
+    loading.value = false
   }
 }
 
-// 搜索
-const handleSearch = () => {
-  currentPage.value = 1
-  fetchUsers()
-}
-
-// 重置搜索
-const resetSearch = () => {
-  searchForm.value = {
-    username: '',
-    name: '',
-    phone: ''
-  }
-  handleSearch()
-}
-
-// 显示添加对话框
-const showAddDialog = () => {
-  isEdit.value = false
-  form.value = {
-    username: '',
-    password: '',
-    name: '',
-    phone: '',
-    email: ''
-  }
+// 添加用户
+const handleAdd = () => {
+  dialogType.value = 'add'
+  form.username = ''
+  form.phone = ''
+  form.email = ''
+  form.userStatus = 'ACTIVE'
   dialogVisible.value = true
 }
 
-// 处理编辑
+// 编辑用户
 const handleEdit = (row) => {
-  isEdit.value = true
-  form.value = { ...row }
+  dialogType.value = 'edit'
+  Object.assign(form, row)
   dialogVisible.value = true
 }
 
-// 处理删除
+// 删除用户
 const handleDelete = (row) => {
-  currentUser.value = row
-  deleteDialogVisible.value = true
-}
-
-// 确认删除
-const confirmDelete = async () => {
-  try {
-    await admin.deleteUser(currentUser.value.id)
-    ElMessage.success('删除成功')
-    deleteDialogVisible.value = false
-    fetchUsers()
-  } catch (error) {
-    console.error('删除失败:', error)
-    ElMessage.error('删除失败')
-  }
-}
-
-// 处理状态切换
-const handleToggleStatus = async (row) => {
-  try {
-    await ElMessageBox.confirm(
-      `确定要${row.status === 'active' ? '禁用' : '启用'}该用户吗？`,
-      '提示',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
-    await admin.updateUserStatus(row.id, row.status === 'active' ? 'disabled' : 'active')
-    ElMessage.success('操作成功')
-    fetchUsers()
-  } catch (error) {
-    if (error !== 'cancel') {
-      console.error('操作失败:', error)
-      ElMessage.error('操作失败')
+  ElMessageBox.confirm(
+    '确定要删除该用户吗？',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
     }
-  }
+  ).then(async () => {
+    try {
+      await admin.deleteUser(row.id)
+      ElMessage.success('删除成功')
+      fetchUsers()
+    } catch (error) {
+      console.error('删除失败:', error)
+      ElMessage.error('删除失败')
+    }
+  })
 }
 
 // 提交表单
@@ -297,36 +265,41 @@ const handleSubmit = async () => {
   
   await formRef.value.validate(async (valid) => {
     if (valid) {
+      submitting.value = true
       try {
-        if (isEdit.value) {
-          await admin.updateUser(form.value.id, form.value)
-          ElMessage.success('更新成功')
-        } else {
-          await admin.createUser(form.value)
+        if (dialogType.value === 'add') {
+          await admin.createUser(form)
           ElMessage.success('添加成功')
+        } else {
+          await admin.updateUser(form.id, form)
+          ElMessage.success('更新成功')
         }
         dialogVisible.value = false
         fetchUsers()
       } catch (error) {
-        console.error('操作失败:', error)
-        ElMessage.error('操作失败')
+        console.error('保存失败:', error)
+        ElMessage.error('保存失败')
+      } finally {
+        submitting.value = false
       }
     }
   })
 }
 
-// 分页处理
+// 分页大小变化
 const handleSizeChange = (val) => {
   pageSize.value = val
   fetchUsers()
 }
 
+// 页码变化
 const handleCurrentChange = (val) => {
   currentPage.value = val
   fetchUsers()
 }
 
 onMounted(() => {
+  console.log(users.value)
   fetchUsers()
 })
 </script>
@@ -354,7 +327,7 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 
-.pagination {
+.pagination-container {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;

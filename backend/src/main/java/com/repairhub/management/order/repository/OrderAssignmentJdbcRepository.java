@@ -97,4 +97,10 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
         String sql = "SELECT * FROM assignment WHERE repairman_id = :repairmanId";
         return jdbc.query(sql, Map.of("repairmanId", repairmanId), mapper);
     }
+
+    @Override
+    public List<OrderAssignment> findAll(){
+        String sql = "SELECT * FROM assignment";
+        return jdbc.query(sql, mapper);
+    }
 }

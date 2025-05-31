@@ -45,22 +45,30 @@
             <el-icon><document /></el-icon>
             <span>订单管理</span>
           </el-menu-item>
-          <el-menu-item index="/admin/inventory">
+          <!-- <el-menu-item index="/admin/inventory">
             <el-icon><box /></el-icon>
             <span>库存管理</span>
           </el-menu-item>
           <el-menu-item index="/admin/finance">
             <el-icon><money /></el-icon>
             <span>财务管理</span>
+          </el-menu-item> -->
+          <el-menu-item index="/admin/assignments">
+            <el-icon><setting /></el-icon>
+            <span>任务分配</span>
           </el-menu-item>
           <el-menu-item index="/admin/statistics">
             <el-icon><data-analysis /></el-icon>
             <span>统计分析</span>
           </el-menu-item>
-          <el-menu-item index="/admin/settings">
+          <el-menu-item index="/admin/profile">
+            <el-icon><money /></el-icon>
+            <span>个人资料</span>
+          </el-menu-item>
+          <!-- <el-menu-item index="/admin/settings">
             <el-icon><setting /></el-icon>
             <span>系统设置</span>
-          </el-menu-item>
+          </el-menu-item> -->
         </el-menu>
       </aside>
       

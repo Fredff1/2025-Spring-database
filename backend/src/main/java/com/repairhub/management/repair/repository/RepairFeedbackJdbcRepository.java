@@ -81,5 +81,11 @@ public class RepairFeedbackJdbcRepository implements RepairFeedbackRepository{
         return jdbcTemplate.query(sql, Map.of("order_id", repairOrderId), mapper);
     }
 
+    @Override
+    public List<RepairFeedback> findAll(){
+        String sql = "SELECT * FROM feedback";
+        return jdbcTemplate.query(sql, mapper);
+    }
+
    
 }

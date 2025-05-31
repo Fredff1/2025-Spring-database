@@ -43,11 +43,11 @@ public class OrderEventListener {
         OrderAssignment assignment = event.getOrderAssignment();
         if(!assignment.getStatus().isAccepted()){
             // 如果维修工拒绝了订单分配，则将订单状态改为 PENDING
-            // orderService.findById(assignment.getOrderId()).ifPresent(order -> {
-            //     order.setStatus(OrderStatus.PENDING);
-            //     orderService.getRepairOrderRepository().update(order);
-            //     orderService.assignOrder(order);
-            // });
+            orderService.findById(assignment.getOrderId()).ifPresent(order -> {
+                // order.setStatus(OrderStatus.PENDING);
+                // orderService.getRepairOrderRepository().update(order);
+                orderService.assignOrder(order);
+            });
         } else {
             orderService.findById(assignment.getOrderId()).ifPresent(order -> {
                 // 如果维修工接受了订单分配，则将订单状态改为 PROCESSING

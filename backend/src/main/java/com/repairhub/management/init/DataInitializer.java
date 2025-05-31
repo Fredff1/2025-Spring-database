@@ -21,7 +21,6 @@ import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.order.repository.RepairOrderRepository;
 import com.repairhub.management.repair.enums.FaultType;
-import com.repairhub.management.repair.enums.RepairType;
 import com.repairhub.management.repairman.entity.RepairmanProfile;
 import com.repairhub.management.repairman.repository.RepairmanProfileRepository;
 import com.repairhub.management.vehicle.entity.Vehicle;
@@ -88,7 +87,7 @@ public class DataInitializer implements ApplicationRunner{
         
         User admin = User.builder()
             .username("admin")
-            .password(passwordEncoder.encode("adminl123"))
+            .password(passwordEncoder.encode("admin123"))
             .email("admin@repairhub.com")
             .phone("345-678-9012")
             .role(UserRole.ADMIN)

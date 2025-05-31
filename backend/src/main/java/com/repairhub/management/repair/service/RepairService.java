@@ -155,7 +155,8 @@ public class RepairService {
     }
 
     public RepairFeedbackDTO convertFeedbackToDTO(RepairFeedback feedback){
-        return RepairFeedbackDTO.from(feedback);
+        User user = userRepository.findById(feedback.getUserId()).orElse(null);
+        return RepairFeedbackDTO.from(feedback,user);
     }
 
     public MaterialUsageDTO convertMaterialUsageToDTO(MaterialUsage materialUsage){

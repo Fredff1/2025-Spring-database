@@ -79,4 +79,10 @@ public class UserJdbcRepository implements UserRepository{
         SqlParameterSource params = new MapSqlParameterSource("role", role.name());
         return jdbc.query(sql, params, mapper);
     }
+
+    @Override
+    public List<User> findAll() {
+        String sql = "SELECT * FROM `users`";
+        return jdbc.query(sql, mapper);
+    }
 }

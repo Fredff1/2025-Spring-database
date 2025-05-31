@@ -23,4 +23,6 @@ public interface OrderAssignmentRepository {
 
     // 查询某个维修工的所有分配记录
     public List<OrderAssignment> findByRepairmanId(Long repairmanId);
+
+    public List<OrderAssignment> findAll();
 }

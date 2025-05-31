@@ -39,6 +39,8 @@
           <el-button type="primary" native-type="submit" :loading="loading">
             登录
           </el-button>
+        </el-form-item>
+        <el-form-item>
           <el-button @click="$router.push('/register')">
             没有账号？去注册
           </el-button>

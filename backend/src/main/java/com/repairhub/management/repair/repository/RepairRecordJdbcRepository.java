@@ -114,5 +114,11 @@ public class RepairRecordJdbcRepository implements RepairRecordRepository {
             Integer.class
         );
     }
+
+    @Override
+    public List<RepairRecord> findAll(){
+        String sql = "SELECT * FROM repair_record";
+        return jdbcTemplate.query(sql, mapper);
+    }
     
 }

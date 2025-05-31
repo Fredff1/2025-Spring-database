@@ -18,6 +18,7 @@
         </el-table-column>
         <el-table-column prop="problem" label="问题描述" min-width="200" show-overflow-tooltip />
         <el-table-column prop="assignmentTime" label="分配时间" width="180" />
+        <el-table-column prop="repairmanName" label="维修人员" width="180" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="getAssignmentStatusTag(row.status)">
@@ -25,24 +26,8 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <!-- <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
-            <el-button
-              v-if="row.status === 'PENDING'"
-              type="success"
-              link
-              @click="handleAcceptAssignment(row)"
-            >
-              接受
-            </el-button>
-            <el-button
-              v-if="row.status === 'PENDING'"
-              type="danger"
-              link
-              @click="handleRejectAssignment(row)"
-            >
-              拒绝
-            </el-button>
             <el-button
               v-if="row.status === 'ACCEPTED'"
               type="primary"
@@ -52,7 +37,7 @@
               查看详情
             </el-button>
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
 
       <!-- 分页 -->
@@ -74,7 +59,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { repairman } from '@/api'
+import { admin } from '@/api'
 import { useRouter } from 'vue-router'
 
 // 任务分配列表
@@ -133,7 +118,7 @@ const getAssignmentStatusText = (status) => {
 // 获取数据
 const fetchData = async () => {
   try {
-    const res = await repairman.getAssignments({
+    const res = await admin.getAssignments({
       page: currentPage.value,
       limit: pageSize.value
     })
@@ -145,56 +130,7 @@ const fetchData = async () => {
   }
 }
 
-// 接受任务分配
-const handleAcceptAssignment = async (row) => {
-  try {
-    await ElMessageBox.confirm('确定接受此任务分配吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
-    await repairman.acceptAssignment(row.assignmentId)
-    ElMessage.success('已接受任务')
-    fetchData()
-  } catch (error) {
-    if (error !== 'cancel') {
-      console.error('操作失败:', error)
-      ElMessage.error('操作失败')
-    }
-  }
-}
 
-// 拒绝任务分配
-const handleRejectAssignment = async (row) => {
-  try {
-    await ElMessageBox.confirm('确定拒绝此任务分配吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
-    await repairman.rejectAssignment(row.assignmentId)
-    ElMessage.success('已拒绝任务')
-    fetchData()
-  } catch (error) {
-    if (error !== 'cancel') {
-      console.error('操作失败:', error)
-      ElMessage.error('操作失败')
-    }
-  }
-}
-
-// 开始维修
-const handleStartRepair = async (row) => {
-  router.push('/repairman/orders')
-  // try {
-  //   await repairman.startRepair(row.orderId)
-  //   ElMessage.success('已开始维修')
-  //   fetchData()
-  // } catch (error) {
-  //   console.error('操作失败:', error)
-  //   ElMessage.error('操作失败')
-  // }
-}
 
 // 分页大小改变
 const handleSizeChange = (val) => {

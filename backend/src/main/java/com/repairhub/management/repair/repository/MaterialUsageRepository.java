@@ -17,4 +17,6 @@ public interface MaterialUsageRepository {
     public List<MaterialUsage> findByRepairOrderId(Long repairOrderId);
 
     public List<MaterialUsage> findByRepairmanId(Long repairmanId);
+
+    public List<MaterialUsage> findAll();
 }

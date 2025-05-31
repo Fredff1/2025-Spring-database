@@ -11,6 +11,7 @@ export const getIncomeStats = params => http.get('/repairman/income', { params }
 // 维修人员订单管理
 export const getOrders = params => http.get('/repairman/repair-orders', { params })
 export const getOrderDetail = id => http.get(`/repairman/repair-orders/${id}`)
+export const updateOrderStatus = (id, status) => http.put(`/repairman/repair-orders/${id}/status`, { status })
 export const submitRepairRecord = data => http.post('/repairman/repair-orders/records',data)
 
 export const getRepairRecords = orderId => http.get(`/repairman/repair-orders/${orderId}/records`);

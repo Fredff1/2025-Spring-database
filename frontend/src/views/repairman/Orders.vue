@@ -32,16 +32,16 @@
         <el-table-column prop="createTime" label="创建时间" width="180" />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleView(row)">查看</el-button>
-            <!-- <el-button
-              v-if="row.status === 'PENDING'"
-              type="success"
-              link
-              @click="handleStartRepair(row)"
+            <el-button type="primary" link @click="handleView(row)">查看详情</el-button>
+            <el-button type="success" link @click="handleFeedback(row)" >
+              查看反馈
+            </el-button>
+            <el-button 
+              type="primary" 
+              link 
+              @click="handleSubmitRecord(row)"
+              v-if="row.status === 'PROCESSING'"
             >
-              开始维修
-            </el-button> -->
-            <el-button v-if="row.status === 'PROCESSING'" type="warning" link @click="handleSubmitRecord(row)">
               提交记录
             </el-button>
           </template>
@@ -60,6 +60,7 @@
     <el-dialog v-model="viewDialogVisible" title="订单详情" width="800px" destroy-on-close>
       <el-descriptions :column="2" border>
         <el-descriptions-item label="订单号">{{ currentOrder.orderNo }}</el-descriptions-item>
+        <el-descriptions-item label="订单客户"><strong>{{ currentOrder.customerName }}</strong></el-descriptions-item>
         <el-descriptions-item label="车牌号">{{ currentOrder.vehiclePlate }}</el-descriptions-item>
         <el-descriptions-item label="维修类型">
           <el-tag :type="getRepairTypeTag(currentOrder.status)">
@@ -164,13 +165,43 @@
         <el-button type="primary" @click="handleRecordSubmit">提交记录</el-button>
       </template>
     </el-dialog>
+
+    <!-- 反馈列表对话框 -->
+    <el-dialog
+      v-model="feedbackDialogVisible"
+      title="维修反馈"
+      width="600px"
+    >
+      <div v-loading="feedbackLoading">
+        <div v-if="feedbackList.length === 0" class="empty-feedback">
+          暂无反馈
+        </div>
+        <div v-else class="feedback-list">
+          <div v-for="feedback in feedbackList" :key="feedback.feedbackId" class="feedback-item">
+            <div class="feedback-header">
+              <span class="feedback-time">{{ (feedback.feedbackTime) }}</span>
+              <el-rate
+                v-if="feedback.rating != null"
+                v-model="feedback.rating"
+                disabled
+                show-score
+                text-color="#ff9900"
+              />
+            </div>
+            <div class="feedback-content"><strong>客户：{{ feedback.username }}</strong></div>
+            <div class="feedback-content">{{ feedback.description }}</div>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { repairman } from '@/api'
+import dayjs from 'dayjs'
 
 // 订单列表数据
 const loading = ref(false)
@@ -209,12 +240,20 @@ const recordRules = {
   ],
 }
 
+// 反馈相关
+const feedbackDialogVisible = ref(false)
+const feedbackLoading = ref(false)
+const feedbackList = ref([])
+const currentOrderId = ref(null)
+
 // 获取维修类型标签
 const getRepairTypeTag = (type) => {
   const map = {
-    MAINTENANCE: 'info',
-    REPAIR: 'warning',
-    ACCIDENT: 'danger'
+    MAINTENANCE: 'success',
+    REPAIR: 'danger',
+    PAINT: 'warning',
+    TIRE: 'warning',
+    OTHER: 'info'
   }
   return map[type] || 'info'
 }
@@ -224,7 +263,9 @@ const getRepairTypeText = (type) => {
   const map = {
     MAINTENANCE: '常规保养',
     REPAIR: '故障维修',
-    ACCIDENT: '事故维修'
+    PAINT: '钣金喷漆',
+    TIRE: '轮胎更换',
+    OTHER: '其他'
   }
   return map[type] || type
 }
@@ -287,27 +328,20 @@ const handleView = async (row) => {
   }
 }
 
-// 开始维修
-// const handleStartRepair = async (row) => {
-//   try {
-//     await repairman.startRepair(row.id)
-//     ElMessage.success('已开始维修')
-//     fetchOrders()
-//   } catch (error) {
-//     console.error('操作失败:', error)
-//     ElMessage.error('操作失败')
-//   }
-// }
-
-// 提交维修记录
-const handleSubmitRecord = (row) => {
-  currentOrder.value = row
-  recordForm.status = 'PROCESSING'
-  recordForm.actualWorkHour = null
-  recordForm.faultDescription = ''
-  recordForm.repairResult = ''
-  recordForm.materials = []
-  recordDialogVisible.value = true
+// 查看反馈
+const handleFeedback = async (row) => {
+  currentOrderId.value = row.id
+  feedbackDialogVisible.value = true
+  feedbackLoading.value = true
+  try {
+    const res = await repairman.getFeedbackList(row.id)
+    feedbackList.value = res || []
+  } catch (error) {
+    console.error('获取反馈列表失败:', error)
+    ElMessage.error('获取反馈列表失败')
+  } finally {
+    feedbackLoading.value = false
+  }
 }
 
 // 添加材料
@@ -323,6 +357,30 @@ const handleAddMaterial = () => {
 // 删除材料
 const handleRemoveMaterial = (index) => {
   recordForm.materials.splice(index, 1)
+}
+
+// 提交维修记录
+const handleSubmitRecord = (row) => {
+  currentOrder.value = row
+  recordForm.status = 'PROCESSING'
+  recordForm.faultDescription = ''
+  recordForm.repairResult = ''
+  recordForm.actualWorkHour = null
+  recordForm.materials = []
+  recordDialogVisible.value = true
+}
+
+// 更新订单状态
+const handleUpdateStatus = async (row) => {
+  try {
+    const newStatus = row.status === 'PENDING' ? 'PROCESSING' : 'COMPLETED'
+    await repairman.updateOrderStatus(row.id, newStatus)
+    ElMessage.success('状态更新成功')
+    fetchOrders()
+  } catch (error) {
+    console.error('状态更新失败:', error)
+    ElMessage.error('状态更新失败')
+  }
 }
 
 // 提交维修记录
@@ -412,5 +470,43 @@ onMounted(() => {
 
 .material-item:hover {
   background-color: #f5f7fa;
+}
+
+.feedback-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.feedback-item {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.feedback-item:last-child {
+  border-bottom: none;
+}
+
+.feedback-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.feedback-time {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.feedback-content {
+  color: var(--text-primary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.empty-feedback {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 32px 0;
 }
 </style>

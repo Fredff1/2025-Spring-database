@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
 import com.repairhub.management.auth.entity.User;
+import com.repairhub.management.auth.repository.UserRepository;
 import com.repairhub.management.order.dto.CreateOrderRequest;
 import com.repairhub.management.order.dto.OrderDTO;
 import com.repairhub.management.order.entity.OrderAssignment;
@@ -34,6 +35,7 @@ import lombok.Getter;
 @Getter
 public class OrderService {
 
+    private final UserRepository userRepository;
     private final RepairOrderRepository repairOrderRepository;
     private final OrderAssignmentRepository orderAssignmentRepository;
     private final RepairmanProfileService repairmanProfileService;
@@ -41,11 +43,14 @@ public class OrderService {
     private final VehicleRepository vehicleRepository;
 
     public OrderService(
+        UserRepository userRepository,
         RepairOrderRepository repairOrderRepository,
         OrderAssignmentRepository orderAssignmentRepository,
         RepairmanProfileService repairmanProfileService,
         VehicleRepository vehicleRepository,
-        ApplicationEventPublisher eventPublisher) {
+        ApplicationEventPublisher eventPublisher
+    ) {
+        this.userRepository = userRepository;
         this.repairOrderRepository = repairOrderRepository;
         this.orderAssignmentRepository = orderAssignmentRepository;
         this.repairmanProfileService = repairmanProfileService;
@@ -65,6 +70,7 @@ public class OrderService {
                 .status(OrderStatus.PENDING) // 假设初始状态为 PENDING
                 .description(request.getDescription())
                 .totalFee(BigDecimal.valueOf(0L))
+                .isPaid(false)
                 .build();
         repairOrderRepository.insert(order);
         OrderCreatedEvent event = new OrderCreatedEvent(this, order);
@@ -100,7 +106,8 @@ public class OrderService {
     }
 
     public OrderDTO toDTO(RepairOrder order){
-        return OrderDTO.from(order, vehicleRepository);
+        User user = userRepository.findById(order.getUserId()).orElse(null);
+        return OrderDTO.from(order, vehicleRepository,user);
     }
 
     public OrderAssignment assignOrder(RepairOrder order){

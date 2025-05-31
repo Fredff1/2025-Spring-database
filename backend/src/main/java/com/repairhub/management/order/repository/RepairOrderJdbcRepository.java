@@ -106,4 +106,10 @@ public class RepairOrderJdbcRepository implements RepairOrderRepository{
             Integer.class
         );
     }
+
+    @Override
+    public List<RepairOrder> findAll(){
+        String sql = "SELECT * FROM repair_order";
+        return jdbc.query(sql, mapper);
+    }
 }
