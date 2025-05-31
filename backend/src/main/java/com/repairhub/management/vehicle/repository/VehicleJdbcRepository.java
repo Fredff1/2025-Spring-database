@@ -4,6 +4,7 @@ package com.repairhub.management.vehicle.repository;
 import org.springframework.boot.autoconfigure.task.TaskExecutionProperties.Simple;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -54,7 +55,14 @@ public class VehicleJdbcRepository implements VehicleRepository {
                    register_date = :registerDate
              WHERE vehicle_id = :vehicleId
             """;
-        return jdbc.update(sql, new BeanPropertySqlParameterSource(v));
+        SqlParameterSource param = new MapSqlParameterSource()
+        .addValue("ownerId", v.getOwnerId())
+        .addValue("brand", v.getBrand())
+        .addValue("model", v.getModel())
+        .addValue("licensePlate", v.getLicensePlate())
+        .addValue("registerDate", v.getRegisterDate())
+        .addValue("vehicleId", v.getVehicleId());
+        return jdbc.update(sql, param);
     }
 
     @Override

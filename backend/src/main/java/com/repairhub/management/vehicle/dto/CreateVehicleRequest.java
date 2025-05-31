@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CreateVehicleRequest {
-    private String plateNumber;
+    private String licensePlate;
     private String brand;
     private String model;
-    private Integer year;
-    private String vin;
+    // private Integer year;
+    // private String vin;
 }

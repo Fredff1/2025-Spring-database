@@ -1,5 +1,6 @@
 package com.repairhub.management.vehicle.controller;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class VehicleController {
     public ResponseEntity<PageResponse<VehicleDTO>> getList(PageRequest request){
         VehicleDTO vehicleDTO = VehicleDTO.builder()
         .id(1L)
-        .createTime(LocalDateTime.now())
+        .registerDate(LocalDate.now())
         .model("model-x")
         .licensePlate("plate-123456")
         .brand("HAH")

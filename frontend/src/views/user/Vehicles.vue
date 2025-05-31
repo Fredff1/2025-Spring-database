@@ -14,6 +14,7 @@
         <el-table-column prop="licensePlate" label="车牌号" width="120" />
         <el-table-column prop="brand" label="品牌" width="120" />
         <el-table-column prop="model" label="型号" width="120" />
+        <el-table-column prop="registerDate" label="注册日期" width="120" />
         <!-- <el-table-column prop="year" label="年份" width="100" />
         <el-table-column prop="color" label="颜色" width="100" />
         <el-table-column prop="mileage" label="里程数" width="120">
@@ -30,7 +31,6 @@
         </el-table-column>
       </el-table>
     </el-card>
-
     <!-- 添加/编辑车辆对话框 -->
     <el-dialog
       v-model="dialogVisible"
@@ -51,7 +51,8 @@
         </el-form-item>
         <el-form-item label="型号" prop="model">
           <el-input v-model="form.model" placeholder="请输入型号" />
-        </el-form-item>
+        </el-form-item> 
+        
         <!-- <el-form-item label="年份" prop="year">
           <el-input-number v-model="form.year" :min="1900" :max="new Date().getFullYear()" />
         </el-form-item>
@@ -111,6 +112,7 @@ const form = ref({
   licensePlate: '',
   brand: '',
   model: '',
+  registerDate: '',
   year: new Date().getFullYear(),
   color: '',
   mileage: 0,
@@ -161,10 +163,11 @@ const showAddDialog = () => {
     licensePlate: '',
     brand: '',
     model: '',
-    year: new Date().getFullYear(),
-    color: '',
-    mileage: 0,
-    vin: ''
+    registerDate: '',
+    // year: new Date().getFullYear(),
+    // color: '',
+    // mileage: 0,
+    // vin: ''
   }
   dialogVisible.value = true
 }
@@ -185,7 +188,7 @@ const handleDelete = (row) => {
 // 确认删除
 const confirmDelete = async () => {
   try {
-    await vehicle.delete(currentVehicle.value.id)
+    await user.deleteVehicle(currentVehicle.value.id)
     ElMessage.success('删除成功')
     deleteDialogVisible.value = false
     fetchVehicles()
@@ -203,10 +206,10 @@ const handleSubmit = async () => {
     if (valid) {
       try {
         if (isEdit.value) {
-          await vehicle.update(form.value.id, form.value)
+          await user.updateVehicle(form.value.id, form.value)
           ElMessage.success('更新成功')
         } else {
-          await vehicle.create(form.value)
+          await user.addVehicle(form.value)
           ElMessage.success('添加成功')
         }
         dialogVisible.value = false

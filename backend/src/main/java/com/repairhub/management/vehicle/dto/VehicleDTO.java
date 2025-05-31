@@ -1,5 +1,6 @@
 package com.repairhub.management.vehicle.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.repairhub.management.vehicle.entity.Vehicle;
@@ -19,7 +20,7 @@ public class VehicleDTO {
     private String brand;
     private String model;
     private String vin;
-    private LocalDateTime createTime;
+    private LocalDate registerDate;
 
     public static VehicleDTO from(Vehicle vehicle){
         VehicleDTO dto = VehicleDTO.builder()
@@ -27,7 +28,7 @@ public class VehicleDTO {
         .licensePlate(vehicle.getLicensePlate())
         .model(vehicle.getModel())
         .brand(vehicle.getBrand())
-        .createTime(LocalDateTime.now()) //TODO time
+        .registerDate(vehicle.getRegisterDate()) //TODO time
 
         .build();
         return dto;

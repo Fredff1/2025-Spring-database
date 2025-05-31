@@ -27,7 +27,7 @@ public class Vehicle {
                 .ownerId(ownerId)
                 .brand(request.getBrand())
                 .model(request.getModel())
-                .licensePlate(request.getPlateNumber())
+                .licensePlate(request.getLicensePlate())
                 .registerDate(LocalDate.now())
                 .build();
     }
