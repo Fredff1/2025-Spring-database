@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.repairhub.management.auth.entity.User;
+import com.repairhub.management.user.dto.UserProfileDTO;
 import com.repairhub.management.user.dto.UserStatusDTO;
 import com.repairhub.management.user.service.UserInfoService;
 
@@ -33,5 +34,14 @@ public class UserController {
         var dto = userInfoService.getStatus(user);
         return new ResponseEntity<>(dto,HttpStatus.OK);
     }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserProfileDTO> getProfile(
+        @AuthenticationPrincipal User user
+    ) {
+        var dto = userInfoService.getProfile(user);
+        return new ResponseEntity<>(dto,HttpStatus.OK);
+    }
+    
     
 }

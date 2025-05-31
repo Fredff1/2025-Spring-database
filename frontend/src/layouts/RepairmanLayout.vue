@@ -37,9 +37,13 @@
             <el-icon><document /></el-icon>
             <span>待处理任务</span>
           </el-menu-item>
+          <el-menu-item index="/repairman/income">
+            <el-icon><data-analysis /></el-icon>
+            <span>收入统计</span>
+          </el-menu-item>
           <el-menu-item index="/repairman/profile">
             <el-icon><money /></el-icon>
-            <span>概览</span>
+            <span>个人资料</span>
           </el-menu-item>
         </el-menu>
       </aside>
@@ -60,7 +64,8 @@ import {
   Tools,
   Document,
   Money,
-  ArrowDown
+  ArrowDown,
+  DataAnalysis
 } from '@element-plus/icons-vue'
 
 import { logout } from '@/utils/auth'

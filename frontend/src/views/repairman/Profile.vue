@@ -11,55 +11,24 @@
           <template #header>
             <div class="card-header">
               <span>基本信息</span>
-              <el-button type="primary" link @click="handleEdit">编辑</el-button>
             </div>
           </template>
-          <el-form
-            ref="formRef"
-            :model="form"
-            :rules="rules"
-            label-width="100px"
-            :disabled="!isEditing"
-          >
-            <el-form-item label="用户名" prop="username">
-              <el-input v-model="form.username" disabled />
-            </el-form-item>
-            <el-form-item label="姓名" prop="name">
-              <el-input v-model="form.name" />
-            </el-form-item>
-            <el-form-item label="手机号" prop="phone">
-              <el-input v-model="form.phone" />
-            </el-form-item>
-            <el-form-item label="邮箱" prop="email">
-              <el-input v-model="form.email" />
-            </el-form-item>
-            <el-form-item label="专长" prop="specialty">
-              <el-select v-model="form.specialty" multiple placeholder="请选择专长">
-                <el-option label="发动机维修" value="engine" />
-                <el-option label="变速箱维修" value="transmission" />
-                <el-option label="电气系统" value="electrical" />
-                <el-option label="底盘系统" value="chassis" />
-                <el-option label="空调系统" value="ac" />
-                <el-option label="车身维修" value="body" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="工作经验" prop="experience">
-              <el-input-number v-model="form.experience" :min="0" :max="50" />
-              <span class="unit">年</span>
-            </el-form-item>
-            <el-form-item label="个人简介" prop="introduction">
-              <el-input
-                v-model="form.introduction"
-                type="textarea"
-                :rows="4"
-                placeholder="请输入个人简介"
-              />
-            </el-form-item>
-            <el-form-item v-if="isEditing">
-              <el-button type="primary" @click="handleSave">保存</el-button>
-              <el-button @click="handleCancel">取消</el-button>
-            </el-form-item>
-          </el-form>
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="用户名">{{ form.username }}</el-descriptions-item>
+            <el-descriptions-item label="手机号">{{ form.phone }}</el-descriptions-item>
+            <el-descriptions-item label="邮箱">{{ form.email }}</el-descriptions-item>
+            <el-descriptions-item label="账号状态">
+              <el-tag :type="getUserStatusType(form.userStatus)">
+                {{ getUserStatusText(form.userStatus) }}
+              </el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="专长">
+              <el-tag type="success">{{ getFaultTypeText(form.specialty) }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="时薪">￥{{ form.hourlyMoneyRate?.toFixed(2) }}</el-descriptions-item>
+            <el-descriptions-item label="创建时间">{{ formatDateTime(form.createTime) }}</el-descriptions-item>
+            <el-descriptions-item label="更新时间">{{ formatDateTime(form.updateTime) }}</el-descriptions-item>
+          </el-descriptions>
         </el-card>
       </el-col>
 
@@ -69,6 +38,10 @@
           <template #header>
             <div class="card-header">
               <span>工作统计</span>
+              <el-radio-group v-model="statsTimeRange" size="small">
+                <el-radio-button label="all">全部</el-radio-button>
+                <el-radio-button label="month">本月</el-radio-button>
+              </el-radio-group>
             </div>
           </template>
           <div class="stats-content">
@@ -90,95 +63,31 @@
             </div>
           </div>
         </el-card>
-
-        <!-- <el-card shadow="hover" class="password-card">
-          <template #header>
-            <div class="card-header">
-              <span>修改密码</span>
-            </div>
-          </template>
-          <el-form
-            ref="passwordFormRef"
-            :model="passwordForm"
-            :rules="passwordRules"
-            label-width="100px"
-          >
-            <el-form-item label="原密码" prop="oldPassword">
-              <el-input
-                v-model="passwordForm.oldPassword"
-                type="password"
-                show-password
-                placeholder="请输入原密码"
-              />
-            </el-form-item>
-            <el-form-item label="新密码" prop="newPassword">
-              <el-input
-                v-model="passwordForm.newPassword"
-                type="password"
-                show-password
-                placeholder="请输入新密码"
-              />
-            </el-form-item>
-            <el-form-item label="确认密码" prop="confirmPassword">
-              <el-input
-                v-model="passwordForm.confirmPassword"
-                type="password"
-                show-password
-                placeholder="请再次输入新密码"
-              />
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="handleChangePassword">
-                修改密码
-              </el-button>
-            </el-form-item>
-          </el-form>
-        </el-card> -->
       </el-col>
     </el-row>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { repairman } from '@/api'
+import dayjs from 'dayjs'
 
 // 表单数据
-const formRef = ref(null)
-const isEditing = ref(false)
 const form = reactive({
   username: '',
-  name: '',
   phone: '',
   email: '',
-  specialty: [],
-  experience: 0,
-  introduction: ''
+  createTime: '',
+  updateTime: '',
+  userStatus: '',
+  specialty: '',
+  hourlyMoneyRate: 0
 })
 
-// 表单验证规则
-const rules = {
-  name: [
-    { required: true, message: '请输入姓名', trigger: 'blur' }
-  ],
-  phone: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
-  ],
-  email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
-  ],
-  specialty: [
-    { required: true, message: '请选择专长', trigger: 'change' }
-  ],
-  experience: [
-    { required: true, message: '请输入工作经验', trigger: 'blur' }
-  ]
-}
-
 // 统计信息
+const statsTimeRange = ref('all')
 const stats = ref({
   completedOrders: 0,
   repairHours: 0,
@@ -186,46 +95,40 @@ const stats = ref({
   averageRating: 0
 })
 
-// 密码表单
-const passwordFormRef = ref(null)
-const passwordForm = reactive({
-  oldPassword: '',
-  newPassword: '',
-  confirmPassword: ''
-})
-
-// 密码验证规则
-const validatePass = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请输入密码'))
-  } else {
-    if (passwordForm.confirmPassword !== '') {
-      passwordFormRef.value?.validateField('confirmPassword')
-    }
-    callback()
+// 获取用户状态类型
+const getUserStatusType = (status) => {
+  const map = {
+    ACTIVE: 'success',
+    INACTIVE: 'info',
+    BLOCKED: 'danger'
   }
+  return map[status] || 'info'
 }
 
-const validatePass2 = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请再次输入密码'))
-  } else if (value !== passwordForm.newPassword) {
-    callback(new Error('两次输入密码不一致'))
-  } else {
-    callback()
+// 获取用户状态文本
+const getUserStatusText = (status) => {
+  const map = {
+    ACTIVE: '正常',
+    INACTIVE: '未激活',
+    BLOCKED: '已封禁'
   }
+  return map[status] || status
 }
 
-const passwordRules = {
-  oldPassword: [
-    { required: true, message: '请输入原密码', trigger: 'blur' }
-  ],
-  newPassword: [
-    { required: true, validator: validatePass, trigger: 'blur' }
-  ],
-  confirmPassword: [
-    { required: true, validator: validatePass2, trigger: 'blur' }
-  ]
+// 获取故障类型文本
+const getFaultTypeText = (type) => {
+  const map = {
+    MAINTENANCE: '常规保养',
+    REPAIR: '故障维修',
+    ACCIDENT: '事故维修'
+  }
+  return map[type] || type
+}
+
+// 格式化日期时间
+const formatDateTime = (datetime) => {
+  if (!datetime) return '-'
+  return dayjs(datetime).format('YYYY-MM-DD HH:mm:ss')
 }
 
 // 获取个人信息
@@ -242,7 +145,12 @@ const fetchProfile = async () => {
 // 获取统计信息
 const fetchStats = async () => {
   try {
-    const res = await repairman.getStats()
+    const params = {
+      startTime: statsTimeRange.value === 'month' 
+        ? dayjs().startOf('month').format('YYYY-MM-DDTHH:mm:ss')
+        : null
+    }
+    const res = await repairman.getStats(params)
     stats.value = res
   } catch (error) {
     console.error('获取统计信息失败:', error)
@@ -250,56 +158,19 @@ const fetchStats = async () => {
   }
 }
 
-// 编辑
-const handleEdit = () => {
-  isEditing.value = true
-}
+// 监听统计时间范围变化
+watch(statsTimeRange, () => {
+  fetchStats()
+})
 
-// 保存
-const handleSave = async () => {
-  if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (valid) {
-      try {
-        await repairman.updateProfile(form)
-        ElMessage.success('保存成功')
-        isEditing.value = false
-      } catch (error) {
-        console.error('保存失败:', error)
-        ElMessage.error('保存失败')
-      }
-    }
-  })
-}
-
-// 取消
-const handleCancel = () => {
-  isEditing.value = false
+onMounted(() => {
   fetchProfile()
-}
+fetchStats()
+})
 
-// 修改密码
-const handleChangePassword = async () => {
-  if (!passwordFormRef.value) return
-  await passwordFormRef.value.validate(async (valid) => {
-    if (valid) {
-      try {
-        await repairman.changePassword(passwordForm)
-        ElMessage.success('密码修改成功')
-        passwordForm.oldPassword = ''
-        passwordForm.newPassword = ''
-        passwordForm.confirmPassword = ''
-      } catch (error) {
-        console.error('密码修改失败:', error)
-        ElMessage.error('密码修改失败')
-      }
-    }
-  })
-}
 
 // 初始化
-fetchProfile()
-fetchStats()
+
 </script>
 
 <style scoped>
@@ -328,11 +199,6 @@ fetchStats()
   align-items: center;
 }
 
-.unit {
-  margin-left: 10px;
-  color: var(--text-secondary);
-}
-
 .stats-card {
   margin-bottom: 24px;
 }
@@ -358,9 +224,5 @@ fetchStats()
   font-size: 20px;
   font-weight: 600;
   color: var(--text-primary);
-}
-
-.password-card {
-  margin-bottom: 24px;
 }
 </style> 

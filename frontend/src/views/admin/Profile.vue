@@ -5,30 +5,18 @@
     </div>
 
     <el-card shadow="hover">
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        label-width="100px"
-      >
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" disabled />
-        </el-form-item>
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="form.name" />
-        </el-form-item>
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="form.phone" />
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSubmit" :loading="loading">
-            保存修改
-          </el-button>
-        </el-form-item>
-      </el-form>
+      <el-descriptions :column="1" border>
+        <el-descriptions-item label="用户名">{{ form.username }}</el-descriptions-item>
+        <el-descriptions-item label="手机号">{{ form.phone }}</el-descriptions-item>
+        <el-descriptions-item label="邮箱">{{ form.email }}</el-descriptions-item>
+        <el-descriptions-item label="账号状态">
+          <el-tag :type="getUserStatusType(form.userStatus)">
+            {{ getUserStatusText(form.userStatus) }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ formatDateTime(form.createTime) }}</el-descriptions-item>
+        <el-descriptions-item label="更新时间">{{ formatDateTime(form.updateTime) }}</el-descriptions-item>
+      </el-descriptions>
     </el-card>
 
     <el-card shadow="hover" class="password-card">
@@ -79,20 +67,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { admin } from '@/api'
+import dayjs from 'dayjs'
 
 const formRef = ref(null)
 const passwordFormRef = ref(null)
 const loading = ref(false)
 const passwordLoading = ref(false)
 
-const form = ref({
+const form = reactive({
   username: '',
-  name: '',
   phone: '',
-  email: ''
+  email: '',
+  createTime: '',
+  updateTime: '',
+  userStatus: ''
 })
 
 const passwordForm = ref({
@@ -164,11 +155,37 @@ const passwordRules = {
   ]
 }
 
+// 获取用户状态类型
+const getUserStatusType = (status) => {
+  const map = {
+    ACTIVE: 'success',
+    INACTIVE: 'info',
+    BLOCKED: 'danger'
+  }
+  return map[status] || 'info'
+}
+
+// 获取用户状态文本
+const getUserStatusText = (status) => {
+  const map = {
+    ACTIVE: '正常',
+    INACTIVE: '未激活',
+    BLOCKED: '已封禁'
+  }
+  return map[status] || status
+}
+
+// 格式化日期时间
+const formatDateTime = (datetime) => {
+  if (!datetime) return '-'
+  return dayjs(datetime).format('YYYY-MM-DD HH:mm:ss')
+}
+
 // 获取用户信息
 const fetchUserInfo = async () => {
   try {
     const res = await admin.getInfo()
-    form.value = res
+    Object.assign(form, res)
   } catch (error) {
     console.error('获取用户信息失败:', error)
     ElMessage.error('获取用户信息失败')
@@ -183,7 +200,7 @@ const handleSubmit = async () => {
     if (valid) {
       loading.value = true
       try {
-        await admin.updateInfo(form.value)
+        await admin.updateInfo(form)
         ElMessage.success('保存成功')
       } catch (error) {
         console.error('保存失败:', error)

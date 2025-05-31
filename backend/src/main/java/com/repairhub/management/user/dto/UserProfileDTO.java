@@ -1,10 +1,8 @@
-package com.repairhub.management.repairman.dto;
+package com.repairhub.management.user.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.repairhub.management.auth.domain.enums.UserStatus;
-import com.repairhub.management.repair.enums.FaultType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RepairmanProfileDTO {
+public class UserProfileDTO {
     private Long id;
     private String username;
     private String phone;
@@ -23,6 +21,4 @@ public class RepairmanProfileDTO {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private UserStatus userStatus;
-    private FaultType specialty;
-    private BigDecimal hourlyMoneyRate;
 }

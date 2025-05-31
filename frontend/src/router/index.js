@@ -16,7 +16,6 @@ import Register from '@/views/Register.vue';
 import UserDashboard from '@/views/user/Dashboard.vue';
 import UserVehicles from '@/views/user/Vehicles.vue';
 import UserRepairOrders from '@/views/user/RepairOrders.vue';
-import UserRepairHistory from '@/views/user/RepairHistory.vue';
 import UserProfile from '@/views/user/Profile.vue';
 
 // 管理员页面
@@ -34,8 +33,7 @@ import AdminProfile from '@/views/admin/Profile.vue';
 // 维修人员页面
 import RepairmanDashboard from '@/views/repairman/Dashboard.vue';
 import RepairmanOrders from '@/views/repairman/Orders.vue';
-import RepairmanHistory from '@/views/repairman/History.vue';
-import RepairmanIncome from '@/views/repairman/Income.vue';
+import RepairmanIncome from '@/views/repairman/IncomeStats.vue';
 import RepairmanProfile from '@/views/repairman/Profile.vue';
 import RepairmanAssignment from '@/views/repairman/Assignments.vue';
 
@@ -87,11 +85,6 @@ const router = createRouter({
           path: 'repair-orders',
           name: 'UserRepairOrders',
           component: UserRepairOrders
-        },
-        {
-          path: 'repair-history',
-          name: 'UserRepairHistory',
-          component: UserRepairHistory
         },
         {
           path: 'profile',
@@ -160,7 +153,7 @@ const router = createRouter({
     // 维修人员路由
     {
       path: '/repairman',
-      component: () => import('@/layouts/RepairmanLayout.vue'),
+      component: RepairmanLayout,
       meta: { requiresAuth: true, role: 'REPAIRMAN' },
       children: [
         {
@@ -182,6 +175,11 @@ const router = createRouter({
           path: 'profile',
           name: 'RepairmanProfile',
           component: RepairmanProfile
+        },
+        {
+          path: 'income',
+          name: 'RepairmanIncome',
+          component: RepairmanIncome
         }
       ]
     },

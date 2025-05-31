@@ -9,10 +9,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.repairhub.management.order.enums.OrderStatus;
+import com.repairhub.management.repair.entity.LaborFeeLog;
 import com.repairhub.management.repair.entity.MaterialUsage;
 import com.repairhub.management.repair.entity.RepairFeedback;
 import com.repairhub.management.repair.entity.RepairRecord;
 import com.repairhub.management.repair.enums.FeedbackType;
+import com.repairhub.management.repair.repository.LaborFeeLogRepository;
 import com.repairhub.management.repair.repository.MaterialUsageRepository;
 import com.repairhub.management.repair.repository.RepairFeedbackRepository;
 import com.repairhub.management.repair.repository.RepairRecordRepository;
@@ -24,15 +26,18 @@ public class OrderInfoInitializer implements ApplicationRunner{
     private final RepairFeedbackRepository feedbackRepository;
     private final RepairRecordRepository recordRepository;
     private final MaterialUsageRepository materialUsageRepository;
+    private final LaborFeeLogRepository laborFeeLogRepository;
 
     public OrderInfoInitializer(
         RepairFeedbackRepository feedbackRepository,
         RepairRecordRepository recordRepository,
-        MaterialUsageRepository materialUsageRepository
+        MaterialUsageRepository materialUsageRepository,
+        LaborFeeLogRepository laborFeeLogRepository
     ){
         this.feedbackRepository = feedbackRepository;
         this.recordRepository = recordRepository;
         this.materialUsageRepository = materialUsageRepository;
+        this.laborFeeLogRepository = laborFeeLogRepository;
     }
     
     @Override
@@ -46,6 +51,7 @@ public class OrderInfoInitializer implements ApplicationRunner{
         .feedbackTime(LocalDateTime.now())
         .build();
         feedbackRepository.insert(feedback);
+
         RepairFeedback feedback_1 = RepairFeedback.builder()
         .orderId(1L)
         .userId(1L)
@@ -55,6 +61,7 @@ public class OrderInfoInitializer implements ApplicationRunner{
         .feedbackTime(LocalDateTime.now())
         .build();
         feedbackRepository.insert(feedback_1);
+
         RepairFeedback feedback_2 = RepairFeedback.builder()
         .orderId(1L)
         .userId(1L)
@@ -64,6 +71,7 @@ public class OrderInfoInitializer implements ApplicationRunner{
         .feedbackTime(LocalDateTime.now())
         .build();
         feedbackRepository.insert(feedback_2);
+
         RepairRecord record = RepairRecord.builder()
         .orderId(1L)
         .repairmanId(2L)
@@ -74,6 +82,27 @@ public class OrderInfoInitializer implements ApplicationRunner{
         .actualWorkHour(BigDecimal.valueOf(2L))
         .build();
         recordRepository.insert(record);
+
+        LaborFeeLog laborFeeLog = LaborFeeLog.builder()
+        .orderId(1L)
+        .repairmanId(2L)
+        .month(LocalDateTime.now().getMonth())
+        .totalHours(BigDecimal.valueOf(2L))
+        .totalIncome(BigDecimal.valueOf(200L))
+        .settleTime(LocalDateTime.now())
+        .build();
+        laborFeeLogRepository.insert(laborFeeLog);
+
+        LaborFeeLog laborFeeLog_1 = LaborFeeLog.builder()
+        .orderId(1L)
+        .repairmanId(2L)
+        .month(LocalDateTime.now().getMonth())
+        .totalHours(BigDecimal.valueOf(2L))
+        .totalIncome(BigDecimal.valueOf(200L))
+        .settleTime(LocalDateTime.now())
+        .build();
+        laborFeeLogRepository.insert(laborFeeLog_1);
+
         RepairRecord record_1 = RepairRecord.builder()
         .orderId(1L)
         .repairmanId(2L)
@@ -84,6 +113,7 @@ public class OrderInfoInitializer implements ApplicationRunner{
         .actualWorkHour(BigDecimal.valueOf(2L))
         .build();
         recordRepository.insert(record_1);
+
         MaterialUsage materialUsage = MaterialUsage.builder()
         .orderId(1L)
         .materialName("喷漆(瓶装)")

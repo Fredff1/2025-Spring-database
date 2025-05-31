@@ -19,8 +19,8 @@
         <el-table-column prop="problem" label="问题描述" min-width="200" show-overflow-tooltip />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="getStatusTag(row.status)">
-              {{ getStatusText(row.status) }}
+            <el-tag :type="getOrderStatusTag(row.status)">
+              {{ getOrderStatusText(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -41,12 +41,7 @@
             >
               开始维修
             </el-button> -->
-            <el-button
-              v-if="row.status === 'PROCESSING'"
-              type="warning"
-              link
-              @click="handleSubmitRecord(row)"
-            >
+            <el-button v-if="row.status === 'PROCESSING'" type="warning" link @click="handleSubmitRecord(row)">
               提交记录
             </el-button>
           </template>
@@ -55,34 +50,26 @@
 
       <!-- 分页 -->
       <div class="pagination">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
+        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 50, 100]"
+          :total="total" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange"
+          @current-change="handleCurrentChange" />
       </div>
     </el-card>
 
     <!-- 查看订单详情对话框 -->
-    <el-dialog
-      v-model="viewDialogVisible"
-      title="订单详情"
-      width="800px"
-      destroy-on-close
-    >
+    <el-dialog v-model="viewDialogVisible" title="订单详情" width="800px" destroy-on-close>
       <el-descriptions :column="2" border>
         <el-descriptions-item label="订单号">{{ currentOrder.orderNo }}</el-descriptions-item>
         <el-descriptions-item label="车牌号">{{ currentOrder.vehiclePlate }}</el-descriptions-item>
         <el-descriptions-item label="维修类型">
-          {{ getRepairTypeText(currentOrder.repairType) }}
+          <el-tag :type="getRepairTypeTag(currentOrder.status)">
+            {{ getRepairTypeText(currentOrder.repairType) }}
+          </el-tag>
+
         </el-descriptions-item>
         <el-descriptions-item label="状态">
-          <el-tag :type="getStatusTag(currentOrder.status)">
-            {{ getStatusText(currentOrder.status) }}
+          <el-tag :type="getOrderStatusTag(currentOrder.status)">
+            {{ getOrderStatusText(currentOrder.status) }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="问题描述" :span="2">
@@ -90,17 +77,18 @@
         </el-descriptions-item>
         <el-descriptions-item label="维修记录" :span="2">
           <el-timeline>
-            <el-timeline-item
-              v-for="record in repairRecords"
-              :key="record.recordId"
-              :timestamp="record.createTime"
-              :type="record.status === '已完成' ? 'success' : 'primary'"
-            >
-              <h4>{{ record.faultDescription }}</h4>
-              <p>维修结果: {{ record.repairResult }}</p>
-              <p>状态: {{ getStatusText(record.status) }}</p>
-              <p>维修时长：{{ record.actualWorkingHour }}h</p>
-              <p>维修人员：{{ record.repairmanName }}</p>
+            <el-timeline-item v-for="record in repairRecords" :key="record.recordId" :timestamp="record.createTime"
+              :type="record.status === '已完成' ? 'success' : 'primary'">
+              <h4>维修记录</h4>
+              <p><strong>当前故障描述：</strong>{{ record.faultDescription }}</p>
+              <p><strong>状态:</strong>
+                <el-tag :type="getOrderStatusTag(record.status)">
+                  {{ getOrderStatusText(record.status) }}
+                </el-tag>
+              </p>
+              <p><strong>维修结果:</strong> {{ record.repairResult }}</p>
+              <p><strong>维修时长：{{ record.actualWorkingHour }}h</strong></p>
+              <p><strong>维修人员：</strong><strong>{{ record.repairmanName }}</strong></p>
             </el-timeline-item>
           </el-timeline>
         </el-descriptions-item>
@@ -125,18 +113,8 @@
     </el-dialog>
 
     <!-- 提交维修记录对话框 -->
-    <el-dialog
-      v-model="recordDialogVisible"
-      title="提交维修记录"
-      width="600px"
-      destroy-on-close
-    >
-      <el-form
-        ref="recordFormRef"
-        :model="recordForm"
-        :rules="recordRules"
-        label-width="100px"
-      >
+    <el-dialog v-model="recordDialogVisible" title="提交维修记录" width="600px" destroy-on-close>
+      <el-form ref="recordFormRef" :model="recordForm" :rules="recordRules" label-width="100px">
         <el-form-item label="订单状态" prop="status">
           <el-select v-model="recordForm.status" placeholder="请选择订单状态">
             <el-option label="维修中" value="PROCESSING" />
@@ -145,27 +123,13 @@
           </el-select>
         </el-form-item>
         <el-form-item label="故障描述" prop="faultDescription">
-          <el-input
-            v-model="recordForm.faultDescription"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入故障描述"
-          />
+          <el-input v-model="recordForm.faultDescription" type="textarea" :rows="4" placeholder="请输入故障描述" />
         </el-form-item>
         <el-form-item label="维修结果" prop="repairResult">
-          <el-input
-            v-model="recordForm.repairResult"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入维修结果"
-          />
+          <el-input v-model="recordForm.repairResult" type="textarea" :rows="4" placeholder="请输入维修结果" />
         </el-form-item>
         <el-form-item label="工作时长(小时)" prop="actualWorkHour">
-          <el-input
-            v-model="recordForm.actualWorkHour"
-            :rows="1"
-            placeholder="请输入工作时长(小时)"
-          />
+          <el-input v-model="recordForm.actualWorkHour" :rows="1" placeholder="请输入工作时长(小时)" />
         </el-form-item>
         <el-form-item label="使用材料" prop="materials">
           <div class="materials-list">
@@ -178,10 +142,7 @@
                   <el-input v-model="material.quantity" placeholder="数量" />
                 </el-col>
                 <el-col :span="6">
-                  <el-input 
-                    v-model="material.unitPrice" 
-                    placeholder="单价(￥)"
-                  />
+                  <el-input v-model="material.unitPrice" placeholder="单价(￥)" />
                 </el-col>
                 <el-col :span="2">
                   <el-button type="danger" link @click="handleRemoveMaterial(index)">
@@ -269,10 +230,10 @@ const getRepairTypeText = (type) => {
 }
 
 // 获取状态标签
-const getStatusTag = (status) => {
+const getOrderStatusTag = (status) => {
   const map = {
     PENDING: 'info',
-    PROCESSING: 'warning',
+    PROCESSING: 'success',
     COMPLETED: 'success',
     CANCELLED: 'danger'
   }
@@ -280,7 +241,7 @@ const getStatusTag = (status) => {
 }
 
 // 获取状态文本
-const getStatusText = (status) => {
+const getOrderStatusText = (status) => {
   const map = {
     PENDING: '待处理',
     PROCESSING: '维修中',
@@ -370,7 +331,7 @@ const handleRecordSubmit = async () => {
   await recordFormRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        
+
         const recordSubmitData = {
           orderId: currentOrder.value.id,
           status: recordForm.status,
@@ -452,4 +413,4 @@ onMounted(() => {
 .material-item:hover {
   background-color: #f5f7fa;
 }
-</style> 
+</style>

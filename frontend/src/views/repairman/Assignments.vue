@@ -117,10 +117,10 @@ const getAssignmentStatusTag = (status) => {
 
 // 获取任务分配状态文本
 const getAssignmentStatusText = (status) => {
-  const map = {
-    PENDING: '常规保养',
-    ACCEPTED: '故障维修',
-    REJECTED: '事故维修',
+   const map = {
+    PENDING: '待处理',
+    ACCEPTED: '已接受',
+    REJECTED: '已拒绝',
     CANCELED: '已取消',
   }
   return map[status] || status

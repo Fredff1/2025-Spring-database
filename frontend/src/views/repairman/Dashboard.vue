@@ -11,16 +11,16 @@
           <el-card shadow="hover" class="overview-card">
             <template #header>
               <div class="card-header">
-                <span>今日订单</span>
-                <el-tag type="info">今日</el-tag>
+                <span>待处理任务分配</span>
+                <el-tag type="info">任务分配</el-tag>
               </div>
             </template>
             <div class="card-content">
-              <div class="value">{{ overview.todayOrders }}</div>
-              <div class="trend" :class="{ 'up': overview.orderTrend > 0 }">
+              <div class="value">{{ overview.totalAssignments }}个待处理分配</div>
+              <!-- <div class="trend" :class="{ 'up': overview.orderTrend > 0 }">
                 {{ overview.orderTrend > 0 ? '+' : '' }}{{ overview.orderTrend }}%
                 <el-icon><arrow-up /></el-icon>
-              </div>
+              </div> -->
             </div>
           </el-card>
         </el-col>
@@ -28,13 +28,12 @@
           <el-card shadow="hover" class="overview-card">
             <template #header>
               <div class="card-header">
-                <span>待处理</span>
-                <el-tag type="warning">待处理</el-tag>
+                <span>待处理订单</span>
+                <el-tag type="warning">订单</el-tag>
               </div>
             </template>
             <div class="card-content">
-              <div class="value">{{ overview.pendingOrders }}</div>
-              <div class="sub-value">个待处理订单</div>
+              <div class="value">{{ overview.processingOrders }}个待处理订单</div>
             </div>
           </el-card>
         </el-col>
@@ -48,10 +47,10 @@
             </template>
             <div class="card-content">
               <div class="value">¥{{ overview.monthlyIncome.toFixed(2) }}</div>
-              <div class="trend" :class="{ 'up': overview.incomeTrend > 0 }">
+              <!-- <div class="trend" :class="{ 'up': overview.incomeTrend > 0 }">
                 {{ overview.incomeTrend > 0 ? '+' : '' }}{{ overview.incomeTrend }}%
                 <el-icon><arrow-up /></el-icon>
-              </div>
+              </div> -->
             </div>
           </el-card>
         </el-col>
@@ -64,8 +63,7 @@
               </div>
             </template>
             <div class="card-content">
-              <div class="value">{{ overview.rating.toFixed(1) }}</div>
-              <div class="sub-value">分</div>
+              <div class="value">{{ overview.rating.toFixed(1) }}分</div>
             </div>
           </el-card>
         </el-col>
@@ -76,7 +74,7 @@
     <div class="work-area">
       <el-row :gutter="20">
         <!-- 任务分配 -->
-        <el-col :span="16">
+        <el-col :span="24">
           <el-card shadow="hover" class="work-card">
             <template #header>
               <div class="card-header">
@@ -96,10 +94,40 @@
               </el-table-column>
               <el-table-column prop="problem" label="问题描述" min-width="200" show-overflow-tooltip />
               <el-table-column prop="assignmentTime" label="分配时间" width="180" />
+              <el-table-column prop="status" label="状态" width="100">
+                <template #default="{ row }">
+                  <el-tag :type="getAssignmentStatusTag(row.status)">
+                    {{ getAssignmentStatusText(row.status) }}
+                  </el-tag>
+                </template>
+              </el-table-column>
               <el-table-column label="操作" width="200" fixed="right">
                 <template #default="{ row }">
-                  <el-button type="success" link @click="handleAcceptAssignment(row)">接受</el-button>
-                  <el-button type="danger" link @click="handleRejectAssignment(row)">拒绝</el-button>
+                  <el-button
+              v-if="row.status === 'PENDING'"
+              type="success"
+              link
+              @click="handleAcceptAssignment(row)"
+            >
+              接受
+            </el-button>
+            <el-button
+              v-if="row.status === 'PENDING'"
+              type="danger"
+              link
+              @click="handleRejectAssignment(row)"
+            >
+              拒绝
+            </el-button>
+            <el-button
+              v-if="row.status === 'ACCEPTED'"
+              type="primary"
+              link
+              @click="handleShowDetail(row)"
+            >
+              查看详情
+            </el-button>
+                  
                 </template>
               </el-table-column>
             </el-table>
@@ -107,7 +135,7 @@
         </el-col>
 
         <!-- 待处理订单 -->
-        <el-col :span="16">
+        <el-col :span="24">
           <el-card shadow="hover" class="work-card">
             <template #header>
               <div class="card-header">
@@ -116,8 +144,8 @@
               </div>
             </template>
             <el-table :data="pendingOrders" style="width: 100%">
-              <el-table-column prop="orderNumber" label="订单号" width="180" />
-              <el-table-column prop="plateNumber" label="车牌号" width="120" />
+              <el-table-column prop="orderNo" label="订单号" width="180" />
+              <el-table-column prop="vehiclePlate" label="车牌号" width="120" />
               <el-table-column prop="repairType" label="维修类型" width="120">
                 <template #default="{ row }">
                   <el-tag :type="getRepairTypeTag(row.repairType)">
@@ -129,55 +157,22 @@
               <el-table-column prop="createTime" label="创建时间" width="180" />
               <el-table-column label="操作" width="120" fixed="right">
                 <template #default="{ row }">
-                  <el-button type="primary" link @click="handleStartRepair(row)">开始维修</el-button>
+                  <el-button type="primary" link @click="handleShowDetail(row)">查看详情</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column prop="status" label="状态" width="100">
+                <template #default="{ row }">
+                  <el-tag :type="getOrderStatusTag(row.status)">
+                    {{ getOrderStatusText(row.status) }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="amount" label="金额" width="120">
+                <template #default="{ row }">
+                  ¥{{ row.amount.toFixed(2) }}
                 </template>
               </el-table-column>
             </el-table>
-          </el-card>
-        </el-col>
-
-        <!-- 工作统计 -->
-        <el-col :span="8">
-          <el-card shadow="hover" class="work-card">
-            <template #header>
-              <div class="card-header">
-                <span>工作统计</span>
-                <el-radio-group v-model="statisticsType" size="small">
-                  <el-radio-button label="week">本周</el-radio-button>
-                  <el-radio-button label="month">本月</el-radio-button>
-                </el-radio-group>
-              </div>
-            </template>
-            <div class="statistics-content">
-              <div class="stat-item">
-                <div class="stat-label">完成订单</div>
-                <div class="stat-value">{{ statistics.completedOrders }}</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-label">维修时长</div>
-                <div class="stat-value">{{ statistics.repairHours }}小时</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-label">收入</div>
-                <div class="stat-value">¥{{ statistics.income.toFixed(2) }}</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-label">评分</div>
-                <div class="stat-value">{{ statistics.rating.toFixed(1) }}分</div>
-              </div>
-            </div>
-          </el-card>
-
-          <!-- 维修类型分布 -->
-          <el-card shadow="hover" class="work-card">
-            <template #header>
-              <div class="card-header">
-                <span>维修类型分布</span>
-              </div>
-            </template>
-            <div class="chart-container">
-              <!-- 这里放置维修类型分布图表 -->
-            </div>
           </el-card>
         </el-col>
       </el-row>
@@ -239,19 +234,61 @@ const getRepairTypeText = (type) => {
   return map[type] || type
 }
 
+// 获取任务分配状态标签
+const getAssignmentStatusTag = (status) => {
+  const map = {
+    PENDING: 'warning',
+    ACCEPTED: 'success',
+    REJECTED: 'danger',
+    CANCELED: 'danger',
+  }
+  return map[status] || status
+}
+
+// 获取任务分配状态文本
+const getAssignmentStatusText = (status) => {
+  const map = {
+    PENDING: '待处理',
+    ACCEPTED: '已接受',
+    REJECTED: '已拒绝',
+    CANCELED: '已取消',
+  }
+  return map[status] || status
+}
+
+// 获取状态标签
+const getOrderStatusTag = (status) => {
+  const map = {
+    PENDING: 'info',
+    PROCESSING: 'success',
+    COMPLETED: 'success',
+    CANCELLED: 'danger'
+  }
+  return map[status] || 'info'
+}
+
+// 获取状态文本
+const getOrderStatusText = (status) => {
+  const map = {
+    PENDING: '待处理',
+    PROCESSING: '维修中',
+    COMPLETED: '已完成',
+    CANCELLED: '已取消'
+  }
+  return map[status] || status
+}
+
 // 获取数据
 const fetchData = async () => {
   try {
-    const [overviewRes, pendingRes, statisticsRes, assignmentsRes] = await Promise.all([
+    const [overviewRes, pendingRes, assignmentsRes] = await Promise.all([
       repairman.getOverview(),
-      repairman.getPendingOrders(),
-      repairman.getStatistics({ type: statisticsType.value }),
+      repairman.getOrders(),
       repairman.getAssignments()
     ])
     overview.value = overviewRes
-    pendingOrders.value = pendingRes
-    statistics.value = statisticsRes
-    assignments.value = assignmentsRes
+    pendingOrders.value = pendingRes.list
+    assignments.value = assignmentsRes.list
   } catch (error) {
     console.error('获取数据失败:', error)
     ElMessage.error('获取数据失败')
@@ -259,15 +296,8 @@ const fetchData = async () => {
 }
 
 // 开始维修
-const handleStartRepair = async (row) => {
-  try {
-    await repairman.startRepair(row.id)
-    ElMessage.success('已开始维修')
-    fetchData()
-  } catch (error) {
-    console.error('操作失败:', error)
-    ElMessage.error('操作失败')
-  }
+const handleShowDetail = async (row) => {
+  router.push('/repairman/orders')
 }
 
 // 接受任务分配

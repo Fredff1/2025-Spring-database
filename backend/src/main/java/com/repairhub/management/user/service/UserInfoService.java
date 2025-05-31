@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.order.repository.RepairOrderRepository;
 import com.repairhub.management.repair.repository.RepairRecordRepository;
+import com.repairhub.management.user.dto.UserProfileDTO;
 import com.repairhub.management.user.dto.UserStatusDTO;
 import com.repairhub.management.vehicle.repository.VehicleRepository;
 
@@ -32,5 +33,18 @@ public class UserInfoService {
         .orderCount(repairOrderRepository.countByUserId(userId))
         .build();
         return statusDTO;
+    }
+
+    public UserProfileDTO getProfile(User user){
+        UserProfileDTO dto = UserProfileDTO.builder()
+        .id(user.getUserId())
+        .username(user.getUsername())
+        .phone(user.getPhone())
+        .email(user.getEmail())
+        .createTime(user.getCreatedAt())
+        .updateTime(user.getUpdatedAt())
+        .userStatus(user.getStatus())
+        .build();
+        return dto;
     }
 }

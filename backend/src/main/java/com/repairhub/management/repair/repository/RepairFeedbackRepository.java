@@ -16,7 +16,5 @@ public interface RepairFeedbackRepository {
 
     public List<RepairFeedback> findByRepairOrderId(Long repairOrderId);
 
-    public List<RepairFeedback> findByRepairmanId(Long repairmanId);
-
 
 }

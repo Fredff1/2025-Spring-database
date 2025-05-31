@@ -1,6 +1,9 @@
 package com.repairhub.management.repairman.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
+
+import com.repairhub.management.repair.dto.LaborFeeLogDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +14,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RepairmanStatisticDTO {
-    private Integer completedOrders;
-    private BigDecimal repairHours;
+public class RepairmanIncomeDTO {
+    private List<LaborFeeLogDTO> list;
+    private Integer total;
     private BigDecimal totalIncome;
-    private Double averageRating;
+    private BigDecimal totalHours;
+    private BigDecimal averageHourlyRate;
 }
