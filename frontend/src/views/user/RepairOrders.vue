@@ -84,42 +84,63 @@
     <el-dialog
       v-model="createDialogVisible"
       title="创建维修订单"
-      width="500px"
+      width="800px"
     >
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        label-width="100px"
-      >
-        <el-form-item label="选择车辆" prop="vehiclePlate">
-          <el-select v-model="form.vehicleId" placeholder="请选择车辆">
-            <el-option
-              v-for="item in vehicles"
-              :key="item.licensePlate"
-              :label="item.licensePlate"
-              :value="item.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="维修类型" prop="faultType">
-          <el-select v-model="form.faultType" placeholder="请选择维修类型">
-            <el-option label="常规保养" value="MAINTENANCE" />
-            <el-option label="故障维修" value="REPAIR" />
-            <el-option label="钣金喷漆" value="PAINT" />
-            <el-option label="轮胎更换" value="TIRE" />
-            <el-option label="其他" value="OTHER" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="问题描述" prop="description">
-          <el-input
-            v-model="form.description"
-            type="textarea"
-            :rows="4"
-            placeholder="请详细描述车辆问题"
-          />
-        </el-form-item>
-      </el-form>
+      <div class="order-list">
+        <div v-for="(order, index) in orderForms" :key="index" class="order-item">
+          <div class="order-header">
+            <h3>订单 #{{ index + 1 }}</h3>
+            <el-button 
+              v-if="orderForms.length > 1"
+              type="danger" 
+              link 
+              @click="removeOrder(index)"
+            >
+              删除
+            </el-button>
+          </div>
+          <el-form
+            :ref="el => { if (el) formRefs[index] = el }"
+            :model="order"
+            :rules="rules"
+            label-width="100px"
+          >
+            <el-form-item label="选择车辆" prop="vehicleId">
+              <el-select v-model="order.vehicleId" placeholder="请选择车辆">
+                <el-option
+                  v-for="item in vehicles"
+                  :key="item.licensePlate"
+                  :label="item.licensePlate"
+                  :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="维修类型" prop="faultType">
+              <el-select v-model="order.faultType" placeholder="请选择维修类型">
+                <el-option label="常规保养" value="MAINTENANCE" />
+                <el-option label="故障维修" value="REPAIR" />
+                <el-option label="钣金喷漆" value="PAINT" />
+                <el-option label="轮胎更换" value="TIRE" />
+                <el-option label="其他" value="OTHER" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="问题描述" prop="description">
+              <el-input
+                v-model="order.description"
+                type="textarea"
+                :rows="4"
+                placeholder="请详细描述车辆问题"
+              />
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+      <div class="add-order">
+        <el-button type="primary" link @click="addOrder">
+          <el-icon><plus /></el-icon>
+          添加订单
+        </el-button>
+      </div>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="createDialogVisible = false">取消</el-button>
@@ -336,15 +357,16 @@ const repairRecords = ref([])
 const materialUsages = ref([])
 const feedbackList = ref([])
 
+// 创建订单相关
+const formRefs = ref([])
+const orderForms = ref([])
+
 // 创建订单表单
-const formRef = ref(null)
 const form = reactive({
   vehicleId: '',
   faultType: '',
   description: ''
 })
-
-
 
 // 反馈表单
 const feedbackFormRef = ref(null)
@@ -391,8 +413,6 @@ const feedbackRules = {
     { min: 5, max: 500, message: '反馈内容长度在 5 到 500 个字符之间', trigger: 'blur' }
   ]
 }
-
-
 
 const getStatusType = (status) => {
   const map = {
@@ -462,9 +482,12 @@ const getRepairTypeText = (type) => {
 // 显示创建订单对话框
 const showCreateDialog = async () => {
   // 重置表单
-  form.vehicleId   = '';
-  form.faultType  = '';
-  form.description = '';
+  orderForms.value = [{
+    vehicleId: '',
+    faultType: '',
+    description: ''
+  }]
+  formRefs.value = []
   
   // 确保车辆列表已加载
   if (vehicles.value.length === 0) {
@@ -474,15 +497,33 @@ const showCreateDialog = async () => {
   createDialogVisible.value = true
 }
 
+// 添加订单
+const addOrder = () => {
+  orderForms.value.push({
+    vehicleId: '',
+    faultType: '',
+    description: ''
+  })
+}
+
+// 删除订单
+const removeOrder = (index) => {
+  orderForms.value.splice(index, 1)
+}
+
 // 处理创建订单
 const handleCreate = async () => {
-  if (!formRef.value) return
-  
   try {
-    await formRef.value.validate()
+    // 验证所有表单
+    const validations = await Promise.all(
+      formRefs.value.map(form => form.validate())
+    )
+    
+    if (validations.some(valid => !valid)) {
+      return
+    }
 
-    const response = await user.createOrder(form)
-
+    const response = await user.createOrderList(orderForms.value)
     ElMessage.success('创建成功')
     createDialogVisible.value = false
     fetchOrders()
@@ -490,8 +531,6 @@ const handleCreate = async () => {
   } catch (error) {
     console.error('创建失败:', error)
     ElMessage.error('创建失败')
-  } finally {
-
   }
 }
 
@@ -539,7 +578,6 @@ const confirmPay = async () => {
     ElMessage.error('支付失败')
   }
 }
-
 
 // 分页处理
 const handleSizeChange = (val) => {
@@ -723,5 +761,41 @@ onMounted(() => {
 .record-content p,
 .feedback-content p {
   margin: 8px 0;
+}
+
+.order-list {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.order-item {
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-bottom: 20px;
+  background-color: var(--bg-color);
+}
+
+.order-item:last-child {
+  margin-bottom: 0;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.order-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.add-order {
+  margin-top: 20px;
+  text-align: center;
 }
 </style> 

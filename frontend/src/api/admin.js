@@ -20,6 +20,7 @@ export const getAssignments = params => http.get('/admin/assignments', { params 
 export const getRepairRecords = orderId => http.get(`/admin/repair-orders/${orderId}/records`);
 export const getMaterialUsages = orderId => http.get(`/admin/repair-orders/${orderId}/materials`);
 export const getFeedbackList = orderId => http.get(`/admin/repair-orders/${orderId}/feedback`);
+export const getIncomeStats = params => http.get('/admin/income', { params })
 // 管理员用户管理
 export const getUsers = params => http.get('/admin/account/customers', { params })
 // export const getUserDetail = id => http.get(`/admin/account/customers/${id}`)

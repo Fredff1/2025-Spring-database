@@ -1,5 +1,6 @@
 package com.repairhub.management.admin.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.repairhub.management.admin.dto.AdminIncomeDTO;
 import com.repairhub.management.admin.dto.AdminInfoDTO;
 import com.repairhub.management.admin.dto.OverviewDTO;
 import com.repairhub.management.admin.dto.StatisticsDTO;
@@ -24,6 +26,7 @@ import com.repairhub.management.order.dto.OrderDTO;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.service.OrderAssignmentService;
 import com.repairhub.management.repair.dto.OrderAssignmentDTO;
+import com.repairhub.management.repairman.dto.RepairmanIncomeDTO;
 import com.repairhub.management.user.dto.UserProfileDTO;
 import com.repairhub.management.user.service.UserInfoService;
 import com.repairhub.management.utils.PageUtils;
@@ -82,6 +85,15 @@ public class AdminController {
         .collect(Collectors.toList());
         PageResponse<OrderAssignmentDTO> resp = new PageResponse<>(dtos, assignments.size());
         return new ResponseEntity<>(resp,HttpStatus.OK);
+    }
+
+    @GetMapping("/income")
+    public ResponseEntity<AdminIncomeDTO> getIncome(
+        @RequestParam int page,
+        @RequestParam int size
+    ) {
+        AdminIncomeDTO incomeDTO = adminService.getIncome(page, size);
+        return ResponseEntity.ok(incomeDTO);
     }
     
 

@@ -67,8 +67,16 @@ public class UserOrderController {
     public ResponseEntity<CommonResponse<String>> createOrder(
         @RequestBody CreateOrderRequest request,
         @AuthenticationPrincipal User user) {
-        //TODO: process POST request
         orderService.createOrder(user, request);
+        var resp = CommonResponse.toResponse(201, "Success", "Creation success");
+        return new ResponseEntity<>(resp,HttpStatus.CREATED);
+    }
+
+    @PostMapping("/batch")
+    public ResponseEntity<CommonResponse<String>> createBatchOrder(
+        @RequestBody List<CreateOrderRequest> requests,
+        @AuthenticationPrincipal User user) {
+        orderService.createBatchOrder(user, requests);
         var resp = CommonResponse.toResponse(201, "Success", "Creation success");
         return new ResponseEntity<>(resp,HttpStatus.CREATED);
     }

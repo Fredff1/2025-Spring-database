@@ -25,6 +25,7 @@ import AdminRepairmen from '@/views/admin/Repairmen.vue';
 import AdminVehicles from '@/views/admin/Vehicles.vue';
 import AdminOrders from '@/views/admin/Orders.vue';
 import AdminStatistics from '@/views/admin/Statistics.vue';
+import AdminIncome from '@/views/admin/IncomeStats.vue';
 import AdminAssignment from '@/views/admin/Assignments.vue';
 import AdminProfile from '@/views/admin/Profile.vue';
 
@@ -135,6 +136,11 @@ const router = createRouter({
           path: 'profile',
           name: 'AdminProfile',
           component: AdminProfile
+        },
+        {
+          path: 'income',
+          name: 'AdminIncome',
+          component: AdminIncome
         }
       ]
     },

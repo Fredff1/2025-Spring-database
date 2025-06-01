@@ -8,7 +8,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.OrderStatus;
+import com.repairhub.management.order.repository.RepairOrderRepository;
 import com.repairhub.management.repair.entity.LaborFeeLog;
 import com.repairhub.management.repair.entity.MaterialUsage;
 import com.repairhub.management.repair.entity.RepairFeedback;
@@ -18,6 +20,7 @@ import com.repairhub.management.repair.repository.LaborFeeLogRepository;
 import com.repairhub.management.repair.repository.MaterialUsageRepository;
 import com.repairhub.management.repair.repository.RepairFeedbackRepository;
 import com.repairhub.management.repair.repository.RepairRecordRepository;
+import com.repairhub.management.repair.service.RepairFeeService;
 
 @Component
 @Order(10)
@@ -27,17 +30,23 @@ public class OrderInfoInitializer implements ApplicationRunner{
     private final RepairRecordRepository recordRepository;
     private final MaterialUsageRepository materialUsageRepository;
     private final LaborFeeLogRepository laborFeeLogRepository;
+    private final RepairOrderRepository orderRepository;
+    private final RepairFeeService repairFeeService;
 
     public OrderInfoInitializer(
         RepairFeedbackRepository feedbackRepository,
         RepairRecordRepository recordRepository,
         MaterialUsageRepository materialUsageRepository,
-        LaborFeeLogRepository laborFeeLogRepository
+        LaborFeeLogRepository laborFeeLogRepository,
+        RepairOrderRepository orderRepository,
+        RepairFeeService repairFeeService
     ){
         this.feedbackRepository = feedbackRepository;
         this.recordRepository = recordRepository;
         this.materialUsageRepository = materialUsageRepository;
         this.laborFeeLogRepository = laborFeeLogRepository;
+        this.orderRepository = orderRepository;
+        this.repairFeeService = repairFeeService;
     }
     
     @Override
@@ -122,7 +131,11 @@ public class OrderInfoInitializer implements ApplicationRunner{
         .createTime(LocalDateTime.now())
         .build();
         materialUsageRepository.insert(materialUsage);
-        
+
+        RepairOrder order = orderRepository.findById(1L).get();
+        BigDecimal fee = repairFeeService.calculateFeeByOrder(order);
+        order.setTotalFee(fee);
+        orderRepository.update(order);
 
     }
 

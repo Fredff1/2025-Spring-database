@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,6 +77,33 @@ public class OrderService {
         OrderCreatedEvent event = new OrderCreatedEvent(this, order);
         eventPublisher.publishEvent(event);
         return order;
+    }
+
+    @Transactional
+    public List<RepairOrder> createBatchOrder(User user,List<CreateOrderRequest> requests){
+        List<ApplicationEvent> events = new ArrayList<>();
+        List<RepairOrder> orders = new ArrayList<>();
+        for(var request : requests){
+            RepairOrder order = RepairOrder.builder()
+                .userId(user.getUserId())
+                .vehicleId(request.getVehicleId())
+                .submitTime(java.time.LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
+                .faultType(request.getFaultType())
+                .status(OrderStatus.PENDING) // 假设初始状态为 PENDING
+                .description(request.getDescription())
+                .totalFee(BigDecimal.valueOf(0L))
+                .isPaid(false)
+                .build();
+            repairOrderRepository.insert(order);
+            OrderCreatedEvent event = new OrderCreatedEvent(this, order);
+            events.add(event);
+            orders.add(order);
+        }
+        for (ApplicationEvent event : events) {
+            eventPublisher.publishEvent(event);
+        }
+        return orders;
     }
 
     @Transactional

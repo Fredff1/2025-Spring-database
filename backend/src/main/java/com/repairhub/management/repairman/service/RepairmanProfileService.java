@@ -206,7 +206,7 @@ public class RepairmanProfileService {
         }
 
         List<LaborFeeLogDTO> logDTOs = pagedLogs.stream()
-            .map(log -> LaborFeeLogDTO.from(log, profile))
+            .map(log -> LaborFeeLogDTO.from(log, profile,repairman))
             .collect(Collectors.toList());
         RepairmanIncomeDTO dto =RepairmanIncomeDTO.builder()
             .total(logs.size())

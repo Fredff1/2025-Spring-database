@@ -84,6 +84,22 @@ public class DataInitializer implements ApplicationRunner{
             .hourlyMoneyRate(new BigDecimal("100.00"))
             .build();
         repairmanProfileRepository.insert(repairmanProfile);
+
+        User repairman1 = User.builder()
+            .username("repair1")
+            .password(passwordEncoder.encode("123456"))
+            .email("rep@repairhub.com")
+            .phone("234-567-8901")
+            .role(UserRole.REPAIRMAN)
+            .status(UserStatus.ACTIVE)
+            .build();
+        userRepository.insert(repairman1);
+        RepairmanProfile repairmanProfile1 = RepairmanProfile.builder()
+            .userId(repairman1.getUserId())
+            .specialty(FaultType.MAINTENANCE)
+            .hourlyMoneyRate(new BigDecimal("70.00"))
+            .build();
+        repairmanProfileRepository.insert(repairmanProfile1);
         
         User admin = User.builder()
             .username("admin")
@@ -112,6 +128,7 @@ public class DataInitializer implements ApplicationRunner{
     private void initOrders(){
         User alice = userRepository.findByUsername("alice").get();
         User repairman = userRepository.findByUsername("bob").get();
+        User repairman1 = userRepository.findByUsername("repair1").get();
         RepairOrder order = RepairOrder.builder()
         .userId(alice.getUserId())
         .vehicleId(1L)
@@ -129,9 +146,17 @@ public class DataInitializer implements ApplicationRunner{
         .orderId(order.getOrderId())
         .repairmanId(repairman.getUserId())
         .assignmentTime(LocalDateTime.now())
-        .status(AssignmentStatus.PENDING)
+        .status(AssignmentStatus.ACCEPTED)
         .build();
         orderAssignmentRepository.insert(assignment);
+
+        OrderAssignment assignment1 = OrderAssignment.builder()
+        .orderId(order.getOrderId())
+        .repairmanId(repairman1.getUserId())
+        .assignmentTime(LocalDateTime.now())
+        .status(AssignmentStatus.PENDING)
+        .build();
+        orderAssignmentRepository.insert(assignment1);
 
     }
     

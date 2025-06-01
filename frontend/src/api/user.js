@@ -11,6 +11,8 @@ export const createOrder = data => http.post('/user/repair-orders', data);
 export const cancelOrder = id => http.post(`/user/repair-orders/${id}/cancel`);
 export const payOrder = id => http.post(`/user/repair-orders/${id}/pay`);
 
+// 批量创建订单
+export const createOrderList = data => http.post('/user/repair-orders/batch', data);
 
 // 维修记录
 export const getRepairRecords = orderId => http.get(`/user/repair-orders/${orderId}/records`);
