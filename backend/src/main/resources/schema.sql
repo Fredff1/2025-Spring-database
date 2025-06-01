@@ -88,6 +88,7 @@ CREATE TABLE `repair_record` (
   completion_time   DATETIME,
   PRIMARY KEY(repair_record_id),
   INDEX idx_rr_order(order_id),
+  CONSTRAINT fk_rr_tech FOREIGN KEY(repairman_id) REFERENCES users(user_id) ON DELETE CASCADE,
   CONSTRAINT fk_rr_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -145,5 +146,6 @@ CREATE TABLE `labor_fee_log` (
   settle_time      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY(labor_fee_log_id),
   INDEX idx_lf_tech(repairman_id),
-  CONSTRAINT fk_lf_tech FOREIGN KEY(repairman_id) REFERENCES users(user_id) ON DELETE CASCADE
+  CONSTRAINT fk_lf_tech FOREIGN KEY(repairman_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_lf_order FOREIGN KEY(order_id)      REFERENCES repair_order(order_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

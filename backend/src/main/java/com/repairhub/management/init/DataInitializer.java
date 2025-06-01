@@ -134,7 +134,7 @@ public class DataInitializer implements ApplicationRunner{
         .vehicleId(1L)
         .submitTime(LocalDateTime.now())
         .updateTime(LocalDateTime.now())
-        .status(OrderStatus.PENDING)
+        .status(OrderStatus.PROCESSING)
         .description("默认维修任务")
         .faultType(FaultType.MAINTENANCE)
         .totalFee(BigDecimal.valueOf(0L))

@@ -7,9 +7,10 @@
     <!-- 订单列表 -->
     <el-card shadow="hover" class="table-card">
       <el-table :data="orders" style="width: 100%" v-loading="loading">
-        <el-table-column prop="orderNo" label="订单号" width="180" />
+        <el-table-column prop="orderNo" label="订单号" width="80" />
+        <el-table-column prop="customerName" label="客户名" width="100" />
         <el-table-column prop="vehiclePlate" label="车牌号" width="120" />
-        <el-table-column prop="repairType" label="维修类型" width="120">
+        <el-table-column prop="repairType" label="维修类型" width="100">
           <template #default="{ row }">
             <el-tag :type="getRepairTypeTag(row.repairType)">
               {{ getRepairTypeText(row.repairType) }}
@@ -24,12 +25,12 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="amount" label="金额" width="120">
+        <el-table-column prop="amount" label="金额" width="90">
           <template #default="{ row }">
             ¥{{ row.amount.toFixed(2) }}
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180" />
+        <el-table-column prop="createTime" label="创建时间" width="160" />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleView(row)">查看详情</el-button>
