@@ -15,7 +15,7 @@
         <el-table-column prop="email" label="邮箱" width="180" />
         <el-table-column prop="specialty" label="专长" width="120">
           <template #default="{ row }">
-            <el-tag>{{ getFaultTypeText(row.specialty) }}</el-tag>
+            <el-tag :type="getRepairTypeTag(row.specialty)">{{ getRepairTypeText(row.specialty)}}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="hourlyMoneyRate" label="时薪" width="120">
@@ -193,15 +193,27 @@ const rules = {
   ]
 }
 
-const getFaultTypeText = (type) => {
+const getRepairTypeText = (type) => {
   const map = {
     MAINTENANCE: '常规保养',
     REPAIR: '故障维修',
-    ACCIDENT: '事故维修'
+    PAINT: '钣金喷漆',
+    TIRE: '轮胎更换',
+    OTHER: '其他'
   }
   return map[type] || type
 }
 
+const getRepairTypeTag = (type) => {
+  const map = {
+    MAINTENANCE: 'success',
+    REPAIR: 'danger',
+    PAINT: 'warning',
+    TIRE: 'warning',
+    OTHER: 'info'
+  }
+  return map[type] || 'info'
+}
 
 // 获取用户状态类型
 const getUserStatusType = (status) => {

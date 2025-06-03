@@ -43,6 +43,8 @@ public class OrderService {
     private final ApplicationEventPublisher eventPublisher;
     private final VehicleRepository vehicleRepository;
 
+    private String assignType = "ALL";
+
     public OrderService(
         UserRepository userRepository,
         RepairOrderRepository repairOrderRepository,
@@ -138,7 +140,7 @@ public class OrderService {
         return OrderDTO.from(order, vehicleRepository,user);
     }
 
-    public OrderAssignment assignOrder(RepairOrder order){
+    public void assignOrder(RepairOrder order){
         //TODO: 实现订单分配逻辑
         List<Long> filter = new ArrayList<>();
         List<OrderAssignment> assignments = orderAssignmentRepository.findByOrderId(order.getOrderId());
@@ -155,17 +157,31 @@ public class OrderService {
         if(profiles.isEmpty()){
             profiles = repairmanProfileService.findAllWithFilter(null, List.of());
         }
-        Random random = new Random();
-        int index = random.nextInt(profiles.size());
-        RepairmanProfile selectedProfile = profiles.get(index);
-        OrderAssignment assignment = OrderAssignment.builder()
+        if(assignType.equals("ALL")){
+            for(RepairmanProfile selectedProfile : profiles){
+                OrderAssignment assignment = OrderAssignment.builder()
+                    .orderId(order.getOrderId())
+                    .repairmanId(selectedProfile.getUserId())
+                    .assignmentTime(LocalDateTime.now())
+                    .status(AssignmentStatus.PENDING)
+                    .build();
+                orderAssignmentRepository.insert(assignment);
+            }
+        }else{
+            Random random = new Random();
+            int index = random.nextInt(profiles.size());
+            RepairmanProfile selectedProfile = profiles.get(index);
+            OrderAssignment assignment = OrderAssignment.builder()
                 .orderId(order.getOrderId())
                 .repairmanId(selectedProfile.getUserId())
                 .assignmentTime(LocalDateTime.now())
                 .status(AssignmentStatus.PENDING)
                 .build();
-        orderAssignmentRepository.insert(assignment);
-        return assignment;
+            orderAssignmentRepository.insert(assignment);
+            
+        }
+
+        
     }
 
     public List<RepairOrder> getOrders(User user){

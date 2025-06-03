@@ -29,34 +29,5 @@ export const formatAmount = (amount) => {
   }).format(amount)
 }
 
-/**
- * 格式化维修类型
- * @param {string} type 维修类型
- * @returns {string} 格式化后的维修类型
- */
-export const formatRepairType = (type) => {
-  const types = {
-    MAINTENANCE: '常规保养',
-    REPAIR: '故障维修',
-    ACCIDENT: '事故维修'
-  }
-  return types[type] || type
-}
 
-/**
- * 格式化订单状态
- * @param {string} status 订单状态
- * @returns {string} 格式化后的订单状态
- */
-export const formatOrderStatus = (status) => {
-  const statuses = {
-    PENDING: '待处理',
-    ASSIGNED: '已分配',
-    ACCEPTED: '已接受',
-    REJECTED: '已拒绝',
-    PROCESSING: '处理中',
-    COMPLETED: '已完成',
-    CANCELLED: '已取消'
-  }
-  return statuses[status] || status
-} 
+

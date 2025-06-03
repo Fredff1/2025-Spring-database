@@ -54,8 +54,8 @@ public class DataInitializer implements ApplicationRunner{
     @Override
     public void run(ApplicationArguments args) throws Exception {
         initUser();
-        initVehicles();
-        initOrders();
+        // initVehicles();
+        // initOrders();
     }
 
     private void initUser(){

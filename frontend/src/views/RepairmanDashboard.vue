@@ -255,12 +255,14 @@ const handleViewRecords = async (order) => {
 
 // 维修类型标签
 const getRepairTypeLabel = (type) => {
-  const types = {
+  const map = {
     MAINTENANCE: '常规保养',
     REPAIR: '故障维修',
-    ACCIDENT: '事故维修'
+    PAINT: '钣金喷漆',
+    TIRE: '轮胎更换',
+    OTHER: '其他'
   }
-  return types[type] || type
+  return map[type] || type
 }
 
 onMounted(() => {

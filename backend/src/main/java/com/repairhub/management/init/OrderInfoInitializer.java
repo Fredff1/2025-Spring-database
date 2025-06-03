@@ -2,6 +2,7 @@ package com.repairhub.management.init;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -51,6 +52,20 @@ public class OrderInfoInitializer implements ApplicationRunner{
     
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        //initData();
+        updateOrders();
+    }
+
+    private void updateOrders(){
+        List<RepairOrder> orders = orderRepository.findAll();
+        for(var order : orders){
+            BigDecimal fee = repairFeeService.calculateFeeByOrder(order);
+            order.setTotalFee(fee);
+            orderRepository.update(order);
+        }
+    }
+
+    private void initData(){
         RepairFeedback feedback = RepairFeedback.builder()
         .orderId(1L)
         .userId(1L)

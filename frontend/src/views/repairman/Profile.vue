@@ -120,7 +120,10 @@ const getFaultTypeText = (type) => {
   const map = {
     MAINTENANCE: '常规保养',
     REPAIR: '故障维修',
-    ACCIDENT: '事故维修'
+    PAINT: '喷漆',
+    TIRE: '轮胎保养',
+    OTHER: '其他',
+
   }
   return map[type] || type
 }
