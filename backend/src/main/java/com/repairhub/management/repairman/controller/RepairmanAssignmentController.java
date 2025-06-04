@@ -50,7 +50,7 @@ public class RepairmanAssignmentController {
         @AuthenticationPrincipal User repairman
     ){
         List<OrderAssignment> assignments = orderAssignmentService.getRepairmanAssignments(repairman.getUserId());
-        List<OrderAssignment> pageAssignments = PageUtils.paginate(assignments, page, assignments.size());
+        List<OrderAssignment> pageAssignments = PageUtils.paginate(assignments, page, limit);
         List<OrderAssignmentDTO> dtos = pageAssignments.stream()
         .map(assignment -> orderAssignmentService.convertAssignmentToDTO(assignment))
         .collect(Collectors.toList());
