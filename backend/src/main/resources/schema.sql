@@ -39,7 +39,7 @@ CREATE TABLE `repairman_profile` (
   user_id           BIGINT PRIMARY KEY,
   specialty         VARCHAR(30),
   hourly_money_rate DECIMAL(10,2),
-  CHECK (specialty IN ('MAINTENANCE','REPAIR','PAINT','TIRE','OTHER')),
+  CHECK (specialty IN ('MAINTENANCE','REPAIR','PAINT','TIRE','ELECTRICAL','BODYWORK','ENGINE','OTHER')),
   CONSTRAINT fk_rm_user FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
@@ -71,7 +71,7 @@ CREATE TABLE `repair_order` (
   PRIMARY KEY(order_id),
   INDEX idx_order_user(user_id),
   INDEX idx_order_vehicle(vehicle_id),
-  CHECK (fault_type IN ('MAINTENANCE','REPAIR','PAINT','TIRE','OTHER')),
+  CHECK (fault_type IN ('MAINTENANCE','REPAIR','PAINT','TIRE','ELECTRICAL','BODYWORK','ENGINE','OTHER')),
   CONSTRAINT fk_order_user    FOREIGN KEY(user_id)    REFERENCES users(user_id) ON DELETE CASCADE,
   CONSTRAINT fk_order_vehicle FOREIGN KEY(vehicle_id) REFERENCES vehicle(vehicle_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -10,8 +10,14 @@ INSERT INTO `users` (
   ('diana',     'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',   'diana@example.com',   '100-200-3001', 'ACTIVE', NOW(), NOW()),
   ('eve',       'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',     'eve@repairhub.com',   '100-200-3002', 'ACTIVE', NOW(), NOW()),
   ('frank',     'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',   'frank@repairhub.com', '100-200-3003', 'ACTIVE', NOW(), NOW()),
-  ('grace',     'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',   'grace@repairhub.com', '100-200-3004', 'ACTIVE', NOW(), NOW());
-
+  ('grace',     'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',   'grace@repairhub.com', '100-200-3004', 'ACTIVE', NOW(), NOW()),
+  ('henry',     'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'henry@example.com', '100-200-3005', 'ACTIVE', NOW(), NOW()),
+  ('irene',     'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'irene@example.com', '100-200-3006', 'ACTIVE', NOW(), NOW()),
+  ('jack',      'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'jack@repairhub.com', '100-200-3007', 'ACTIVE', NOW(), NOW()),
+  ('kate',      'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'kate@repairhub.com', '100-200-3008', 'ACTIVE', NOW(), NOW()),
+  ('lily',      'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'lily@example.com', '100-200-3010', 'ACTIVE', NOW(), NOW()),
+  ('mike',      'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'mike@repairhub.com', '100-200-3011', 'ACTIVE', NOW(), NOW()),
+  ('nancy',     'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'nancy@repairhub.com', '100-200-3012', 'ACTIVE', NOW(), NOW());
 -- === 2. 维修人员档案（repairman_profile）示例 ===
 -- eve 擅长 MAINTENANCE，时薪 90.00
 INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate) VALUES
@@ -34,6 +40,14 @@ INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate) VALUES
     'PAINT',
     75.00
   );
+-- jack 擅长 ELECTRICAL，时薪 85.00
+-- kate 擅长 BODYWORK，时薪 78.00
+INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate) VALUES
+  ((SELECT user_id FROM users WHERE username = 'jack'), 'ELECTRICAL', 85.00),
+  ((SELECT user_id FROM users WHERE username = 'kate'), 'BODYWORK', 78.00),
+  ((SELECT user_id FROM users WHERE username = 'mike'), 'ELECTRICAL', 88.00),
+  ((SELECT user_id FROM users WHERE username = 'nancy'), 'ELECTRICAL', 82.00);
+
 
 -- === 3. 车辆（vehicle）示例 ===
 INSERT INTO `vehicle` (owner_id, brand, model, license_plate, register_date) VALUES
@@ -49,6 +63,37 @@ INSERT INTO `vehicle` (owner_id, brand, model, license_plate, register_date) VAL
     (SELECT user_id FROM users WHERE username = 'diana'),
     'Ford',   'Focus',   '沪B333CC', '2021-12-01'
   );
+
+INSERT INTO `vehicle` (owner_id, brand, model, license_plate, register_date) VALUES
+  ((SELECT user_id FROM users WHERE username = 'henry'), 'Mazda', '3', '苏C444DD', '2021-03-10'),
+  ((SELECT user_id FROM users WHERE username = 'irene'), 'BMW', 'X1', '粤D555EE', '2020-09-25'),
+  ((SELECT user_id FROM users WHERE username = 'lily'), 'Nissan', 'Altima', '湘A666FF', '2021-11-11');
+
+INSERT INTO `vehicle` (owner_id, brand, model, license_plate, register_date) VALUES (
+  (SELECT user_id FROM users WHERE username = 'irene'),
+  'BrandComplex0', 'ModelX0', '豫Y9900XX', DATE('2025-05-08')
+);
+
+INSERT INTO `vehicle` (owner_id, brand, model, license_plate, register_date) VALUES (
+  (SELECT user_id FROM users WHERE username = 'charlie'),
+  'BrandComplex1', 'ModelX1', '豫Y9901XX', DATE('2025-05-26')
+);
+
+INSERT INTO `vehicle` (owner_id, brand, model, license_plate, register_date) VALUES (
+  (SELECT user_id FROM users WHERE username = 'lily'),
+  'BrandComplex2', 'ModelX2', '豫Y9902XX', DATE('2025-05-07')
+);
+
+INSERT INTO `vehicle` (owner_id, brand, model, license_plate, register_date) VALUES (
+  (SELECT user_id FROM users WHERE username = 'charlie'),
+  'BrandComplex3', 'ModelX3', '豫Y9903XX', DATE('2025-05-11')
+);
+
+INSERT INTO `vehicle` (owner_id, brand, model, license_plate, register_date) VALUES (
+  (SELECT user_id FROM users WHERE username = 'henry'),
+  'BrandComplex4', 'ModelX4', '豫Y9904XX', DATE('2025-05-27')
+);
+
 
 -- === 4. 报修工单（repair_order）示例 ===
 -- charlie 针对第一辆车提交了一条 MAINTENANCE 故障工单
@@ -70,6 +115,71 @@ INSERT INTO `repair_order` (
     (SELECT vehicle_id FROM vehicle WHERE license_plate = '沪B333CC'),
     '刹车片磨损，应更换', 0.00, NOW(), NOW(), 'PENDING', 'REPAIR', FALSE
   );
+
+  -- henry 的 ELECTRICAL 故障工单
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES
+  ((SELECT user_id FROM users WHERE username = 'henry'),
+   (SELECT vehicle_id FROM vehicle WHERE license_plate = '苏C444DD'),
+   '车灯无法点亮，需要电路检查', 0.00, NOW(), NOW(), 'PENDING', 'ELECTRICAL', FALSE);
+
+-- irene 的 BODYWORK 故障工单
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES
+  ((SELECT user_id FROM users WHERE username = 'irene'),
+   (SELECT vehicle_id FROM vehicle WHERE license_plate = '粤D555EE'),
+   '车门有划痕，需要钣金修复', 0.00, NOW(), NOW(), 'PENDING', 'BODYWORK', FALSE);
+
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES (
+  (SELECT user_id FROM users WHERE username = 'lily'),
+  (SELECT vehicle_id FROM vehicle WHERE license_plate = '湘A666FF'),
+  '中控系统失灵，仪表盘无响应', 0.00, NOW(), NOW(), 'PENDING', 'ELECTRICAL', FALSE
+);
+
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES (
+  (SELECT user_id FROM users WHERE username = 'irene'),
+  (SELECT vehicle_id FROM vehicle WHERE license_plate = '豫Y9900XX'),
+  '电池电量掉得快', 0.00, '2025-05-08 11:15:07', '2025-05-08 11:15:07', 'PENDING', 'ELECTRICAL', FALSE
+);
+
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES (
+  (SELECT user_id FROM users WHERE username = 'charlie'),
+  (SELECT vehicle_id FROM vehicle WHERE license_plate = '豫Y9901XX'),
+  '轮胎鼓包', 0.00, '2025-05-26 11:15:07', '2025-05-26 11:15:07', 'PENDING', 'REPAIR', FALSE
+);
+
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES (
+  (SELECT user_id FROM users WHERE username = 'lily'),
+  (SELECT vehicle_id FROM vehicle WHERE license_plate = '豫Y9902XX'),
+  '导航系统崩溃', 0.00, '2025-05-07 11:15:07', '2025-05-07 11:15:07', 'PENDING', 'ELECTRICAL', FALSE
+);
+
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES (
+  (SELECT user_id FROM users WHERE username = 'charlie'),
+  (SELECT vehicle_id FROM vehicle WHERE license_plate = '豫Y9903XX'),
+  '车窗升降失灵', 0.00, '2025-05-11 11:15:07', '2025-05-11 11:15:07', 'PENDING', 'BODYWORK', FALSE
+);
+
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES (
+  (SELECT user_id FROM users WHERE username = 'henry'),
+  (SELECT vehicle_id FROM vehicle WHERE license_plate = '豫Y9904XX'),
+  '车漆开裂，需要喷涂', 0.00, '2025-05-27 11:15:07', '2025-05-27 11:15:07', 'PENDING', 'PAINT', FALSE
+);
+
 
 -- === 5. 派单（assignment）示例 ===
 -- 为 charlie 的第一个工单派发给 eve、frank、grace 三位技师
@@ -103,6 +213,104 @@ INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_st
     (SELECT user_id FROM users WHERE username = 'eve'),
     NOW(), 'PENDING'
   );
+
+  -- henry 的工单派给 jack（接单）和 kate（待定）
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%车灯%'),
+   (SELECT user_id FROM users WHERE username = 'jack'), NOW(), 'ACCEPTED'),
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%车灯%'),
+   (SELECT user_id FROM users WHERE username = 'kate'), NOW(), 'PENDING');
+
+-- irene 的工单派给 kate（接单）
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%划痕%'),
+   (SELECT user_id FROM users WHERE username = 'kate'), NOW(), 'ACCEPTED');
+
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
+   (SELECT user_id FROM users WHERE username = 'mike'), NOW(), 'ACCEPTED'),
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
+   (SELECT user_id FROM users WHERE username = 'nancy'), NOW(), 'PENDING');
+
+-- 第一轮派单失败
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  ((SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
+   (SELECT user_id FROM users WHERE username = 'frank'),
+   '2025-05-08 11:15:07', 'REJECTED'),
+  ((SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
+   (SELECT user_id FROM users WHERE username = 'jack'),
+   '2025-05-08 11:15:07', 'REJECTED');
+
+-- 第二轮派单成功
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
+  (SELECT user_id FROM users WHERE username = 'nancy'),
+  '2025-05-08 21:15:07', 'ACCEPTED'
+);
+
+-- 第一轮派单失败
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  ((SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
+   (SELECT user_id FROM users WHERE username = 'nancy'),
+   '2025-05-26 11:15:07', 'REJECTED'),
+  ((SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
+   (SELECT user_id FROM users WHERE username = 'kate'),
+   '2025-05-26 11:15:07', 'REJECTED');
+
+-- 第二轮派单成功
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
+  (SELECT user_id FROM users WHERE username = 'frank'),
+  '2025-05-26 21:15:07', 'ACCEPTED'
+);
+
+-- 第一轮派单失败
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  ((SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
+   (SELECT user_id FROM users WHERE username = 'frank'),
+   '2025-05-07 11:15:07', 'REJECTED'),
+  ((SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
+   (SELECT user_id FROM users WHERE username = 'eve'),
+   '2025-05-07 11:15:07', 'REJECTED');
+
+-- 第二轮派单成功
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
+  (SELECT user_id FROM users WHERE username = 'mike'),
+  '2025-05-07 21:15:07', 'ACCEPTED'
+);
+
+-- 第一轮派单失败
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  ((SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
+   (SELECT user_id FROM users WHERE username = 'grace'),
+   '2025-05-11 11:15:07', 'REJECTED'),
+  ((SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
+   (SELECT user_id FROM users WHERE username = 'frank'),
+   '2025-05-11 11:15:07', 'REJECTED');
+
+-- 第二轮派单成功
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
+  (SELECT user_id FROM users WHERE username = 'nancy'),
+  '2025-05-11 21:15:07', 'ACCEPTED'
+);
+
+-- 第一轮派单失败
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  ((SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
+   (SELECT user_id FROM users WHERE username = 'kate'),
+   '2025-05-27 11:15:07', 'REJECTED'),
+  ((SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
+   (SELECT user_id FROM users WHERE username = 'nancy'),
+   '2025-05-27 11:15:07', 'REJECTED');
+
+-- 第二轮派单成功
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
+  (SELECT user_id FROM users WHERE username = 'eve'),
+  '2025-05-27 21:15:07', 'ACCEPTED'
+);
 
 -- === 6. 维修记录（repair_record）示例 ===
 -- 假设 eve 拒绝了 charlie 的工单并未插入记录；frank 拒绝，grace 接单并完成一次维修
@@ -147,6 +355,108 @@ INSERT INTO `repair_record` (
     NOW()
   );
 
+-- jack 完成 henry 的电路维修
+INSERT INTO `repair_record` (
+  order_id, repairman_id, fault_description, repair_result, order_status, actual_work_hours, completion_time
+) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%车灯%'),
+   (SELECT user_id FROM users WHERE username = 'jack'),
+   '检查发现保险丝熔断，更换保险丝后恢复正常',
+   '测试完成，车灯工作正常',
+   'COMPLETED',
+   1.5,
+   NOW());
+
+-- kate 完成 irene 的钣金修复
+INSERT INTO `repair_record` (
+  order_id, repairman_id, fault_description, repair_result, order_status, actual_work_hours, completion_time
+) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%划痕%'),
+   (SELECT user_id FROM users WHERE username = 'kate'),
+   '打磨划痕区域，喷漆修复，抛光',
+   '车门表面恢复光亮如新',
+   'COMPLETED',
+   3.0,
+   NOW());
+
+INSERT INTO `repair_record` (
+  order_id, repairman_id, fault_description, repair_result, order_status, actual_work_hours, completion_time
+) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
+   (SELECT user_id FROM users WHERE username = 'mike'),
+   '初步检查发现主电源模块断电，尝试更换保险丝',
+   '问题未完全解决，仍有部分模块无响应',
+   'PROCESSING', 1.5, NOW());
+
+INSERT INTO `repair_record` (
+  order_id, repairman_id, fault_description, repair_result, order_status, actual_work_hours, completion_time
+) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
+   (SELECT user_id FROM users WHERE username = 'mike'),
+   '更换控制单元，更新固件，全部模块恢复正常',
+   '问题彻底解决',
+   'COMPLETED', 2.0, NOW());
+
+INSERT INTO `repair_record` (
+  order_id, repairman_id, fault_description, repair_result, order_status, actual_work_hours, completion_time
+) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
+  (SELECT user_id FROM users WHERE username = 'nancy'),
+  '电池电量掉得快 检查后完成维修',
+  '问题已修复，测试通过',
+  'COMPLETED',
+  2.5,
+  '2025-05-08 23:45:07'
+);
+
+INSERT INTO `repair_record` (
+  order_id, repairman_id, fault_description, repair_result, order_status, actual_work_hours, completion_time
+) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
+  (SELECT user_id FROM users WHERE username = 'frank'),
+  '轮胎鼓包 检查后完成维修',
+  '问题已修复，测试通过',
+  'COMPLETED',
+  2.5,
+  '2025-05-26 23:45:07'
+);
+
+INSERT INTO `repair_record` (
+  order_id, repairman_id, fault_description, repair_result, order_status, actual_work_hours, completion_time
+) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
+  (SELECT user_id FROM users WHERE username = 'mike'),
+  '导航系统崩溃 检查后完成维修',
+  '问题已修复，测试通过',
+  'COMPLETED',
+  2.5,
+  '2025-05-07 23:45:07'
+);
+
+INSERT INTO `repair_record` (
+  order_id, repairman_id, fault_description, repair_result, order_status, actual_work_hours, completion_time
+) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
+  (SELECT user_id FROM users WHERE username = 'nancy'),
+  '车窗升降失灵 检查后完成维修',
+  '问题已修复，测试通过',
+  'COMPLETED',
+  2.5,
+  '2025-05-11 23:45:07'
+);
+
+INSERT INTO `repair_record` (
+  order_id, repairman_id, fault_description, repair_result, order_status, actual_work_hours, completion_time
+) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
+  (SELECT user_id FROM users WHERE username = 'eve'),
+  '车漆开裂，需要喷涂 检查后完成维修',
+  '问题已修复，测试通过',
+  'COMPLETED',
+  2.5,
+  '2025-05-27 23:45:07'
+);
+
 -- === 7. 材料消耗记录（material_usage）示例 ===
 -- charlie 的工单：paint 材料 1 瓶（100.00）
 INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
@@ -165,6 +475,51 @@ INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, cre
     (SELECT order_id FROM repair_order WHERE description LIKE '%刹车片磨损%'),
     '刹车片套装', 1, 200.00, NOW()
   );
+
+-- henry 的工单：保险丝 1 个（15.00）
+INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%车灯%'),
+   '保险丝', 1, 15.00, NOW());
+
+-- irene 的工单：喷漆材料 1 套（250.00）
+INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%划痕%'),
+   '喷漆材料', 1, 250.00, NOW());
+
+INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
+   '主控制单元', 1, 300.00, NOW()),
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
+   '保险丝', 2, 15.00, NOW());
+INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
+   '复合组件0', 1, 160, '2025-05-08 23:45:07'),
+  ((SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
+   '维修材料', 2, 30.00, '2025-05-08 23:45:07');
+
+INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
+   '复合组件1', 1, 165, '2025-05-26 23:45:07'),
+  ((SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
+   '维修材料', 2, 30.00, '2025-05-26 23:45:07');
+
+INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
+   '复合组件2', 1, 170, '2025-05-07 23:45:07'),
+  ((SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
+   '维修材料', 2, 30.00, '2025-05-07 23:45:07');
+
+INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
+   '复合组件3', 1, 175, '2025-05-11 23:45:07'),
+  ((SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
+   '维修材料', 2, 30.00, '2025-05-11 23:45:07');
+
+INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
+   '复合组件4', 1, 180, '2025-05-27 23:45:07'),
+  ((SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
+   '维修材料', 2, 30.00, '2025-05-27 23:45:07');
 
 -- === 8. 工时费日志（labor_fee_log）示例 ===
 -- charlie 的工单由 grace 完成，用时 2.50h，时薪 75.00，收入合计 187.50
@@ -190,6 +545,61 @@ INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_i
     'JUNE', 0.5, 120.00, NOW()
   );
 
+INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%车灯%'),
+   (SELECT user_id FROM users WHERE username = 'jack'),
+   'JUNE', 1.5, 127.50, NOW());
+
+INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%划痕%'),
+   (SELECT user_id FROM users WHERE username = 'kate'),
+   'JUNE', 3.0, 234.00, NOW());
+
+INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
+   (SELECT user_id FROM users WHERE username = 'mike'),
+   'JUNE', 3.5, 308.00, NOW());
+
+INSERT INTO `labor_fee_log` (
+  order_id, repairman_id, month, total_hours, total_income, settle_time
+) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
+  (SELECT user_id FROM users WHERE username = 'nancy'),
+  'JUNE', 2.5, 187.5, '2025-05-08 23:45:07'
+);
+
+INSERT INTO `labor_fee_log` (
+  order_id, repairman_id, month, total_hours, total_income, settle_time
+) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
+  (SELECT user_id FROM users WHERE username = 'frank'),
+  'JUNE', 2.5, 193.75, '2025-05-26 23:45:07'
+);
+
+INSERT INTO `labor_fee_log` (
+  order_id, repairman_id, month, total_hours, total_income, settle_time
+) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
+  (SELECT user_id FROM users WHERE username = 'mike'),
+  'JUNE', 2.5, 200.0, '2025-05-07 23:45:07'
+);
+
+INSERT INTO `labor_fee_log` (
+  order_id, repairman_id, month, total_hours, total_income, settle_time
+) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
+  (SELECT user_id FROM users WHERE username = 'nancy'),
+  'JUNE', 2.5, 206.25, '2025-05-11 23:45:07'
+);
+
+INSERT INTO `labor_fee_log` (
+  order_id, repairman_id, month, total_hours, total_income, settle_time
+) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
+  (SELECT user_id FROM users WHERE username = 'eve'),
+  'JUNE', 2.5, 212.5, '2025-05-27 23:45:07'
+);
+
 -- === 9. 反馈（feedback）示例 ===
 -- charlie 对 grace 的首次维修进行评分
 INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES
@@ -214,3 +624,93 @@ INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, 
     (SELECT user_id FROM users WHERE username = 'diana'),
     4, 'GENERAL', '维修效果不错，下次再来', NOW()
   );
+
+-- henry 对 jack 评价
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%车灯%'),
+   (SELECT user_id FROM users WHERE username = 'henry'),
+   5, 'RATING', '修得很快，非常专业！', NOW());
+
+-- irene 对 kate 一般反馈
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%划痕%'),
+   (SELECT user_id FROM users WHERE username = 'irene'),
+   4, 'GENERAL', '效果不错，但稍微有点慢。', NOW());
+
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
+   (SELECT user_id FROM users WHERE username = 'lily'), NULL, 'URGENT', '什么时候能修好仪表盘？', NOW());
+
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
+   (SELECT user_id FROM users WHERE username = 'lily'), 5, 'RATING', '全部功能恢复，服务很好！', NOW());
+
+-- 催单反馈
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
+  (SELECT user_id FROM users WHERE username = 'irene'),
+  NULL, 'URGENT', '技师长时间未响应，请尽快处理', '2025-05-08 15:15:07'
+);
+
+-- 完成后评分反馈
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
+  (SELECT user_id FROM users WHERE username = 'irene'),
+  4, 'RATING', '过程虽有延误，修好即可', '2025-05-08 23:45:07'
+);
+
+-- 催单反馈
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
+  (SELECT user_id FROM users WHERE username = 'charlie'),
+  NULL, 'URGENT', '技师长时间未响应，请尽快处理', '2025-05-26 15:15:07'
+);
+
+-- 完成后评分反馈
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
+  (SELECT user_id FROM users WHERE username = 'charlie'),
+  4, 'RATING', '过程虽有延误，修好即可', '2025-05-26 23:45:07'
+);
+
+-- 催单反馈
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
+  (SELECT user_id FROM users WHERE username = 'lily'),
+  NULL, 'URGENT', '技师长时间未响应，请尽快处理', '2025-05-07 15:15:07'
+);
+
+-- 完成后评分反馈
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
+  (SELECT user_id FROM users WHERE username = 'lily'),
+  4, 'RATING', '过程虽有延误，修好即可', '2025-05-07 23:45:07'
+);
+
+-- 催单反馈
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
+  (SELECT user_id FROM users WHERE username = 'charlie'),
+  NULL, 'URGENT', '技师长时间未响应，请尽快处理', '2025-05-11 15:15:07'
+);
+
+-- 完成后评分反馈
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
+  (SELECT user_id FROM users WHERE username = 'charlie'),
+  4, 'RATING', '过程虽有延误，修好即可', '2025-05-11 23:45:07'
+);
+
+-- 催单反馈
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
+  (SELECT user_id FROM users WHERE username = 'henry'),
+  NULL, 'URGENT', '技师长时间未响应，请尽快处理', '2025-05-27 15:15:07'
+);
+
+-- 完成后评分反馈
+INSERT INTO `feedback` (order_id, user_id, rating, feed_back_type, description, feedback_time) VALUES (
+  (SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
+  (SELECT user_id FROM users WHERE username = 'henry'),
+  4, 'RATING', '过程虽有延误，修好即可', '2025-05-27 23:45:07'
+);

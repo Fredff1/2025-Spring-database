@@ -110,9 +110,12 @@ const goToOrders = () => {
 const getRepairTypeText = (type) => {
   const map = {
     MAINTENANCE: '常规保养',
-    REPAIR: '故障维修',
+    REPAIR: '通用维修',
     PAINT: '钣金喷漆',
     TIRE: '轮胎更换',
+    ELECTRICAL: '电路系统修复',
+    BODYWORK: '车身修复',
+    ENGINE: '发动机维修',
     OTHER: '其他'
   }
   return map[type] || type

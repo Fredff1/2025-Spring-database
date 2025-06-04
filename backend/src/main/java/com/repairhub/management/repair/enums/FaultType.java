@@ -6,4 +6,6 @@ public enum FaultType {
     PAINT,        // 刹车
     TIRE, // 传动
     OTHER,
+    ELECTRICAL, 
+    BODYWORK,
 }
