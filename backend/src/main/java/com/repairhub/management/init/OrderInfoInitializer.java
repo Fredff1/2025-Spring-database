@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.repository.RepairOrderRepository;
+import com.repairhub.management.order.service.OrderService;
 import com.repairhub.management.repair.entity.LaborFeeLog;
 import com.repairhub.management.repair.entity.MaterialUsage;
 import com.repairhub.management.repair.entity.RepairFeedback;
@@ -33,6 +34,7 @@ public class OrderInfoInitializer implements ApplicationRunner{
     private final LaborFeeLogRepository laborFeeLogRepository;
     private final RepairOrderRepository orderRepository;
     private final RepairFeeService repairFeeService;
+    private final OrderService orderService;
 
     public OrderInfoInitializer(
         RepairFeedbackRepository feedbackRepository,
@@ -40,7 +42,8 @@ public class OrderInfoInitializer implements ApplicationRunner{
         MaterialUsageRepository materialUsageRepository,
         LaborFeeLogRepository laborFeeLogRepository,
         RepairOrderRepository orderRepository,
-        RepairFeeService repairFeeService
+        RepairFeeService repairFeeService,
+        OrderService orderService
     ){
         this.feedbackRepository = feedbackRepository;
         this.recordRepository = recordRepository;
@@ -48,6 +51,7 @@ public class OrderInfoInitializer implements ApplicationRunner{
         this.laborFeeLogRepository = laborFeeLogRepository;
         this.orderRepository = orderRepository;
         this.repairFeeService = repairFeeService;
+        this.orderService = orderService;
     }
     
     @Override
@@ -62,6 +66,7 @@ public class OrderInfoInitializer implements ApplicationRunner{
             BigDecimal fee = repairFeeService.calculateFeeByOrder(order);
             order.setTotalFee(fee);
             orderRepository.update(order);
+            orderService.finishOrder(order);
         }
     }
 

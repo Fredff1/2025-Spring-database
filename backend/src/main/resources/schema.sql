@@ -30,6 +30,7 @@ CREATE TABLE `users` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `uk_user_username` (`username`),
   UNIQUE KEY `uk_user_email`    (`email`),
+  INDEX idx_username(username),
   CHECK (status IN ('ACTIVE','DISABLED','LOCKED')),
   CHECK (role IN ('CUSTOMER','REPAIRMAN','ADMIN'))
 ) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4;

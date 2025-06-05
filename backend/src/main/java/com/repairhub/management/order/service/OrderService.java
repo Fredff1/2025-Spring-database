@@ -184,6 +184,18 @@ public class OrderService {
         
     }
 
+    @Transactional
+    public void finishOrder(RepairOrder order){
+        Long orderId = order.getOrderId();
+        List<OrderAssignment> assignments = orderAssignmentRepository.findByOrderId(orderId);
+        for(OrderAssignment assignment : assignments){
+            if(assignment.getStatus().equals(AssignmentStatus.PENDING)){
+                assignment.setStatus(AssignmentStatus.CANCELED);
+                orderAssignmentRepository.update(assignment);
+            }
+        }
+    }
+
     public List<RepairOrder> getOrders(User user){
         List<RepairOrder> orders = repairOrderRepository.findByUserId(user.getUserId());
         orders.sort(Comparator.comparing(RepairOrder::getSubmitTime).reversed());

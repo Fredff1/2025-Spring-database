@@ -59,7 +59,7 @@ public class AdminOrderController {
         @RequestParam(defaultValue = "5")   int limit
     ) {
         List<RepairOrder> orders = repairOrderRepository.findAll();
-        List<RepairOrder> pagedOrders = PageUtils.paginate(orders, page, orders.size());
+        List<RepairOrder> pagedOrders = PageUtils.paginate(orders, page, limit);
         List<OrderDTO> dtos = pagedOrders.stream()
         .map(order -> orderService.toDTO(order))
         .collect(Collectors.toList());

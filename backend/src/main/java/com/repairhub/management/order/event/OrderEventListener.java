@@ -2,6 +2,7 @@ package com.repairhub.management.order.event;
 
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -11,6 +12,7 @@ import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.OrderStatus;
+import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.order.service.OrderService;
 import com.repairhub.management.repair.dto.CreateLaborFeeLogDTO;
 import com.repairhub.management.repair.service.RepairFeeService;
@@ -22,14 +24,17 @@ public class OrderEventListener {
     private final OrderService orderService;
     private final RepairFeeService repairFeeService;
     private final RepairmanProfileRepository profileRepository;
+    private final OrderAssignmentRepository orderAssignmentRepository;
 
     public OrderEventListener(
         OrderService orderService,
         RepairFeeService repairFeeService,
-        RepairmanProfileRepository profileRepository) {
+        RepairmanProfileRepository profileRepository,
+        OrderAssignmentRepository orderAssignmentRepository) {
         this.repairFeeService = repairFeeService;
         this.orderService = orderService;
         this.profileRepository = profileRepository;
+        this.orderAssignmentRepository = orderAssignmentRepository;
     }
     
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
@@ -66,5 +71,6 @@ public class OrderEventListener {
         BigDecimal fee = repairFeeService.calculateFeeByOrder(order);
         order.setTotalFee(fee);
         orderService.getRepairOrderRepository().update(order);
+        orderService.finishOrder(order);
     }
 }

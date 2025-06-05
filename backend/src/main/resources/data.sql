@@ -49,21 +49,21 @@ INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate) VALUES
   ((SELECT user_id FROM users WHERE username = 'nancy'), 'ELECTRICAL', 82.00);
 
 
--- === 3. 车辆（vehicle）示例 ===
+-- === 3. 车辆（vehicle）示例 === sedan即小轿车 suv即多功能 pickup即皮卡 待选包括Van卡车  Hatchback小型车 Coupe 跑车 Convertible敞篷车
 INSERT INTO `vehicle` (owner_id, brand, model, license_plate, register_date) VALUES
-  ((SELECT user_id FROM users WHERE username = 'charlie'),'Toyota', 'Corolla', '浙A111AA', '2023-08-15'),
-  ((SELECT user_id FROM users WHERE username = 'charlie'),'Honda',  'Civic',   '浙A222BB', '2022-06-30'),
-  ((SELECT user_id FROM users WHERE username = 'charlie'),'BrandComplex1', 'ModelX1', '浙A333CC', DATE('2025-05-26')),
-  ((SELECT user_id FROM users WHERE username = 'charlie'),'BrandComplex3', 'ModelX3', '浙A444DD', DATE('2025-05-11')),
-  ((SELECT user_id FROM users WHERE username = 'diana'),'Ford',   'Focus',   '沪B333CC', '2021-12-01');
+  ((SELECT user_id FROM users WHERE username = 'charlie'),'Toyota', 'Sedan', '浙A111AA', '2023-08-15'),
+  ((SELECT user_id FROM users WHERE username = 'charlie'),'Honda',  'Sedan',   '浙A222BB', '2022-06-30'),
+  ((SELECT user_id FROM users WHERE username = 'charlie'),'BrandComplex1', 'SUV', '浙A333CC', DATE('2025-05-26')),
+  ((SELECT user_id FROM users WHERE username = 'charlie'),'BrandComplex3', 'Sedan', '浙A444DD', DATE('2025-05-11')),
+  ((SELECT user_id FROM users WHERE username = 'diana'),'Ford',   'SUV',   '沪B333CC', '2021-12-01');
 
 INSERT INTO `vehicle` (owner_id, brand, model, license_plate, register_date) VALUES
-  ((SELECT user_id FROM users WHERE username = 'henry'), 'Mazda', '3', '苏C444DD', '2021-03-10'),
-  ((SELECT user_id FROM users WHERE username = 'henry'),'BrandComplex4', 'ModelX4', '苏C555EE', DATE('2025-05-27')),
-  ((SELECT user_id FROM users WHERE username = 'irene'), 'BMW', 'X1', '粤D555EE', '2020-09-25'),
-  ((SELECT user_id FROM users WHERE username = 'irene'),'BrandComplex0', 'ModelX0', '豫Y000XX', DATE('2025-05-08')),
-  ((SELECT user_id FROM users WHERE username = 'lily'), 'Nissan', 'Altima', '湘A666FF', '2021-11-11'),
-  ((SELECT user_id FROM users WHERE username = 'lily'),'BrandComplex2', 'ModelX2', '豫Y2222XX', DATE('2025-05-07'));
+  ((SELECT user_id FROM users WHERE username = 'henry'), 'Mazda', 'Pickup', '苏C444DD', '2021-03-10'),
+  ((SELECT user_id FROM users WHERE username = 'henry'),'BrandComplex4', 'SUV', '苏C555EE', DATE('2025-05-27')),
+  ((SELECT user_id FROM users WHERE username = 'irene'), 'BMW', 'Sedan', '粤D555EE', '2020-09-25'),
+  ((SELECT user_id FROM users WHERE username = 'irene'),'BrandComplex0', 'SUV', '豫Y000XX', DATE('2025-05-08')),
+  ((SELECT user_id FROM users WHERE username = 'lily'), 'Nissan', 'SUV', '湘A666FF', '2021-11-11'),
+  ((SELECT user_id FROM users WHERE username = 'lily'),'BrandComplex2', 'Pickup', '豫Y2222XX', DATE('2025-05-07'));
 
 
 -- === 4. 报修工单（repair_order）示例 ===

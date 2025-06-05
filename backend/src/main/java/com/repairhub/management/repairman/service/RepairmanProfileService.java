@@ -1,6 +1,7 @@
 package com.repairhub.management.repairman.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -200,7 +201,7 @@ public class RepairmanProfileService {
         BigDecimal totalWorkHour = repairmanIncomeRepository.sumTotalHours(repairmanId, startTime, endTime);
         BigDecimal averageHourlyRate = BigDecimal.ZERO;
         if (totalWorkHour.compareTo(BigDecimal.ZERO) > 0) {
-            averageHourlyRate = totalIncome.divide(totalWorkHour);
+            averageHourlyRate = totalIncome.divide(totalWorkHour,RoundingMode.HALF_UP);
         } else {
             averageHourlyRate = profile.getHourlyMoneyRate();
         }
