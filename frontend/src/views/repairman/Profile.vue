@@ -30,6 +30,41 @@
             <el-descriptions-item label="更新时间">{{ formatDateTime(form.updateTime) }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
+
+        <div style="margin-top: 16px; text-align: right">
+          <el-button type="primary" @click="openEditDialog">编辑资料</el-button>
+        </div>
+
+        <el-dialog v-model="editDialogVisible" title="编辑个人资料" width="500px" destroy-on-close>
+          <el-form :model="editForm" label-width="80px">
+            <el-form-item label="用户名">
+              <el-input v-model="editForm.username" />
+            </el-form-item>
+            <el-form-item label="手机号">
+              <el-input v-model="editForm.phone" />
+            </el-form-item>
+            <el-form-item label="邮箱">
+              <el-input v-model="editForm.email" />
+            </el-form-item>
+            <el-form-item label="专长">
+              <el-select v-model="editForm.specialty" placeholder="请选择专长">
+                <el-option label="常规保养" value="MAINTENANCE" />
+                <el-option label="通用维修" value="REPAIR" />
+                <el-option label="钣金喷漆" value="PAINT" />
+                <el-option label="轮胎更换" value="TIRE" />
+                <el-option label="电路系统修复" value="ELECTRICAL" />
+                <el-option label="车身修复" value="BODYWORK" />
+                <el-option label="发动机维修" value="ENGINE" />
+                <el-option label="其他" value="OTHER" />
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <el-button @click="editDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="submitEdit">保存</el-button>
+          </template>
+        </el-dialog>
+
       </el-col>
 
       <!-- 统计信息 -->
@@ -119,10 +154,13 @@ const getUserStatusText = (status) => {
 const getFaultTypeText = (type) => {
   const map = {
     MAINTENANCE: '常规保养',
-    REPAIR: '故障维修',
-    PAINT: '喷漆',
-    TIRE: '轮胎保养',
-    OTHER: '其他',
+    REPAIR: '通用维修',
+    PAINT: '钣金喷漆',
+    TIRE: '轮胎更换',
+    ELECTRICAL: '电路系统修复',
+    BODYWORK: '车身修复',
+    ENGINE: '发动机维修',
+    OTHER: '其他'
 
   }
   return map[type] || type
@@ -160,6 +198,49 @@ const fetchStats = async () => {
     ElMessage.error('获取统计信息失败')
   }
 }
+
+const editDialogVisible = ref(false)
+const editForm = reactive({
+  username: '',
+  phone: '',
+  email: '',
+  specialty: ''
+})
+
+// 打开编辑对话框
+const openEditDialog = () => {
+  Object.assign(editForm, {
+    username: form.username,
+    phone: form.phone,
+    email: form.email,
+    specialty: form.specialty
+  })
+  editDialogVisible.value = true
+}
+
+// 提交编辑
+const submitEdit = async () => {
+  try {
+    const response = await repairman.updateProfile(editForm)
+    console.log('后端返回的 response:', response)
+    const token = response.token
+
+
+    // res 是字符串类型的新 token
+    if (typeof token === 'string') {
+      localStorage.setItem('token', token) // 替换旧 token
+      ElMessage.success('更新成功，正在刷新信息...')
+      location.reload() // 强制刷新页面使新 token 生效
+    } else {
+      ElMessage.warning('更新成功但未收到新 token，请重新登录')
+    }
+    editDialogVisible.value = false
+  } catch (error) {
+    console.error('更新失败:', error)
+    ElMessage.error('更新失败')
+  }
+}
+
 
 // 监听统计时间范围变化
 watch(statsTimeRange, () => {

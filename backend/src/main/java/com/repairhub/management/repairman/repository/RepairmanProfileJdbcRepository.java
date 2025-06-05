@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import com.repairhub.management.repair.enums.FaultType;
+import com.repairhub.management.repairman.dto.RepairmanProfileUpdateDTO;
 import com.repairhub.management.repairman.entity.RepairmanProfile;
 import com.repairhub.management.repairman.entity.RepairmanProfileRowMapper;
 
@@ -46,14 +47,19 @@ public class RepairmanProfileJdbcRepository implements RepairmanProfileRepositor
     }
 
     @Override
-    public int update(RepairmanProfile profile){
+    public int update(Long userId,RepairmanProfileUpdateDTO profile){
         String sql = """
             UPDATE repairman_profile
-               SET specialty         = :specialty,
-                   hourly_money_rate = :hourlyMoneyRate
+               SET specialty         = :specialty       
              WHERE user_id = :userId
             """;
-        return jdbc.update(sql, new BeanPropertySqlParameterSource(profile));
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue("userId",userId)
+            .addValue("specialty", profile.getSpecialty().name());
+
+
+        return jdbc.update(sql, params);
     }
 
     @Override

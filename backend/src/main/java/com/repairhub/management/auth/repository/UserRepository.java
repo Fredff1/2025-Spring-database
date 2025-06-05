@@ -13,5 +13,5 @@ public interface UserRepository {
     List<User> findAllByRole(UserRole role);
     List<User> findAll();
     int updateStatus(Long userId, String status);
-
+    int updateBasicInfo(Long userId, String username, String phone, String email);
 }

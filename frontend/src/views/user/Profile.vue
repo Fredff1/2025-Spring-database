@@ -17,6 +17,29 @@
         <el-descriptions-item label="创建时间">{{ formatDateTime(form.createTime) }}</el-descriptions-item>
         <el-descriptions-item label="更新时间">{{ formatDateTime(form.updateTime) }}</el-descriptions-item>
       </el-descriptions>
+
+      <div style="margin-top: 16px; text-align: right">
+        <el-button type="primary" @click="openEditDialog">编辑资料</el-button>
+      </div>
+
+      <el-dialog v-model="editDialogVisible" title="编辑个人资料" width="500px" destroy-on-close>
+        <el-form :model="editForm" label-width="80px">
+          <el-form-item label="用户名">
+            <el-input v-model="editForm.username" />
+          </el-form-item>
+          <el-form-item label="手机号">
+            <el-input v-model="editForm.phone" />
+          </el-form-item>
+          <el-form-item label="邮箱">
+            <el-input v-model="editForm.email" />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitEdit">保存</el-button>
+        </template>
+      </el-dialog>
+
     </el-card>
   </div>
 </template>
@@ -70,6 +93,48 @@ const fetchUserInfo = async () => {
   } catch (error) {
     console.error('获取用户信息失败:', error)
     ElMessage.error('获取用户信息失败')
+  }
+}
+
+// 编辑资料对话框
+const editDialogVisible = ref(false)
+const editForm = reactive({
+  username: '',
+  phone: '',
+  email: ''
+})
+
+// 打开编辑对话框
+const openEditDialog = () => {
+  Object.assign(editForm, {
+    username: form.username,
+    phone: form.phone,
+    email: form.email
+  })
+  editDialogVisible.value = true
+}
+
+// 提交编辑
+const submitEdit = async () => {
+  try {
+    const response = await user.updateProfile(editForm) // 需要在 api/user.js 中定义对应方法
+    console.log('后端返回的 response:', response)
+    const token = response.token
+
+
+    // res 是字符串类型的新 token
+    if (typeof token === 'string') {
+      localStorage.setItem('token', token) // 替换旧 token
+      ElMessage.success('更新成功，正在刷新信息...')
+      location.reload() // 强制刷新页面使新 token 生效
+    } else {
+      ElMessage.warning('更新成功但未收到新 token，请重新登录')
+    }
+    editDialogVisible.value = false
+    
+  } catch (error) {
+    console.error('更新失败:', error)
+    ElMessage.error('更新失败')
   }
 }
 
