@@ -3,6 +3,8 @@ import http from './http';
 // 用户认证
 export const getProfile = () => http.get('/user/profile');
 export const getStats = () => http.get('/user/status');
+export const updateProfile = (data) => http.post('/user/profile/update', data);
+
 
 // 用户订单管理
 export const getRepairOrders = params => http.get('/user/repair-orders', { params });
@@ -26,7 +28,6 @@ export const getVehicleDetail = id => http.get(`/user/vehicles/${id}`);
 export const addVehicle = data => http.post('/user/vehicles', data);
 export const updateVehicle = (id, data) => http.put(`/user/vehicles/${id}`, data);
 export const deleteVehicle = id => http.delete(`/user/vehicles/${id}`);
-
 
 
 

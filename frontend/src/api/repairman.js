@@ -1,12 +1,12 @@
 import http from './http'
 
 // 维修人员认证
-export const updateProfile = data => http.put('/repairman/profile', data)
+// export const updateProfile = data => http.put('/repairman/profile', data)
 export const getProfile = () => http.get('/repairman/profile')
 export const getOverview = () => http.get('/repairman/overview')
 export const getStats = params => http.get('/repairman/statistics', { params })
 export const getIncomeStats = params => http.get('/repairman/income', { params })
-
+export const updateProfile = (data) =>http.post('/repairman/profile', data)
 
 // 维修人员订单管理
 export const getOrders = params => http.get('/repairman/repair-orders', { params })

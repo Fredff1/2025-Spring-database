@@ -74,6 +74,23 @@ public class UserJdbcRepository implements UserRepository{
     }
 
     @Override
+    public int updateBasicInfo(Long userId, String username, String phone, String email) {
+        String sql = """
+            UPDATE `users`
+                SET username = :username,
+                     phone    = :phone,
+                     email    = :email
+                 WHERE user_id = :userId
+        """;
+        SqlParameterSource params = new MapSqlParameterSource()
+            .addValue("userId", userId)
+            .addValue("username", username)
+            .addValue("phone", phone)
+            .addValue("email", email);
+        return jdbc.update(sql, params);
+    }
+
+    @Override
     public List<User> findAllByRole(UserRole role){
         String sql = "SELECT * FROM `users` WHERE role = :role";
         SqlParameterSource params = new MapSqlParameterSource("role", role.name());

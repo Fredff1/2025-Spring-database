@@ -35,11 +35,13 @@ import com.repairhub.management.repair.repository.RepairRecordRepository;
 import com.repairhub.management.repairman.dto.RepairmanIncomeDTO;
 import com.repairhub.management.repairman.dto.RepairmanOverviewDTO;
 import com.repairhub.management.repairman.dto.RepairmanProfileDTO;
+import com.repairhub.management.repairman.dto.RepairmanProfileUpdateDTO;
 import com.repairhub.management.repairman.dto.RepairmanStatisticDTO;
 import com.repairhub.management.repairman.entity.RepairmanProfile;
 import com.repairhub.management.repairman.repository.RepairmanDashboardRepository;
 import com.repairhub.management.repairman.repository.RepairmanIncomeRepository;
 import com.repairhub.management.repairman.repository.RepairmanProfileRepository;
+import com.repairhub.management.user.dto.UserProfileDTO;
 import com.repairhub.management.utils.PageUtils;
 
 @Service
@@ -217,6 +219,22 @@ public class RepairmanProfileService {
             .averageHourlyRate(averageHourlyRate)
             .build();
         return dto;
+    }
+
+    public UserProfileDTO updateProfile(Long userId, RepairmanProfileUpdateDTO dto){
+        userRepository.updateBasicInfo(userId, dto.getUsername(), dto.getPhone(), dto.getEmail());
+        repairmanProfileRepository.update(userId, dto);
+        User updatedUser = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        return new UserProfileDTO().builder()
+            .id(updatedUser.getUserId())
+            .username(updatedUser.getUsername())
+            .phone(updatedUser.getPhone())
+            .email(updatedUser.getEmail())
+            .createTime(updatedUser.getCreatedAt())
+            .updateTime(updatedUser.getUpdatedAt())
+            .userStatus(updatedUser.getStatus())
+            .build();
     }
 
    

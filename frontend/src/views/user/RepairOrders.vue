@@ -118,9 +118,12 @@
             <el-form-item label="维修类型" prop="faultType">
               <el-select v-model="order.faultType" placeholder="请选择维修类型">
                 <el-option label="常规保养" value="MAINTENANCE" />
-                <el-option label="故障维修" value="REPAIR" />
+                <el-option label="通用维修" value="REPAIR" />
                 <el-option label="钣金喷漆" value="PAINT" />
                 <el-option label="轮胎更换" value="TIRE" />
+                <el-option label="电路系统修复" value="ELECTRICAL" />
+                <el-option label="车身修复" value="BODYWORK" />
+                <el-option label="发动机维修" value="ENGINE" />
                 <el-option label="其他" value="OTHER" />
               </el-select>
             </el-form-item>
