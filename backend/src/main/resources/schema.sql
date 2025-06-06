@@ -20,7 +20,7 @@ CREATE TABLE `users` (
   user_id    BIGINT      NOT NULL AUTO_INCREMENT,
   username   VARCHAR(50) NOT NULL,
   role       VARCHAR(20) NOT NULL,
-  password   VARCHAR(100) NOT NULL,        -- 存哈希值
+  password   VARCHAR(100) NOT NULL,       
   email      VARCHAR(100) NOT NULL,
   phone      VARCHAR(20),
   status     VARCHAR(20)  NOT NULL DEFAULT 'ACTIVE',
@@ -77,6 +77,12 @@ CREATE TABLE `repair_order` (
   CONSTRAINT fk_order_user    FOREIGN KEY(user_id)    REFERENCES users(user_id) ON DELETE CASCADE,
   CONSTRAINT fk_order_vehicle FOREIGN KEY(vehicle_id) REFERENCES vehicle(vehicle_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
+
+
+
 
 
 CREATE TABLE `repair_record` (
@@ -151,3 +157,5 @@ CREATE TABLE `labor_fee_log` (
   CONSTRAINT fk_lf_tech FOREIGN KEY(repairman_id) REFERENCES users(user_id) ON DELETE CASCADE,
   CONSTRAINT fk_lf_order FOREIGN KEY(order_id)      REFERENCES repair_order(order_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+

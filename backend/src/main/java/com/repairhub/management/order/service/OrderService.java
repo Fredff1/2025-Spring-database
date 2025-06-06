@@ -116,7 +116,14 @@ public class OrderService {
 
     @Transactional
     public void cancelOrder(Long orderId){
-        repairOrderRepository.deleteById(orderId);
+        var order = repairOrderRepository.findById(orderId).get();
+        order.setStatus(OrderStatus.CANCELLED);
+        List<OrderAssignment> assignments = orderAssignmentRepository.findByOrderId(order.getOrderId());
+        for(var assignment: assignments){
+            assignment.setStatus(AssignmentStatus.CANCELED);
+            orderAssignmentRepository.update(assignment);
+        }
+        repairOrderRepository.update(order);
     }
 
     public Optional<RepairOrder> findById(Long orderId) {

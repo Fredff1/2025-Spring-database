@@ -432,17 +432,57 @@ const fetchVehicleOrderStats = async () => {
     const res = await admin.getVehicleOrderStats({ period: vehiclePeriod.value })
     const xData = res.map(i => getModelText(i.model))
     const yData = res.map(i => i.repairCount)
-    nextTick(() => {
-      if (!vehicleBarChartInstance.value) {
-        vehicleBarChartInstance.value = echarts.init(vehicleBarChart.value)
+    const avgData = res.map(i => i.averageCost);
+    await nextTick();
+    if (!vehicleBarChartInstance.value) {
+      vehicleBarChartInstance.value = echarts.init(vehicleBarChart.value);
+    }
+
+    vehicleBarChartInstance.value.setOption({
+      title: { text: '车型维修统计', left: 'center' },
+      xAxis: { type: 'category', data: xData },
+      yAxis: [
+        {
+          type: 'value',
+          name: '维修次数',
+          minInterval: 1,
+          axisLine: { lineStyle: { color: '#5470C6' } },
+          axisLabel: { formatter: '{value}' }
+        },
+        {
+          type: 'value',
+          name: '平均费用（¥）',
+          position: 'right',
+          axisLine: { lineStyle: { color: '#EE6666' } },
+          axisLabel: { formatter: value => `¥${value}` }
+        }
+      ],
+      series: [
+        {
+          name: '维修次数',
+          type: 'bar',
+          data: yData,
+          itemStyle: { color: '#5470C6' }
+        },
+        {
+          name: '平均费用',
+          type: 'line',
+          yAxisIndex: 1,  
+          data: avgData,
+          itemStyle: { color: '#EE6666' },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: params => `¥${params.data.toFixed(2)}`
+          },
+          smooth: true 
+        }
+      ],
+      legend: {
+        data: ['维修次数', '平均费用'],
+        top: 30
       }
-      vehicleBarChartInstance.value.setOption({
-        title: { text: '车型维修统计', left: 'center' },
-        xAxis: { type: 'category', data: xData },
-        yAxis: { type: 'value', minInterval: 1},
-        series: [{ data: yData, type: 'bar' }]
-      })
-    })
+    });
   } catch (e) {
     ElMessage.error('获取车辆维修统计失败')
   }
@@ -545,7 +585,6 @@ const fetchFaultTypeStats = async () => {
   }
 }
 
-// 订单流程统计
 const fetchOrderProcessStats = async () => {
   try {
     const end = new Date()
@@ -553,20 +592,42 @@ const fetchOrderProcessStats = async () => {
     if (orderProcessPeriod.value === 'recent') {
       begin.setDate(end.getDate() - 30)
     } else {
-      begin.setFullYear(end.getFullYear() - 10) 
+      begin.setFullYear(end.getFullYear() - 10)
     }
     const beginStr = begin.toISOString().slice(0, 10)
     const endStr   = end.toISOString().slice(0, 10)
+
     const res = await admin.getOrderProcessStats({
       begin: beginStr,
       end:   endStr
     })
-    const xData      = res.map(i => getRepairTypeText(i.faultType)) 
-    const finished   = res.map(i => i.completedOrders)
-    const processing = res.map(i => i.processingOrders)
+
+    const xData = res.map(i => getRepairTypeText(i.faultType))
+
+    const pending   = res.map(i => i.pendingOrders)
+    const processing= res.map(i => i.processingOrders)
+    const finished  = res.map(i => i.completedOrders)
+
+    const sumTotal = res.reduce((sum, i) => sum + i.totalOrders, 0)
+
+
+    const percentPending    = res.map(i => {
+      return sumTotal === 0
+        ? '0%'
+        : ((i.pendingOrders    / sumTotal) * 100).toFixed(1) + '%'
+    })
+    const percentProcessing = res.map(i => {
+      return sumTotal === 0
+        ? '0%'
+        : ((i.processingOrders / sumTotal) * 100).toFixed(1) + '%'
+    })
+    const percentFinished   = res.map(i => {
+      return sumTotal === 0
+        ? '0%'
+        : ((i.completedOrders  / sumTotal) * 100).toFixed(1) + '%'
+    })
 
     await nextTick()
-
     if (!orderProcessBarChartInstance.value) {
       orderProcessBarChartInstance.value = echarts.init(orderProcessBarChart.value)
     } else {
@@ -576,42 +637,54 @@ const fetchOrderProcessStats = async () => {
     orderProcessBarChartInstance.value.setOption({
       title: { text: '订单流程统计', left: 'center' },
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      legend: { data: ['已完成', '处理中'], bottom: 10 },
+      legend: { data: ['待处理', '处理中', '已完成'], bottom: 10 },
       grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
       xAxis: {
         type: 'category',
         data: xData,
-        axisLabel: { rotate: 30, interval: 0 } 
+        axisLabel: { rotate: 30, interval: 0 }
       },
-      yAxis: { type: 'value',minInterval: 1 },
+      yAxis: { type: 'value', minInterval: 1 },
       series: [
         {
-          name: '已完成',
+          name: '待处理',
           type: 'bar',
-          data: finished,
-          coordinateSystem: 'cartesian2d',
-          barWidth: '30%',
-          itemStyle: {
-            color: '#4caf50'
+          data: pending,
+          barWidth: '20%',
+          itemStyle: { color: '#2196f3' },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: params => percentPending[params.dataIndex]
           }
         },
         {
           name: '处理中',
           type: 'bar',
           data: processing,
-          coordinateSystem: 'cartesian2d',
-          barWidth: '30%',
-          itemStyle: {
-            color: '#ff9800'
+          barWidth: '20%',
+          itemStyle: { color: '#ff9800' },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: params => percentProcessing[params.dataIndex]
+          }
+        },
+        {
+          name: '已完成',
+          type: 'bar',
+          data: finished,
+          barWidth: '20%',
+          itemStyle: { color: '#4caf50' },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: params => percentFinished[params.dataIndex]
           }
         }
       ]
     })
 
-    // 可选：在绘制完之后让图表自适应容器大小
-    // setTimeout(() => {
-    //   orderProcessBarChartInstance.value.resize()
-    // }, 100)
   } catch (e) {
     ElMessage.error('获取订单流程统计失败')
   }

@@ -35,6 +35,7 @@ public class RepairOrderStatisticRepository {
         @Override
         public OrderProcessStatDTO mapRow(ResultSet rs, int rowNum) throws SQLException{
             return OrderProcessStatDTO.builder()
+            .pendingOrders(rs.getLong("pending_orders"))
             .completedOrders(rs.getLong("completed_orders"))
             .processingOrders(rs.getLong("processing_orders"))
             .totalOrders(rs.getLong("total_orders"))
@@ -63,8 +64,9 @@ public class RepairOrderStatisticRepository {
               ro.fault_type AS fault_type,
               COUNT(*) AS total_orders,
               SUM(CASE WHEN ro.status = 'COMPLETED' THEN 1 ELSE 0 END) AS completed_orders,
-              SUM(CASE WHEN ro.status = 'PROCESSING' THEN 1 ELSE 0 END) AS processing_orders
-            FROM repair_order ro
+              SUM(CASE WHEN ro.status = 'PROCESSING' THEN 1 ELSE 0 END) AS processing_orders,
+              SUM(CASE WHEN ro.status = 'PENDING' THEN 1 ELSE 0 END) AS pending_orders
+              FROM repair_order ro
             WHERE ro.submit_time BETWEEN :begin AND :end
             GROUP BY ro.fault_type
             ORDER BY total_orders DESC

@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class OrderProcessStatDTO {
+   private Long pendingOrders;
    private Long processingOrders;
    private Long completedOrders;
    private Long totalOrders;
