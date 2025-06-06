@@ -143,7 +143,7 @@ INSERT INTO `repair_order` (
 ) VALUES
   ((SELECT user_id FROM users WHERE username = 'henry'),
    (SELECT vehicle_id FROM vehicle WHERE license_plate = '苏C444DD'),
-   '车灯无法点亮，需要电路检查', 0.00, '2025-04-05 11:11:11', '2025-04-05 11:11:11', 'PENDING', 'ELECTRICAL', FALSE);
+   '车灯无法点亮，需要电路检查', 0.00, '2025-04-05 11:11:11', '2025-04-05 11:11:11', 'PROCESSING', 'ELECTRICAL', FALSE);
 
 INSERT INTO `repair_order` (
   user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid

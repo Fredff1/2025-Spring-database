@@ -9,8 +9,11 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.enums.AssignmentStatus;
 import com.repairhub.management.order.enums.OrderStatus;
+import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.order.repository.RepairOrderRepository;
 import com.repairhub.management.order.service.OrderService;
 import com.repairhub.management.repair.entity.LaborFeeLog;
@@ -35,6 +38,7 @@ public class OrderInfoInitializer implements ApplicationRunner{
     private final RepairOrderRepository orderRepository;
     private final RepairFeeService repairFeeService;
     private final OrderService orderService;
+    private final OrderAssignmentRepository orderAssignmentRepository;
 
     public OrderInfoInitializer(
         RepairFeedbackRepository feedbackRepository,
@@ -43,7 +47,8 @@ public class OrderInfoInitializer implements ApplicationRunner{
         LaborFeeLogRepository laborFeeLogRepository,
         RepairOrderRepository orderRepository,
         RepairFeeService repairFeeService,
-        OrderService orderService
+        OrderService orderService,
+        OrderAssignmentRepository orderAssignmentRepository
     ){
         this.feedbackRepository = feedbackRepository;
         this.recordRepository = recordRepository;
@@ -52,6 +57,7 @@ public class OrderInfoInitializer implements ApplicationRunner{
         this.orderRepository = orderRepository;
         this.repairFeeService = repairFeeService;
         this.orderService = orderService;
+        this.orderAssignmentRepository = orderAssignmentRepository;
     }
     
     @Override
@@ -63,10 +69,22 @@ public class OrderInfoInitializer implements ApplicationRunner{
     private void updateOrders(){
         List<RepairOrder> orders = orderRepository.findAll();
         for(var order : orders){
+            List<OrderAssignment> assignments = orderAssignmentRepository.findByOrderId(order.getOrderId());
+            for(var assignment: assignments){
+                if(assignment.getStatus().equals(AssignmentStatus.ACCEPTED)){
+                    if(order.getStatus().equals(OrderStatus.PENDING)){
+                        order.setStatus(OrderStatus.PROCESSING);
+                    }
+                    
+                }
+            }
             BigDecimal fee = repairFeeService.calculateFeeByOrder(order);
             order.setTotalFee(fee);
             orderRepository.update(order);
-            orderService.finishOrder(order);
+            if(order.getStatus().equals(OrderStatus.COMPLETED)){
+                orderService.finishOrder(order);
+            }
+            
         }
     }
 

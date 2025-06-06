@@ -87,13 +87,32 @@ public class RepairOrderJdbcRepository implements RepairOrderRepository{
 
     @Override
     public List<RepairOrder> findByUserId(Long userId){
-        String sql = "SELECT * FROM repair_order WHERE user_id = :userId";
+        String sql = """
+                SELECT * FROM repair_order WHERE user_id = :userId
+                ORDER BY
+                  CASE
+                    WHEN status = 'PROCESSING' THEN 0
+                    WHEN status = 'PENDING'    THEN 0
+                    ELSE 1
+                  END ASC,
+                  submit_time DESC
+                
+                """;;
         return jdbc.query(sql, Map.of("userId", userId), mapper);
     }
 
     @Override
     public List<RepairOrder> findByUserIdAndVehicleId(Long userId, Long vehicleId){
-        String sql = "SELECT * FROM repair_order WHERE user_id = :userId AND vehicle_id = :vehicleId";
+        String sql = """
+            SELECT * FROM repair_order WHERE user_id = :userId AND vehicle_id = :vehicleId
+            ORDER BY
+              CASE
+                WHEN status = 'PROCESSING' THEN 0
+                WHEN status = 'PENDING'    THEN 0
+                ELSE 1
+                END ASC,
+              submit_time DESC
+                """;;
         return jdbc.query(sql, Map.of("userId", userId, "vehicleId", vehicleId), mapper);
     }
 
@@ -109,7 +128,16 @@ public class RepairOrderJdbcRepository implements RepairOrderRepository{
 
     @Override
     public List<RepairOrder> findAll(){
-        String sql = "SELECT * FROM repair_order";
+        String sql = """
+            SELECT * FROM repair_order
+            ORDER BY
+              CASE
+                WHEN status = 'PROCESSING' THEN 0
+                WHEN status = 'PENDING'    THEN 0
+                ELSE 1
+              END ASC,
+              submit_time DESC
+                """;;
         return jdbc.query(sql, mapper);
     }
 }

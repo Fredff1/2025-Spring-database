@@ -80,7 +80,7 @@ public class VehicleStatisticRepository {
                 JOIN vehicle v
                   ON ro.vehicle_id = v.vehicle_id
                 WHERE ro.status = 'COMPLETED'
-                  AND ro.submit_time < :since
+                  AND ro.submit_time > :since
                 GROUP BY v.model
                 ORDER BY repair_count DESC
                 """;
@@ -118,7 +118,7 @@ public class VehicleStatisticRepository {
                 FROM repair_order ro
                 JOIN vehicle v
                   ON ro.vehicle_id = v.vehicle_id
-                WHERE ro.submit_time < :since
+                WHERE ro.submit_time > :since
                 GROUP BY v.model, ro.fault_type
                 ORDER BY count DESC
                 """;

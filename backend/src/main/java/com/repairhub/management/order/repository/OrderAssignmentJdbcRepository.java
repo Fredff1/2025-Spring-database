@@ -87,20 +87,20 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
     // 查询某个订单的所有分配记录
     @Override
     public List<OrderAssignment> findByOrderId(Long orderId){
-        String sql = "SELECT * FROM assignment WHERE order_id = :orderId";
+        String sql = "SELECT * FROM assignment WHERE order_id = :orderId ORDER BY assignment_time DESC";
         return jdbc.query(sql, Map.of("orderId", orderId), mapper);
     }
 
     // 查询某个维修工的所有分配记录
     @Override
     public List<OrderAssignment> findByRepairmanId(Long repairmanId){
-        String sql = "SELECT * FROM assignment WHERE repairman_id = :repairmanId";
+        String sql = "SELECT * FROM assignment WHERE repairman_id = :repairmanId ORDER BY assignment_time DESC";
         return jdbc.query(sql, Map.of("repairmanId", repairmanId), mapper);
     }
 
     @Override
     public List<OrderAssignment> findAll(){
-        String sql = "SELECT * FROM assignment";
+        String sql = "SELECT * FROM assignment ORDER BY assignment_time DESC";
         return jdbc.query(sql, mapper);
     }
 }

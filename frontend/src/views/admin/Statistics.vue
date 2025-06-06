@@ -169,7 +169,13 @@
           <template #header>按故障类型 - 未完成订单统计</template>
           <div class="table-wrapper">
             <el-table :data="unfinishedByFaultType" border stripe style="width: 90%;">
-              <el-table-column prop="name"  label="故障类型" />
+              <el-table-column prop="name"  label="故障类型" >
+                <template #default="{ row }">
+                    <el-tag :type="getRepairTypeTag(row.name)">
+                    {{ getRepairTypeText(row.name) }}
+                    </el-tag>
+                </template>
+              </el-table-column>
               <el-table-column prop="count" label="数量"     width="100" />
             </el-table>
           </div>
@@ -229,28 +235,28 @@ const negativeFeedbackList = ref([])
 const negativeFeedbackTotal = ref(0)
 const negativeFeedbackPage = ref(1)
 const negativeFeedbackLimit = ref(10)
-const negativeFeedbackPeriod = ref('all')
+const negativeFeedbackPeriod = ref('recent')
 
 // 成本分析
 const costPieChart = ref(null)
 const costPieChartInstance = ref(null)
-const costPeriod = ref('all')
+const costPeriod = ref('recent')
 
 // 车辆维修统计
 const vehicleBarChart = ref(null)
 const vehicleBarChartInstance = ref(null)
-const vehiclePeriod = ref('all')
+const vehiclePeriod = ref('recent')
 
 // 故障类型统计
 const faultTypePieChart = ref(null)
 const chartInst = ref(null)
 const chartData = ref({ level1: {}, level2: {} })
-const faultTypePeriod = ref('all')
+const faultTypePeriod = ref('recent')
 
 // 订单流程统计
 const orderProcessBarChart = ref(null)
 const orderProcessBarChartInstance = ref(null)
-const orderProcessPeriod = ref('all')
+const orderProcessPeriod = ref('recent')
 
 // 维修类型不匹配统计
 const mismatchList = ref([])
