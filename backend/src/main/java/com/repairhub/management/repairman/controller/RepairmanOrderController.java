@@ -61,12 +61,12 @@ public class RepairmanOrderController {
         @RequestParam(defaultValue = "5")   int limit,
         @AuthenticationPrincipal User repairman
     ) {
-        List<RepairOrder> orders = repairmanProfileService.findRepairmanOrders(repairman);
-        List<RepairOrder> pagedOrders = PageUtils.paginate(orders, page, orders.size());
+        PageResponse<RepairOrder> orders = repairmanProfileService.findRepairmanOrders(repairman,page,limit);
+        List<RepairOrder> pagedOrders = orders.getList();
         List<OrderDTO> dtos = pagedOrders.stream()
         .map(order -> orderService.toDTO(order))
         .collect(Collectors.toList());
-        PageResponse<OrderDTO> resp = new PageResponse<>(dtos, orders.size());
+        PageResponse<OrderDTO> resp = new PageResponse<>(dtos, orders.getTotal());
         return new ResponseEntity<>(resp,HttpStatus.OK);
     }
 

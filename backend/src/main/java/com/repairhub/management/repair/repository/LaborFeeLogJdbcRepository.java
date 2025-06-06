@@ -14,8 +14,10 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.repair.entity.LaborFeeLog;
 import com.repairhub.management.repair.entity.LaborFeeLogRowMapper;
+import com.repairhub.management.utils.PageUtils;
 
 @Repository
 public class LaborFeeLogJdbcRepository implements LaborFeeLogRepository{
@@ -102,5 +104,25 @@ public class LaborFeeLogJdbcRepository implements LaborFeeLogRepository{
     public List<LaborFeeLog> findAll(){
         String sql = "SELECT * FROM labor_fee_log";
         return jdbcTemplate.query(sql, mapper);
+    }
+
+    @Override
+    public PageResponse<LaborFeeLog> findAllWithPage(int pageNum,int pageSize){
+        long offset = PageUtils.calculateOffset(pageNum, pageSize);
+        String querySql = """
+            SELECT * FROM labor_fee_log 
+            ORDER BY settle_time DESC
+            LIMIT :pageSize
+            OFFSET :offset
+        """;
+        SqlParameterSource queryParams = new MapSqlParameterSource()
+        .addValue("offset", offset)
+        .addValue("pageSize", pageSize);
+        List<LaborFeeLog> logs = jdbcTemplate.query(querySql,queryParams, mapper);
+        String countSql = """
+            SELECT COUNT(*) FROM labor_fee_log 
+            """;
+        Integer total = jdbcTemplate.queryForObject(countSql,queryParams,Integer.class);
+        return new PageResponse<>(logs, total);
     }
 }

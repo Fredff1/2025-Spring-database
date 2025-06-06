@@ -13,8 +13,11 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.OrderAssignmentRowMapper;
+import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.utils.PageUtils;
 
 @Repository
 public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
@@ -102,5 +105,56 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
     public List<OrderAssignment> findAll(){
         String sql = "SELECT * FROM assignment ORDER BY assignment_time DESC";
         return jdbc.query(sql, mapper);
+    }
+
+    @Override
+    public PageResponse<OrderAssignment> findAllWithPage(int pageNum,int pageSize){
+        long offset = PageUtils.calculateOffset(pageNum, pageSize);
+        String querySql = """
+            SELECT * 
+            FROM assignment
+            ORDER BY assignment_time DESC
+            LIMIT :pageSize
+            OFFSET :offset
+        """;
+        SqlParameterSource queryParams = new MapSqlParameterSource()
+        .addValue("offset", offset)
+        .addValue("pageSize", pageSize);
+
+        String countSql = """
+            SELECT COUNT(*) 
+            FROM assignment
+        """;
+        List<OrderAssignment> orders = jdbc.query(querySql, queryParams, mapper);
+        Integer total = jdbc.queryForObject(countSql,new MapSqlParameterSource(),Integer.class);
+        PageResponse<OrderAssignment> resp = new PageResponse<>(orders, total);
+        return resp;
+    }
+
+    @Override
+    public PageResponse<OrderAssignment> findByRepairmanIdWithPage(Long repairmanId,int pageNum,int pageSize){
+        long offset = PageUtils.calculateOffset(pageNum, pageSize);
+        String querySql = """
+            SELECT * 
+            FROM assignment
+            WHERE repairman_id = :repairmanId
+            ORDER BY assignment_time DESC
+            LIMIT :pageSize
+            OFFSET :offset
+        """;
+        SqlParameterSource queryParams = new MapSqlParameterSource()
+        .addValue("offset", offset)
+        .addValue("pageSize", pageSize)
+        .addValue("repairmanId", repairmanId);
+
+        String countSql = """
+            SELECT COUNT(*) 
+            FROM assignment
+            WHERE repairman_id = :repairmanId
+        """;
+        List<OrderAssignment> orders = jdbc.query(querySql, queryParams, mapper);
+        Integer total = jdbc.queryForObject(countSql,queryParams,Integer.class);
+        PageResponse<OrderAssignment> resp = new PageResponse<>(orders, total);
+        return resp;
     }
 }

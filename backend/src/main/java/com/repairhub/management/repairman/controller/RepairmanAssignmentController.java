@@ -49,12 +49,12 @@ public class RepairmanAssignmentController {
         @RequestParam(defaultValue = "5")   int limit,
         @AuthenticationPrincipal User repairman
     ){
-        List<OrderAssignment> assignments = orderAssignmentService.getRepairmanAssignments(repairman.getUserId());
-        List<OrderAssignment> pageAssignments = PageUtils.paginate(assignments, page, limit);
+        PageResponse<OrderAssignment> assignments = orderAssignmentService.getRepairmanAssignments(repairman.getUserId(),page,limit);
+        List<OrderAssignment> pageAssignments = assignments.getList();
         List<OrderAssignmentDTO> dtos = pageAssignments.stream()
         .map(assignment -> orderAssignmentService.convertAssignmentToDTO(assignment))
         .collect(Collectors.toList());
-        PageResponse<OrderAssignmentDTO> resp = new PageResponse<>(dtos, assignments.size());
+        PageResponse<OrderAssignmentDTO> resp = new PageResponse<>(dtos, assignments.getTotal());
         return new ResponseEntity<>(resp,HttpStatus.OK);
     }
 

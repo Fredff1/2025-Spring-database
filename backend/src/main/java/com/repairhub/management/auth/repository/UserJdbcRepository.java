@@ -16,6 +16,8 @@ import org.springframework.stereotype.Repository;
 import com.repairhub.management.auth.domain.enums.UserRole;
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.entity.UserRowMapper;
+import com.repairhub.management.common.dto.PageResponse;
+import com.repairhub.management.utils.PageUtils;
 
 @Repository
 public class UserJdbcRepository implements UserRepository{
@@ -101,5 +103,32 @@ public class UserJdbcRepository implements UserRepository{
     public List<User> findAll() {
         String sql = "SELECT * FROM `users`";
         return jdbc.query(sql, mapper);
+    }
+
+    @Override
+    public PageResponse<User> findAllByRoleWithPage(UserRole role,int pageNum,int pageSize){
+        long offset = PageUtils.calculateOffset(pageNum, pageSize);
+        String querySql = """
+            SELECT * 
+            FROM `users` 
+            WHERE role = :role       
+            ORDER BY user_id ASC
+            LIMIT :pageSize
+            OFFSET :offset
+
+        """;
+
+        SqlParameterSource queryParams = new MapSqlParameterSource()
+        .addValue("offset", offset)
+        .addValue("pageSize", pageSize)
+        .addValue("role", role.name());
+        List<User> users = jdbc.query(querySql, queryParams, mapper);
+        String countSql = """
+            SELECT COUNT(*) 
+            FROM users
+            WHERE role = :role    
+        """;
+        int total = jdbc.queryForObject(countSql, queryParams, Integer.class);
+        return new PageResponse<>(users, total);
     }
 }

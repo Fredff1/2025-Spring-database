@@ -17,6 +17,7 @@ import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.repository.UserRepository;
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.dto.CreateOrderRequest;
 import com.repairhub.management.order.dto.OrderDTO;
 import com.repairhub.management.order.entity.OrderAssignment;
@@ -225,9 +226,8 @@ public class OrderService {
         }
     }
 
-    public List<RepairOrder> getOrders(User user){
-        List<RepairOrder> orders = repairOrderRepository.findByUserId(user.getUserId());
-        orders.sort(Comparator.comparing(RepairOrder::getSubmitTime).reversed());
+    public PageResponse<RepairOrder> getOrders(User user,int page,int limit){
+        PageResponse<RepairOrder> orders = repairOrderRepository.findByUserIdWithPage(user.getUserId(), page, page);
         return orders;
     }
 }

@@ -3,6 +3,7 @@ package com.repairhub.management.order.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.entity.OrderAssignment;
 
 public interface OrderAssignmentRepository {
@@ -25,4 +26,8 @@ public interface OrderAssignmentRepository {
     public List<OrderAssignment> findByRepairmanId(Long repairmanId);
 
     public List<OrderAssignment> findAll();
+
+    public PageResponse<OrderAssignment> findAllWithPage(int pageNum,int pageSize);
+
+    public PageResponse<OrderAssignment> findByRepairmanIdWithPage(Long repairmanId,int pageNum,int pageSize);
 }

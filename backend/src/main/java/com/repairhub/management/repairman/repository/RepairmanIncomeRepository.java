@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.repair.entity.LaborFeeLog;
 
 public interface RepairmanIncomeRepository {
@@ -11,6 +12,6 @@ public interface RepairmanIncomeRepository {
 
     BigDecimal sumTotalHours(Long repairmanId, LocalDate startTime, LocalDate endTime);
 
-    List<LaborFeeLog> findFeeLogs(Long repairmanId, LocalDate startTime, LocalDate endTime);
+    PageResponse<LaborFeeLog> findFeeLogs(Long repairmanId, LocalDate startTime, LocalDate endTime,int pageNum,int pageSize);
 }   
 

@@ -9,6 +9,7 @@ import com.repairhub.management.admin.dto.AdminIncomeDTO;
 import com.repairhub.management.admin.dto.AdminOverviewDTO;
 import com.repairhub.management.admin.repository.AdminOverviewRepository;
 import com.repairhub.management.auth.repository.UserRepository;
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.dto.OrderDTO;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.service.OrderService;
@@ -47,20 +48,20 @@ public class AdminService {
         this.orderService = orderService;
     }
 
-    public List<VehicleDetailDTO> findAllVehicles() {
-        List<Vehicle> vehicles = vehicleRepository.findAll();
-        List<VehicleDetailDTO> dtos = vehicles.stream()
+    public PageResponse<VehicleDetailDTO> findAllVehicles(int pageNum,int pageSize) {
+        PageResponse<Vehicle> vehicles = vehicleRepository.findAllWithPage(pageNum,pageSize);
+        List<VehicleDetailDTO> dtos = vehicles.getList().stream()
         .map(vehicle -> VehicleDetailDTO.from(vehicle,userRepository.findById(vehicle.getOwnerId()).get()))
         .collect(Collectors.toList());
-        return dtos;
+        return new PageResponse<>(dtos, vehicles.getTotal());
     }
 
     public AdminIncomeDTO getIncome(
         int page,
         int size
     ){
-        List<LaborFeeLog> logs = laborFeeLogRepository.findAll();
-        List<LaborFeeLog> pagedLogs = PageUtils.paginate(logs, page, size);
+        PageResponse<LaborFeeLog> logs = laborFeeLogRepository.findAllWithPage(page,size);
+        List<LaborFeeLog> pagedLogs = logs.getList();
         List<LaborFeeLogDTO> dtos = pagedLogs.stream()
         .map(log -> LaborFeeLogDTO.from(
             log, 
@@ -69,7 +70,7 @@ public class AdminService {
         .collect(Collectors.toList());
         AdminIncomeDTO incomeDTO = AdminIncomeDTO.builder()
         .list(dtos)
-        .total(logs.size())
+        .total(logs.getTotal())
         .build();
         return incomeDTO;
     }

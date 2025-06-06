@@ -26,10 +26,10 @@
               :row-key="row => row.feedbackId"
             >
               <el-table-column prop="customerName" label="用户" width="100" />
-              <el-table-column prop="faultType"    label="故障类型" width="120" >
+              <el-table-column prop="feedbackType"    label="反馈类型" width="120" >
                 <template #default="{ row }">
-                    <el-tag :type="getRepairTypeTag(row.faultType)">
-                    {{ getRepairTypeText(row.faultType) }}
+                    <el-tag :type="getFeedbackTag(row.feedbackType)">
+                    {{ getFeedbackText(row.feedbackType) }}
                     </el-tag>
                 </template>
               </el-table-column>
@@ -290,6 +290,24 @@ const formatDateTime = dt => {
   return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`
 }
 
+const getFeedbackText = (value) => {
+  const map = {
+    RATING: '评分反馈',
+    URGENT: '催单反馈',
+    GENERAL: '一般反馈',
+  }
+  return map[value] || value
+}
+
+const getFeedbackTag = (value) => {
+  const map = {
+    RATING: 'success',
+    URGENT: 'danger',
+    GENERAL: 'info',
+  }
+  return map[value] || value
+}
+
 const getModelText = (model) => {
     const map = {
         SUV: '多用途车',
@@ -364,6 +382,7 @@ const fetchNegativeFeedback = async () => {
 
     // 1) 把后端原始字段映射到 table props 对应的字段：
     negativeFeedbackList.value = (res.list || []).map(item => ({
+      feedbackType: item.feedbackType,
       customerName: item.customerName,         // 用户名
       content:      item.feedbackContent,      // 反馈内容，映射到 prop="content"
       date:         item.feedbackTime,         // 反馈时间，映射到 prop="date"

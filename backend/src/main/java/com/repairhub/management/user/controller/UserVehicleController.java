@@ -16,6 +16,7 @@ import com.repairhub.management.vehicle.service.VehicleService;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springdoc.core.converters.models.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,13 +43,10 @@ public class UserVehicleController {
 
     @GetMapping("")
     public ResponseEntity<PageResponse<VehicleDTO>> getVehicles(
-        @RequestParam(defaultValue = "1")   int page,
-        @RequestParam(defaultValue = "5")   int limit,
         @AuthenticationPrincipal User user
     ) {
         List<Vehicle> vehicles = vehicleService.getVehicles(user);
-        List<Vehicle> pagedVehicles = PageUtils.paginate(vehicles, page, limit);
-        List<VehicleDTO> dtos = pagedVehicles.stream().map(vehicle -> VehicleDTO.from(vehicle)).collect(Collectors.toList());
+        List<VehicleDTO> dtos = vehicles.stream().map(vehicle -> VehicleDTO.from(vehicle)).collect(Collectors.toList());
         var resp = new PageResponse<VehicleDTO>(dtos,vehicles.size());
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.repairhub.management.auth.domain.enums.UserRole;
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.repository.UserRepository;
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.repairman.dto.RepairmanProfileDTO;
 import com.repairhub.management.repairman.repository.RepairmanProfileRepository;
 import com.repairhub.management.repairman.service.RepairmanProfileService;
@@ -33,19 +34,19 @@ public class AdminUserService {
         this.repairmanProfileService = repairmanProfileService;
     }
 
-    public List<UserProfileDTO> findAllCustomers(){
-        List<User> customers = userRepository.findAllByRole(UserRole.CUSTOMER);
-        List<UserProfileDTO> dtos = customers.stream()
+    public PageResponse<UserProfileDTO> findAllCustomers(int page,int limit){
+        PageResponse<User> customers = userRepository.findAllByRoleWithPage(UserRole.CUSTOMER,page,limit);
+        List<UserProfileDTO> dtos = customers.getList().stream()
         .map(customer -> userInfoService.getProfile(customer))
         .collect(Collectors.toList());
-        return dtos;
+        return new PageResponse<>(dtos, customers.getTotal());
     }
 
-    public List<RepairmanProfileDTO> findAllRepairmen() {
-        List<User> repairmen = userRepository.findAllByRole(UserRole.REPAIRMAN);
-        List<RepairmanProfileDTO> dtos = repairmen.stream()
+    public PageResponse<RepairmanProfileDTO> findAllRepairmen(int page,int limit) {
+        PageResponse<User> repairmen = userRepository.findAllByRoleWithPage(UserRole.REPAIRMAN,page,limit);
+        List<RepairmanProfileDTO> dtos = repairmen.getList().stream()
             .map(repairman -> repairmanProfileService.getProfileDTO(repairman))
             .collect(Collectors.toList());
-        return dtos;
+        return new PageResponse<>(dtos, repairmen.getTotal());
     }
 }

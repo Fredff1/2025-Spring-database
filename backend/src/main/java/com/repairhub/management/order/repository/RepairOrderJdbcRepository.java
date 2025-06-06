@@ -14,8 +14,11 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import com.repairhub.management.common.dto.PageResponse;
+import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.entity.RepairOrderRowMapper;
+import com.repairhub.management.utils.PageUtils;
 
 @Repository
 public class RepairOrderJdbcRepository implements RepairOrderRepository{
@@ -97,7 +100,7 @@ public class RepairOrderJdbcRepository implements RepairOrderRepository{
                   END ASC,
                   submit_time DESC
                 
-                """;;
+                """;
         return jdbc.query(sql, Map.of("userId", userId), mapper);
     }
 
@@ -139,5 +142,99 @@ public class RepairOrderJdbcRepository implements RepairOrderRepository{
               submit_time DESC
                 """;;
         return jdbc.query(sql, mapper);
+    }
+
+    @Override
+    public PageResponse<RepairOrder> findAllWithPage(int pageNum,int pageSize){
+        long offset = PageUtils.calculateOffset(pageNum, pageSize);
+        String querySql = """
+            SELECT * 
+            FROM repair_order
+            ORDER BY
+              CASE
+                WHEN status = 'PROCESSING' THEN 0
+                WHEN status = 'PENDING'    THEN 0
+                ELSE 1
+              END ASC,
+              submit_time DESC
+            LIMIT :pageSize
+            OFFSET :offset
+        """;
+        SqlParameterSource queryParams = new MapSqlParameterSource()
+        .addValue("offset", offset)
+        .addValue("pageSize", pageSize);
+
+        String countSql = """
+            SELECT COUNT(*) 
+            FROM repair_order
+        """;
+        List<RepairOrder> orders = jdbc.query(querySql, queryParams, mapper);
+        Integer total = jdbc.queryForObject(countSql,new MapSqlParameterSource(),Integer.class);
+        PageResponse<RepairOrder> resp = new PageResponse<>(orders, total);
+        return resp;
+    }
+
+    @Override
+    public PageResponse<RepairOrder> findByUserIdWithPage(Long userId,int pageNum,int pageSize){
+        long offset = PageUtils.calculateOffset(pageNum, pageSize);
+        SqlParameterSource queryParams = new MapSqlParameterSource()
+        .addValue("offset", offset)
+        .addValue("pageSize", pageSize)
+        .addValue("userId", userId);
+        String querySql = """
+                SELECT * FROM repair_order WHERE user_id = :userId
+                ORDER BY
+                  CASE
+                    WHEN status = 'PROCESSING' THEN 0
+                    WHEN status = 'PENDING'    THEN 0
+                    ELSE 1
+                  END ASC,
+                  submit_time DESC
+                LIMIT :pageSize
+                OFFSET :offset  
+                
+                """;
+        String countSql = """
+                SELECT COUNT(*) 
+                FROM repair_order 
+                WHERE user_id = :userId
+                """;
+        List<RepairOrder> orders = jdbc.query(querySql, queryParams, mapper);
+        Integer total = jdbc.queryForObject(countSql,queryParams,Integer.class);
+        PageResponse<RepairOrder> resp = new PageResponse<>(orders, total);
+        return resp;
+    }
+
+    @Override
+    public PageResponse<RepairOrder> findByRepairmanIdWithPage(Long repairmanId,int pageNum,int pageSize){
+        long offset = PageUtils.calculateOffset(pageNum, pageSize);
+        SqlParameterSource queryParams = new MapSqlParameterSource()
+        .addValue("offset", offset)
+        .addValue("pageSize", pageSize)
+        .addValue("repairmanId", repairmanId);
+        
+        String querySql = """
+                SELECT *
+                FROM repair_order ro
+                JOIN assignment a
+                  ON ro.order_id = a.order_id
+                WHERE a.repairman_id = :repairmanId
+                  AND a.assignment_status = 'ACCEPTED'
+                ORDER BY submit_time DESC
+                LIMIT :pageSize
+                OFFSET :offset
+                """;
+        String countSql = """
+                SELECT COUNT(*) 
+                FROM repair_order ro
+                JOIN assignment a
+                  ON ro.order_id = a.order_id
+                WHERE a.repairman_id = :repairmanId
+                  AND a.assignment_status = 'ACCEPTED'
+                """;
+        List<RepairOrder> orders = jdbc.query(querySql, queryParams, mapper);
+        Integer total = jdbc.queryForObject(countSql,queryParams,Integer.class);
+        PageResponse<RepairOrder> resp = new PageResponse<>(orders, total);
+        return resp;
     }
 }

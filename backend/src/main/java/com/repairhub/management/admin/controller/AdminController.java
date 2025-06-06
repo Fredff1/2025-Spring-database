@@ -67,11 +67,8 @@ public class AdminController {
         @RequestParam int page,
         @RequestParam int limit
     ) {
-        List<VehicleDetailDTO> dtos = adminService.findAllVehicles();
-        PageResponse<VehicleDetailDTO> response = new PageResponse<>(
-        PageUtils.paginate(dtos, page, limit),
-        dtos.size());
-        return ResponseEntity.ok(response);
+        PageResponse<VehicleDetailDTO> dtos = adminService.findAllVehicles(page,limit);
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/assignments")
@@ -79,12 +76,12 @@ public class AdminController {
         @RequestParam(defaultValue = "1")   int page,
         @RequestParam(defaultValue = "5")   int limit
     ){
-        List<OrderAssignment> assignments = orderAssignmentService.getAllAssignments();
-        List<OrderAssignment> pageAssignments = PageUtils.paginate(assignments, page, limit);
+        PageResponse<OrderAssignment> assignments = orderAssignmentService.getAllAssignmentsWithPage(page,limit);
+        List<OrderAssignment> pageAssignments = assignments.getList();
         List<OrderAssignmentDTO> dtos = pageAssignments.stream()
         .map(assignment -> orderAssignmentService.convertAssignmentToDTO(assignment))
         .collect(Collectors.toList());
-        PageResponse<OrderAssignmentDTO> resp = new PageResponse<>(dtos, assignments.size());
+        PageResponse<OrderAssignmentDTO> resp = new PageResponse<>(dtos, assignments.getTotal());
         return new ResponseEntity<>(resp,HttpStatus.OK);
     }
 

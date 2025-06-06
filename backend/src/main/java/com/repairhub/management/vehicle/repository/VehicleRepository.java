@@ -3,6 +3,7 @@ package com.repairhub.management.vehicle.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.vehicle.entity.Vehicle;
 
 public interface VehicleRepository {
@@ -18,6 +19,8 @@ public interface VehicleRepository {
     List<Vehicle> findByOwner(Long ownerId);
     /** 查询所有车辆 */
     List<Vehicle> findAll();
+    
+    PageResponse<Vehicle> findAllWithPage(int pageNum,int pageSize);
     /** 按品牌查询 */
     List<Vehicle> findByBrand(String brand);
     /** 按车型查询 */

@@ -29,22 +29,16 @@ public class AdminUserController {
         @RequestParam int page,
         @RequestParam int limit
     ) {
-        var customers = adminUserService.findAllCustomers();
-        PageResponse<UserProfileDTO> resp = new PageResponse<>(
-            PageUtils.paginate(customers, page, limit), 
-            customers.size());
-        return ResponseEntity.ok(resp);
+        var customers = adminUserService.findAllCustomers(page,limit);
+        return ResponseEntity.ok(customers);
     }
 
     @GetMapping("/repairmen")
     public ResponseEntity<PageResponse<RepairmanProfileDTO>> getAllRepairmen(
         @RequestParam int page,
         @RequestParam int limit) {
-        var repairmen = adminUserService.findAllRepairmen();
-        PageResponse<RepairmanProfileDTO> resp = new PageResponse<>(
-            PageUtils.paginate(repairmen, page, limit), 
-            repairmen.size());
-        return ResponseEntity.ok(resp);
+        var repairmen = adminUserService.findAllRepairmen(page,limit);
+        return ResponseEntity.ok(repairmen);
     }
 
 }

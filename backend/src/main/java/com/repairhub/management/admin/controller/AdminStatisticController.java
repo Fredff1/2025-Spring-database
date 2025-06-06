@@ -40,15 +40,13 @@ public class AdminStatisticController {
         @RequestParam(defaultValue = "10")   int limit,
         @RequestParam(defaultValue = "recent")  String period
     ){  
-        List<NegativeFeedbackStatDTO> dtos = null;
+        PageResponse<NegativeFeedbackStatDTO> dtos = null;
         if(period.equals("recent")){
-            dtos = statisticService.getRecentNegative();
+            dtos = statisticService.getRecentNegative(page,limit);
         }else{
-            dtos = statisticService.getAllNegative();
+            dtos = statisticService.getAllNegative(page,limit);
         }
-        List<NegativeFeedbackStatDTO> pagedDto = PageUtils.paginate(dtos, page, limit);
-        PageResponse<NegativeFeedbackStatDTO> response = new PageResponse<>(pagedDto, dtos.size());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/cost/proportion")

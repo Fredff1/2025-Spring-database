@@ -3,6 +3,7 @@ package com.repairhub.management.repair.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.repair.entity.LaborFeeLog;
 
 public interface LaborFeeLogRepository {
@@ -19,4 +20,6 @@ public interface LaborFeeLogRepository {
     public List<LaborFeeLog> findAllByRepairmanId(Long repairmanId);
 
     public List<LaborFeeLog> findAll();
+
+    public PageResponse<LaborFeeLog> findAllWithPage(int pageNum,int pageSize);
 }

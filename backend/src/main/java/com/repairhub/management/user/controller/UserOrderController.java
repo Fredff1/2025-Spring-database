@@ -56,10 +56,10 @@ public class UserOrderController {
         @RequestParam(defaultValue = "5")   int limit,
         @AuthenticationPrincipal User user
     ) {
-        List<RepairOrder> orders = orderService.getOrders(user);
-        var pagedOrders = PageUtils.paginate(orders, page, limit);
+        PageResponse<RepairOrder> orders = orderService.getOrders(user,page,limit);
+        var pagedOrders = orders.getList();
         List<OrderDTO> dtos = pagedOrders.stream().map(order -> orderService.toDTO(order)).collect(Collectors.toList());
-        PageResponse<OrderDTO> resp = new PageResponse<OrderDTO>(dtos, orders.size());
+        PageResponse<OrderDTO> resp = new PageResponse<OrderDTO>(dtos, orders.getTotal());
         return new ResponseEntity<>(resp,HttpStatus.OK);
     }
 

@@ -17,6 +17,7 @@ import org.springframework.transaction.reactive.TransactionalEventPublisher;
 
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.repository.UserRepository;
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.AssignmentStatus;
@@ -120,15 +121,9 @@ public class RepairmanProfileService {
         return profile;
     }
 
-    public List<RepairOrder> findRepairmanOrders(User repairman) {
+    public PageResponse<RepairOrder> findRepairmanOrders(User repairman,int page,int limit) {
         Long repairmanId = repairman.getUserId();
-        List<OrderAssignment> assignments = orderAssignmentRepository.findByRepairmanId(repairmanId);
-        List<OrderAssignment> filteredAssignments = assignments.stream()
-                .filter(assignment -> assignment.getStatus().isAccepted())
-                .collect(Collectors.toList());
-        List<RepairOrder> orders = filteredAssignments.stream()
-                .map(assignment -> orderRepository.findById(assignment.getOrderId()).get())
-                .collect(Collectors.toList());
+        PageResponse<RepairOrder> orders = orderRepository.findByRepairmanIdWithPage(repairmanId, page, limit);
         return orders;
     }
 
@@ -205,8 +200,8 @@ public class RepairmanProfileService {
         Long repairmanId = repairman.getUserId();
         RepairmanProfile profile = repairmanProfileRepository.findByUserId(repairmanId)
             .orElseThrow(() -> new RuntimeException("维修工档案不存在"));
-        List<LaborFeeLog> logs = repairmanIncomeRepository.findFeeLogs(repairmanId, startTime, endTime);
-        List<LaborFeeLog> pagedLogs = PageUtils.paginate(logs, page, limit);
+        PageResponse<LaborFeeLog> logs = repairmanIncomeRepository.findFeeLogs(repairmanId, startTime, endTime,page,limit);
+        List<LaborFeeLog> pagedLogs = logs.getList();
         BigDecimal totalIncome = repairmanIncomeRepository.sumTotalIncome(repairmanId, startTime, endTime);
         BigDecimal totalWorkHour = repairmanIncomeRepository.sumTotalHours(repairmanId, startTime, endTime);
         BigDecimal averageHourlyRate = BigDecimal.ZERO;
@@ -220,7 +215,7 @@ public class RepairmanProfileService {
             .map(log -> LaborFeeLogDTO.from(log, profile,repairman))
             .collect(Collectors.toList());
         RepairmanIncomeDTO dto =RepairmanIncomeDTO.builder()
-            .total(logs.size())
+            .total(logs.getTotal())
             .list(logDTOs)
             .totalIncome(totalIncome)
             .totalHours(totalWorkHour)
@@ -234,7 +229,7 @@ public class RepairmanProfileService {
         repairmanProfileRepository.update(userId, dto);
         User updatedUser = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        return new UserProfileDTO().builder()
+        return UserProfileDTO.builder()
             .id(updatedUser.getUserId())
             .username(updatedUser.getUsername())
             .phone(updatedUser.getPhone())

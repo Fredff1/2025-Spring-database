@@ -27,5 +27,8 @@ public class PageUtils {
         return list.subList(start, end);
     }
 
-
+    public static long calculateOffset(int pageNum,int pageSize){
+        long offset = (pageNum - 1) * pageSize;
+        return offset;
+    }
 }

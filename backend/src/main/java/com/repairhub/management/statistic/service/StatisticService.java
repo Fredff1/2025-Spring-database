@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.statistic.dto.CostAnalysisDTO;
 import com.repairhub.management.statistic.dto.MismatchRepairTypeDTO;
 import com.repairhub.management.statistic.dto.NegativeFeedbackStatDTO;
@@ -41,12 +42,12 @@ public class StatisticService {
         this.repairOrderStatisticRepository = repairOrderStatisticRepository;
     }
 
-    public List<NegativeFeedbackStatDTO> getAllNegative() {
-        return feedbackStatisticRepository.findAllNegativeFeedbacks();
+    public PageResponse<NegativeFeedbackStatDTO> getAllNegative(int page,int limit) {
+        return feedbackStatisticRepository.findAllNegativeFeedbacks(page,limit);
     }
 
-    public List<NegativeFeedbackStatDTO> getRecentNegative() {
-        return feedbackStatisticRepository.findNegativeFeedbacksSince(LocalDateTime.now().minusMonths(1L));
+    public PageResponse<NegativeFeedbackStatDTO> getRecentNegative(int page,int limit) {
+        return feedbackStatisticRepository.findNegativeFeedbacksSince(LocalDateTime.now().minusMonths(1L),page,limit);
     }
 
     /**

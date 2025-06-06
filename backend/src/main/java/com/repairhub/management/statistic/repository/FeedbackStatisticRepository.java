@@ -11,12 +11,15 @@ import java.util.stream.Collectors;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.repair.enums.FaultType;
 import com.repairhub.management.repair.enums.FeedbackType;
 import com.repairhub.management.statistic.dto.NegativeFeedbackStatDTO;
+import com.repairhub.management.utils.PageUtils;
 
 @Repository
 public class FeedbackStatisticRepository {
@@ -52,8 +55,9 @@ public class FeedbackStatisticRepository {
         }
     };
 
-    public List<NegativeFeedbackStatDTO> findAllNegativeFeedbacks() {
-        String sql = """
+    public PageResponse<NegativeFeedbackStatDTO> findAllNegativeFeedbacks(int pageNum,int pageSize) {
+      long offset = PageUtils.calculateOffset(pageNum, pageSize);  
+      String sql = """
             SELECT
               fb.feedback_id,
               fb.order_id,
@@ -84,13 +88,28 @@ public class FeedbackStatisticRepository {
               fb.description,
               fb.feedback_time
             ORDER BY fb.feedback_time DESC
+            LIMIT :pageSize
+            OFFSET :offset
             """;
-        return jdbc.query(sql, Collections.emptyMap(), mapper);
+        String countSql = """
+            SELECT COUNT(*)
+            FROM feedback fb
+            JOIN repair_order ro ON fb.order_id = ro.order_id
+            WHERE (fb.feed_back_type = 'URGENT' OR fb.rating <= 3)
+        """;
+          SqlParameterSource queryParams = new MapSqlParameterSource()
+        .addValue("offset", offset)
+        .addValue("pageSize", pageSize);
+        var feedbacks = jdbc.query(sql, queryParams, mapper);
+        int total = jdbc.queryForObject(countSql, Collections.emptyMap(), Integer.class);
+        PageResponse<NegativeFeedbackStatDTO> resp = new PageResponse<>(feedbacks, total);
+        return resp;
     }
 
 
-    public List<NegativeFeedbackStatDTO> findNegativeFeedbacksSince(LocalDateTime since) {
-        String sql = """
+    public PageResponse<NegativeFeedbackStatDTO> findNegativeFeedbacksSince(LocalDateTime since,int pageNum,int pageSize) {
+      long offset = PageUtils.calculateOffset(pageNum, pageSize);  
+      String sql = """
             SELECT
               fb.feedback_id,
               fb.order_id,
@@ -122,11 +141,23 @@ public class FeedbackStatisticRepository {
               fb.description,
               fb.feedback_time
             ORDER BY fb.feedback_time DESC
+            LIMIT :pageSize
+            OFFSET :offset
             """;
-
+        String countSql = """
+            SELECT COUNT(*)
+            FROM feedback fb
+            JOIN repair_order ro ON fb.order_id = ro.order_id
+            WHERE (fb.feed_back_type = 'URGENT' OR fb.rating <= 3)
+              AND fb.feedback_time >= :since
+        """;
         MapSqlParameterSource params = new MapSqlParameterSource()
-            .addValue("since", since);
-
-        return jdbc.query(sql, params, mapper);
+            .addValue("since", since)
+            .addValue("offset", offset)
+            .addValue("pageSize", pageSize);
+        var feedbacks = jdbc.query(sql, params, mapper);
+        int total = jdbc.queryForObject(countSql, params, Integer.class);
+        PageResponse<NegativeFeedbackStatDTO> resp = new PageResponse<>(feedbacks, total);
+        return resp;
     }
 }

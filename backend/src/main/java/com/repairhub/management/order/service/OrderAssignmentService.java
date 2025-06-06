@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.repository.UserRepository;
+import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.repository.OrderAssignmentRepository;
@@ -40,14 +41,18 @@ public class OrderAssignmentService {
         this.repairmanProfileService = repairmanProfileService;
     }
 
-    public List<OrderAssignment> getRepairmanAssignments(Long repairmanId){
-        List<OrderAssignment> assignments = assignmentRepository.findByRepairmanId(repairmanId);
+    public PageResponse<OrderAssignment> getRepairmanAssignments(Long repairmanId,int page,int limit){
+        PageResponse<OrderAssignment> assignments = assignmentRepository.findByRepairmanIdWithPage(repairmanId,page,limit);
         return assignments;
     }
 
     public List<OrderAssignment> getAllAssignments(){
         List<OrderAssignment> assignments = assignmentRepository.findAll();
         return assignments;
+    }
+
+    public PageResponse<OrderAssignment> getAllAssignmentsWithPage(int pageNum,int pageSize){
+        return assignmentRepository.findAllWithPage(pageNum, pageSize);
     }
 
     public OrderAssignmentDTO convertAssignmentToDTO(OrderAssignment assignment){

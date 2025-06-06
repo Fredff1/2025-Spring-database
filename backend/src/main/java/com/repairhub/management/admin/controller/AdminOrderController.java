@@ -63,12 +63,12 @@ public class AdminOrderController {
         @RequestParam(defaultValue = "1")   int page,
         @RequestParam(defaultValue = "5")   int limit
     ) {
-        List<RepairOrder> orders = repairOrderRepository.findAll();
-        List<RepairOrder> pagedOrders = PageUtils.paginate(orders, page, limit);
+        PageResponse<RepairOrder> orders = repairOrderRepository.findAllWithPage(page, limit);
+        List<RepairOrder> pagedOrders = orders.getList();
         List<OrderDTO> dtos = pagedOrders.stream()
         .map(order -> orderService.toDTO(order))
         .collect(Collectors.toList());
-        PageResponse<OrderDTO> resp = new PageResponse<>(dtos, orders.size());
+        PageResponse<OrderDTO> resp = new PageResponse<>(dtos, orders.getTotal());
         return new ResponseEntity<>(resp,HttpStatus.OK);
     }
 
