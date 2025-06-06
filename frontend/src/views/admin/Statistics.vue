@@ -140,10 +140,11 @@
     <el-row :gutter="20" style="margin-bottom: 24px;">
       <el-col :span="12">
         <el-card class="stat-card">
-          <template #header>维修类型不匹配统计</template>
+          <template #header>维修类型不匹配的维修记录统计</template>
           <div class="table-wrapper">
             <el-table :data="mismatchList" border stripe style="width: 90%;">
-              <el-table-column prop="orderId"            label="订单ID"     width="120" />
+              <el-table-column prop="orderId"            label="订单ID"     width="80" />
+              <el-table-column prop="repairRecordId"     label="维修记录ID"     width="100" />
               <el-table-column prop="orderFaultType"     label="期望类型"   width="120" >
                  <template #default="{ row }">
                     <el-tag :type="getRepairTypeTag(row.orderFaultType)">
@@ -151,14 +152,14 @@
                     </el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="repairmanSpecialty" label="实际类型"   width="120" >
+              <el-table-column prop="repairmanSpecialty" label="实际类型"   width="110" >
                  <template #default="{ row }">
                     <el-tag :type="getRepairTypeTag(row.repairmanSpecialty)">
                     {{ getRepairTypeText(row.repairmanSpecialty) }}
                     </el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="repairmanName"      label="维修人员"   width="150" />
+              <el-table-column prop="repairmanName"      label="维修人员"   width="120" />
             </el-table>
           </div>
         </el-card>
@@ -793,6 +794,9 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   padding: 16px 0;
+  max-height: 300px;
+  min-height: 300px; 
+  overflow-y: auto;
 }
 
 /* 图表容器固定高度 */
