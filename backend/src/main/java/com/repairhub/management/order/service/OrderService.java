@@ -195,6 +195,7 @@ public class OrderService {
                 orderAssignmentRepository.insert(assignment);
                 order.setStatus(OrderStatus.PROCESSING);
                 repairOrderRepository.update(order);
+                return;
             }
         }
         if(assignType.equals("ALL")){
