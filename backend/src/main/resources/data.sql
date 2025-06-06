@@ -93,6 +93,31 @@ INSERT INTO `repair_order` (
   '车窗升降失灵', 0.00, '2025-05-11 11:15:07', '2025-05-11 11:15:07', 'PENDING', 'BODYWORK', FALSE
 );
 
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES
+  (
+    (SELECT user_id FROM users WHERE username = 'charlie'),
+    (SELECT vehicle_id FROM vehicle WHERE license_plate = '浙A111AA'),
+    '常规保养浙A111AA', 0.00, '2025-06-04 11:15:07', '2025-06-04 11:15:07', 'PENDING', 'MAINTENANCE', FALSE
+  );
+
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES (
+  (SELECT user_id FROM users WHERE username = 'charlie'),
+  (SELECT vehicle_id FROM vehicle WHERE license_plate = '浙A333CC'),
+  '日常检修浙A333CC', 0.00, '2025-06-04 11:15:07', '2025-06-04 11:15:07', 'PENDING', 'REPAIR', FALSE
+);
+
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES (
+  (SELECT user_id FROM users WHERE username = 'charlie'),
+  (SELECT vehicle_id FROM vehicle WHERE license_plate = '浙A444DD'),
+  '日常检修浙A444DD', 0.00, '2025-06-04 11:15:07', '2025-06-04 11:15:07', 'PENDING', 'BODYWORK', FALSE
+);
+
 -- diana 针对自己车辆提交了一条 REPAIR 故障工单
 INSERT INTO `repair_order` (
   user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
@@ -103,7 +128,16 @@ INSERT INTO `repair_order` (
     '刹车片磨损，应更换', 0.00, '2025-04-01 11:11:11', '2025-04-01 11:11:11', 'PENDING', 'REPAIR', FALSE
   );
 
-  -- henry 的 两份故障工单
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES
+  (
+    (SELECT user_id FROM users WHERE username = 'diana'),
+    (SELECT vehicle_id FROM vehicle WHERE license_plate = '沪B333CC'),
+    '刹车片再次磨损，仍需更换', 0.00, '2025-06-06 11:11:11', '2025-06-06 11:11:11', 'PENDING', 'REPAIR', FALSE
+  );
+  
+  -- henry 的 4份故障工单
 INSERT INTO `repair_order` (
   user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
 ) VALUES
@@ -117,6 +151,21 @@ INSERT INTO `repair_order` (
   (SELECT user_id FROM users WHERE username = 'henry'),
   (SELECT vehicle_id FROM vehicle WHERE license_plate = '苏C555EE'),
   '车漆开裂，需要喷涂', 0.00, '2025-05-27 11:15:07', '2025-05-27 11:15:07', 'PENDING', 'PAINT', FALSE
+);
+
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES
+  ((SELECT user_id FROM users WHERE username = 'henry'),
+   (SELECT vehicle_id FROM vehicle WHERE license_plate = '苏C444DD'),
+   '常规保养苏C444DD', 0.00, '2025-06-05 11:11:11', '2025-06-05 11:11:11', 'PENDING', 'ELECTRICAL', FALSE);
+
+INSERT INTO `repair_order` (
+  user_id, vehicle_id, description, total_fee, submit_time, update_time, status, fault_type, is_paid
+) VALUES (
+  (SELECT user_id FROM users WHERE username = 'henry'),
+  (SELECT vehicle_id FROM vehicle WHERE license_plate = '苏C555EE'),
+  '常规保养苏C555EE', 0.00, '2025-06-27 11:15:07', '2025-06-27 11:15:07', 'PENDING', 'PAINT', FALSE
 );
 
 -- irene 的 两份故障工单
@@ -177,6 +226,26 @@ INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_st
     '2025-05-08 13:15:07', 'PENDING'
   );
 
+-- 为 charlie 的第二三四个工单派发给 技师
+  INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  (
+    (SELECT order_id FROM repair_order WHERE description LIKE '%常规保养浙A111AA%'),
+    (SELECT user_id FROM users WHERE username = 'eve'),
+    '2025-05-08 13:15:07', 'ACCEPTED'
+  );
+   INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  (
+    (SELECT order_id FROM repair_order WHERE description LIKE '%日常检修浙A333CC%'),
+    (SELECT user_id FROM users WHERE username = 'frank'),
+    '2025-05-08 13:15:07', 'ACCEPTED'
+  );
+  INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  (
+    (SELECT order_id FROM repair_order WHERE description LIKE '%日常检修浙A444DD%'),
+    (SELECT user_id FROM users WHERE username = 'frank'),
+    '2025-05-08 13:15:07', 'PENDING'
+  );
+
 -- 为 diana 的工单派发给 frank 与 eve 两位技师，其中 frank 已接单，eve 待定
 INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
   (
@@ -196,6 +265,18 @@ INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_st
    (SELECT user_id FROM users WHERE username = 'jack'), '2025-04-06 11:11:11', 'ACCEPTED'),
   ((SELECT order_id FROM repair_order WHERE description LIKE '%车灯%'),
    (SELECT user_id FROM users WHERE username = 'kate'), '2025-04-06 11:11:11', 'PENDING');
+
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%车灯%'),
+   (SELECT user_id FROM users WHERE username = 'grace'), '2025-06-06 11:11:11', 'ACCEPTED');
+
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%常规保养苏C444DD%'),
+   (SELECT user_id FROM users WHERE username = 'eve'), '2025-06-06 11:11:11', 'ACCEPTED');
+
+INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%常规保养苏C555EE%'),
+   (SELECT user_id FROM users WHERE username = 'eve'), '2025-06-06 11:11:11', 'PENDING');
 
 -- irene 的工单派给 kate（接单）
 INSERT INTO `assignment` (order_id, repairman_id, assignment_time, assignment_status) VALUES
@@ -447,6 +528,21 @@ WHERE description IN (
   '导航系统崩溃',
   '中控系统失灵，仪表盘无响应',
   '车漆开裂，需要喷涂'
+);
+
+UPDATE repair_order
+SET status = 'PROCESSING'
+WHERE description IN (
+  '刹车片再次磨损，仍需更换',
+  '常规保养浙A111AA',
+  '日常检修浙A333CC'
+);
+UPDATE repair_order
+SET status = 'PENDING'
+WHERE description IN (
+  '日常检修浙A444DD',
+  '常规保养苏C555EE'
+
 );
 
 
