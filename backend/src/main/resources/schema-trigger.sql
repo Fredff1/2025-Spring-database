@@ -1,3 +1,13 @@
+-- 定义历史表和触发器 --
+-- 重启后自动重建历史表和触发器--
+-- 历史表结构：
+-- 原始表所有字段（去掉not null等约束以及外键约束和检查），保留必要的索引
+-- 主键改为history_id
+-- 添加changed_at，operation作为历史标记值，从而区分历史记录以及更新做的事情
+-- 每张历史表三个触发器
+-- 原始表insert/delete/update就往对应的历史表插入操作记录
+-- 所有的历史表和触发器结构都很相似
+
 DROP TRIGGER IF EXISTS tr_repair_order_after_insert$$
 DROP TRIGGER IF EXISTS tr_repair_order_after_update$$
 DROP TRIGGER IF EXISTS tr_repair_order_after_delete$$
