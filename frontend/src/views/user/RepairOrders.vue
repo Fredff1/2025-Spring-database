@@ -193,6 +193,12 @@
             <el-descriptions-item label="创建时间">{{ currentOrder?.createTime }}</el-descriptions-item>
             <el-descriptions-item label="更新时间">{{ currentOrder?.updateTime }}</el-descriptions-item>
             <el-descriptions-item label="问题描述" :span="2">{{ currentOrder?.problem }}</el-descriptions-item>
+            <el-descriptions-item label="维修人员" :span="2">
+            <el-table :data="currentOrder.repairmanBaseInfos" style="width: 100%">
+              <el-table-column prop="repairmanName" label="维修人" />
+              <el-table-column prop="repairmanNumber" label="维修人工号"/>
+            </el-table>
+          </el-descriptions-item>
             <el-descriptions-item label="金额">¥{{ currentOrder?.amount?.toFixed(2) }}</el-descriptions-item>
             <el-descriptions-item label="支付状态">
               <el-tag :type="currentOrder?.isPaid ? 'success' : 'warning'">
@@ -444,7 +450,6 @@ const fetchOrders = async () => {
       page: currentPage.value,
       limit: pageSize.value
     })
-    console.log(res)
     orders.value = res.list
     total.value = res.total
   } catch (error) {

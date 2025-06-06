@@ -9,8 +9,9 @@
     <!-- 维修人员列表 -->
     <el-card shadow="hover">
       <el-table :data="repairmen" style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
+        <!-- <el-table-column prop="id" label="ID" width="80" /> -->
         <el-table-column prop="username" label="用户名" width="120" />
+        <el-table-column prop="repairmanNumber" label="工号" width="180" />
         <el-table-column prop="phone" label="手机号" width="120" />
         <el-table-column prop="email" label="邮箱" width="180" />
         <el-table-column prop="specialty" label="专长" width="120">

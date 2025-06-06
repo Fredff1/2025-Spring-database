@@ -27,7 +27,10 @@ import com.repairhub.management.order.event.OrderCreatedEvent;
 import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.order.repository.RepairOrderRepository;
 import com.repairhub.management.repairman.entity.RepairmanProfile;
+import com.repairhub.management.repairman.repository.RepairmanBaseInfoRepository;
 import com.repairhub.management.repairman.service.RepairmanProfileService;
+import com.repairhub.management.utils.OrderUtil;
+import com.repairhub.management.vehicle.entity.Vehicle;
 import com.repairhub.management.vehicle.repository.VehicleRepository;
 
 import lombok.Getter;
@@ -42,6 +45,7 @@ public class OrderService {
     private final RepairmanProfileService repairmanProfileService;
     private final ApplicationEventPublisher eventPublisher;
     private final VehicleRepository vehicleRepository;
+    private final RepairmanBaseInfoRepository repairmanBaseInfoRepository; 
 
     private String assignType = "ALL";
 
@@ -51,7 +55,8 @@ public class OrderService {
         OrderAssignmentRepository orderAssignmentRepository,
         RepairmanProfileService repairmanProfileService,
         VehicleRepository vehicleRepository,
-        ApplicationEventPublisher eventPublisher
+        ApplicationEventPublisher eventPublisher,
+        RepairmanBaseInfoRepository repairmanBaseInfoRepository
     ) {
         this.userRepository = userRepository;
         this.repairOrderRepository = repairOrderRepository;
@@ -59,6 +64,7 @@ public class OrderService {
         this.repairmanProfileService = repairmanProfileService;
         this.vehicleRepository = vehicleRepository;
         this.eventPublisher = eventPublisher;
+        this.repairmanBaseInfoRepository = repairmanBaseInfoRepository;
     }
 
     @Transactional
@@ -137,7 +143,23 @@ public class OrderService {
 
     public OrderDTO toDTO(RepairOrder order){
         User user = userRepository.findById(order.getUserId()).orElse(null);
-        return OrderDTO.from(order, vehicleRepository,user);
+        Vehicle vehicle = vehicleRepository.findById(order.getVehicleId()).get();
+        var dto =OrderDTO.builder()
+            .id(order.getOrderId())
+            .orderNo(OrderUtil.getOrderNumber(order.getOrderId())) 
+            .vehicleId(order.getVehicleId())
+            .vehiclePlate(vehicle.getLicensePlate()) 
+            .repairType(order.getFaultType())
+            .problem(order.getDescription())
+            .status(order.getStatus())
+            .amount(order.getTotalFee())
+            .isPaid(order.getIsPaid())
+            .customerName(user.getUsername())
+            .createTime(order.getSubmitTime())
+            .updateTime(order.getUpdateTime()) 
+            .repairmanBaseInfos(repairmanBaseInfoRepository.findAllByOrderId(order.getOrderId()))
+            .build();
+        return dto;
     }
 
     public void assignOrder(RepairOrder order){

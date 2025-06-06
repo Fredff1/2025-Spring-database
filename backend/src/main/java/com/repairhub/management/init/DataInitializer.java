@@ -69,37 +69,6 @@ public class DataInitializer implements ApplicationRunner{
             .build();
         userRepository.insert(customer);
 
-        User repairman = User.builder()
-            .username("bob")
-            .password(passwordEncoder.encode("bob123"))
-            .email("bob@repairhub.com")
-            .phone("234-567-8901")
-            .role(UserRole.REPAIRMAN)
-            .status(UserStatus.ACTIVE)
-            .build();
-        userRepository.insert(repairman);
-        RepairmanProfile repairmanProfile = RepairmanProfile.builder()
-            .userId(repairman.getUserId())
-            .specialty(FaultType.MAINTENANCE)
-            .hourlyMoneyRate(new BigDecimal("100.00"))
-            .build();
-        repairmanProfileRepository.insert(repairmanProfile);
-
-        User repairman1 = User.builder()
-            .username("repair1")
-            .password(passwordEncoder.encode("123456"))
-            .email("rep@repairhub.com")
-            .phone("234-567-8901")
-            .role(UserRole.REPAIRMAN)
-            .status(UserStatus.ACTIVE)
-            .build();
-        userRepository.insert(repairman1);
-        RepairmanProfile repairmanProfile1 = RepairmanProfile.builder()
-            .userId(repairman1.getUserId())
-            .specialty(FaultType.MAINTENANCE)
-            .hourlyMoneyRate(new BigDecimal("70.00"))
-            .build();
-        repairmanProfileRepository.insert(repairmanProfile1);
         
         User admin = User.builder()
             .username("admin")

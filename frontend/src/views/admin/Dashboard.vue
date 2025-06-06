@@ -1,4 +1,4 @@
- <template>
+<template>
   <div class="dashboard">
     <div class="page-header">
       <h2 class="page-title">工作台</h2>
@@ -17,10 +17,6 @@
             </template>
             <div class="card-content">
               <div class="value">{{ overview.todayOrders }}</div>
-              <div class="trend" :class="{ 'up': overview.orderTrend > 0 }">
-                {{ overview.orderTrend > 0 ? '+' : '' }}{{ overview.orderTrend }}%
-                <el-icon><arrow-up /></el-icon>
-              </div>
             </div>
           </el-card>
         </el-col>
@@ -28,12 +24,12 @@
           <el-card shadow="hover" class="overview-card">
             <template #header>
               <div class="card-header">
-                <span>待处理</span>
-                <el-tag type="warning">待处理</el-tag>
+                <span>未完成</span>
+                <el-tag type="warning">未完成</el-tag>
               </div>
             </template>
             <div class="card-content">
-              <div class="value">{{ overview.pendingOrders }}</div>
+              <div class="value">{{ overview.unfinishedOrders }}</div>
               <div class="sub-value">个待处理订单</div>
             </div>
           </el-card>
@@ -42,16 +38,12 @@
           <el-card shadow="hover" class="overview-card">
             <template #header>
               <div class="card-header">
-                <span>本月收入</span>
+                <span>本月费用</span>
                 <el-tag type="success">本月</el-tag>
               </div>
             </template>
             <div class="card-content">
-              <div class="value">¥{{ overview.monthlyIncome.toFixed(2) }}</div>
-              <div class="trend" :class="{ 'up': overview.incomeTrend > 0 }">
-                {{ overview.incomeTrend > 0 ? '+' : '' }}{{ overview.incomeTrend }}%
-                <el-icon><arrow-up /></el-icon>
-              </div>
+              <div class="value">¥{{ overview.monthlyCost }}</div>
             </div>
           </el-card>
         </el-col>
@@ -59,13 +51,12 @@
           <el-card shadow="hover" class="overview-card">
             <template #header>
               <div class="card-header">
-                <span>评分</span>
-                <el-tag type="primary">平均</el-tag>
+                <span>活跃维修人员数</span>
+                <el-tag type="primary">维修人员数</el-tag>
               </div>
             </template>
             <div class="card-content">
-              <div class="value">{{ overview.rating.toFixed(1) }}</div>
-              <div class="sub-value">分</div>
+              <div class="value">{{ overview.activeRepairmen }}</div>
             </div>
           </el-card>
         </el-col>
@@ -76,7 +67,7 @@
     <div class="work-area">
       <el-row :gutter="20">
         <!-- 待处理订单 -->
-        <el-col :span="16">
+        <el-col :span="18">
           <el-card shadow="hover" class="work-card">
             <template #header>
               <div class="card-header">
@@ -84,9 +75,9 @@
                 <el-button type="primary" link @click="handleViewAll">查看全部</el-button>
               </div>
             </template>
-            <el-table :data="pendingOrders" style="width: 100%">
-              <el-table-column prop="orderNumber" label="订单号" width="180" />
-              <el-table-column prop="plateNumber" label="车牌号" width="120" />
+            <el-table :data="unfinishedOrders" style="width: 100%">
+              <el-table-column prop="orderNo" label="订单号" width="90" />
+              <el-table-column prop="vehiclePlate" label="车牌号" width="120" />
               <el-table-column prop="repairType" label="维修类型" width="120">
                 <template #default="{ row }">
                   <el-tag :type="getRepairTypeTag(row.repairType)">
@@ -94,58 +85,38 @@
                   </el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="problem" label="问题描述" min-width="200" show-overflow-tooltip />
-              <el-table-column prop="createTime" label="创建时间" width="180" />
-              <el-table-column label="操作" width="120" fixed="right">
+              <el-table-column prop="status" label="订单状态" width="120">
                 <template #default="{ row }">
-                  <el-button type="primary" link @click="handleStartRepair(row)">开始维修</el-button>
+                  <el-tag :type="getOrderStatusTag(row.status)">
+                    {{ getOrderStatusText(row.status) }}
+                  </el-tag>
                 </template>
               </el-table-column>
+              <el-table-column prop="problem" label="问题描述" min-width="200" show-overflow-tooltip />
+              <el-table-column prop="createTime" label="创建时间" width="180" />
             </el-table>
           </el-card>
         </el-col>
 
-        <!-- 工作统计 -->
-        <el-col :span="8">
+        <!-- 右侧信息 -->
+        <el-col :span="6">
+          <!-- 系统状态 -->
           <el-card shadow="hover" class="work-card">
             <template #header>
               <div class="card-header">
-                <span>工作统计</span>
-                <el-radio-group v-model="statisticsType" size="small">
-                  <el-radio-button label="week">本周</el-radio-button>
-                  <el-radio-button label="month">本月</el-radio-button>
-                </el-radio-group>
+                <span>系统状态</span>
+                <el-button type="primary" link @click="handleRefreshStatus">刷新</el-button>
               </div>
             </template>
-            <div class="statistics-content">
-              <div class="stat-item">
-                <div class="stat-label">完成订单</div>
-                <div class="stat-value">{{ statistics.completedOrders }}</div>
+            <div class="system-status">
+              <div class="status-item">
+                <span class="label">CPU使用率</span>
+                <el-progress :percentage="systemStatus.cpu" :status="getProgressStatus(systemStatus.cpu)" />
               </div>
-              <div class="stat-item">
-                <div class="stat-label">维修时长</div>
-                <div class="stat-value">{{ statistics.repairHours }}小时</div>
+              <div class="status-item">
+                <span class="label">内存使用率</span>
+                <el-progress :percentage="systemStatus.memory" :status="getProgressStatus(systemStatus.memory)" />
               </div>
-              <div class="stat-item">
-                <div class="stat-label">收入</div>
-                <div class="stat-value">¥{{ statistics.income.toFixed(2) }}</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-label">评分</div>
-                <div class="stat-value">{{ statistics.rating.toFixed(1) }}分</div>
-              </div>
-            </div>
-          </el-card>
-
-          <!-- 维修类型分布 -->
-          <el-card shadow="hover" class="work-card">
-            <template #header>
-              <div class="card-header">
-                <span>维修类型分布</span>
-              </div>
-            </template>
-            <div class="chart-container">
-              <!-- 这里放置维修类型分布图表 -->
             </div>
           </el-card>
         </el-col>
@@ -155,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted,watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowUp } from '@element-plus/icons-vue'
@@ -166,31 +137,56 @@ const router = useRouter()
 // 概览数据
 const overview = ref({
   todayOrders: 0,
-  orderTrend: 0,
-  pendingOrders: 0,
-  monthlyIncome: 0,
-  incomeTrend: 0,
-  rating: 0
+  unfinishedOrders: 0,
+  monthlyCost: 0,
+  activeRepairmen: 0
 })
 
 // 待处理订单
-const pendingOrders = ref([])
+const unfinishedOrders = ref([])
 
-// 工作统计
-const statisticsType = ref('week')
-const statistics = ref({
-  completedOrders: 0,
-  repairHours: 0,
-  income: 0,
-  rating: 0
+// 维修人员状态
+
+
+// 系统状态
+const systemStatus = ref({
+  cpu: 0,
+  memory: 0,
 })
+
+const getOrderStatusTag = (status) => {
+  const map = {
+    PENDING: 'info',
+    PROCESSING: 'success',
+    COMPLETED: 'success',
+    CANCELLED: 'danger'
+  }
+  return map[status] || 'info'
+}
+
+// 获取状态文本
+const getOrderStatusText = (status) => {
+  const map = {
+    PENDING: '待处理',
+    PROCESSING: '维修中',
+    COMPLETED: '已完成',
+    CANCELLED: '已取消'
+  }
+  return map[status] || status
+}
+
 
 // 获取维修类型标签
 const getRepairTypeTag = (type) => {
   const map = {
-    maintenance: 'info',
-    repair: 'warning',
-    accident: 'danger'
+    MAINTENANCE: 'success',
+    REPAIR: 'warning',
+    PAINT: 'danger',
+    TIRE: 'info',
+    ELECTRICAL: 'warning',
+    BODYWORK: 'danger',
+    ENGINE: 'danger',
+    OTHER: 'info'
   }
   return map[type] || 'info'
 }
@@ -198,88 +194,69 @@ const getRepairTypeTag = (type) => {
 // 获取维修类型文本
 const getRepairTypeText = (type) => {
   const map = {
-    maintenance: '常规保养',
-    repair: '故障维修',
-    accident: '事故维修'
+    MAINTENANCE: '常规保养',
+    REPAIR: '通用维修',
+    PAINT: '钣金喷漆',
+    TIRE: '轮胎更换',
+    ELECTRICAL: '电路系统修复',
+    BODYWORK: '车身修复',
+    ENGINE: '发动机维修',
+    OTHER: '其他'
   }
   return map[type] || type
+}
+
+
+// 获取进度条状态
+const getProgressStatus = (percentage) => {
+  if (percentage >= 90) return 'exception'
+  if (percentage >= 70) return 'warning'
+  return 'success'
 }
 
 // 获取数据
 const fetchData = async () => {
   try {
-    const [overviewRes, pendingRes, statisticsRes] = await Promise.all([
+    const [overviewRes, unfinishedRes, systemRes] = await Promise.all([
       admin.getOverview(),
-      admin.getPendingOrders(),
-      admin.getStatistics({ type: statisticsType.value })
+      admin.getUnfinishedOrders(),
+      admin.getSystemStatus()
     ])
     overview.value = overviewRes
-    pendingOrders.value = pendingRes
-    statistics.value = statisticsRes
+    unfinishedOrders.value = unfinishedRes
+    systemStatus.value = systemRes
   } catch (error) {
     console.error('获取数据失败:', error)
     ElMessage.error('获取数据失败')
   }
 }
 
-// 开始维修
-const handleStartRepair = async (row) => {
-  try {
-    await admin.startRepair(row.id)
-    ElMessage.success('已开始维修')
-    fetchData()
-  } catch (error) {
-    console.error('操作失败:', error)
-    ElMessage.error('操作失败')
-  }
-}
-
 // 查看全部订单
 const handleViewAll = () => {
-  router.push('/repairman/orders')
+  router.push('/admin/orders')
 }
 
-// 监听统计类型变化
-watch(statisticsType, () => {
-  fetchData()
-})
-
-onMounted(() => {
-  fetchData()
-})
-
-// 获取统计数据
-const fetchStatistics = async () => {
-  try {
-    const res = await admin.getStatistics()
-    statistics.value = res
-  } catch (error) {
-    console.error('获取统计数据失败:', error)
-    ElMessage.error('获取统计数据失败')
-  }
+// 查看全部维修人员
+const handleViewRepairmen = () => {
+  router.push('/admin/repairmen')
 }
 
-// 获取最近订单
-const fetchRecentOrders = async () => {
-  try {
-    const res = await admin.getRecentOrders()
-    recentOrders.value = res
-  } catch (error) {
-    console.error('获取最近订单失败:', error)
-    ElMessage.error('获取最近订单失败')
-  }
-}
-
-// 获取系统状态
-const fetchSystemStatus = async () => {
+// 刷新系统状态
+const handleRefreshStatus = async () => {
   try {
     const res = await admin.getSystemStatus()
     systemStatus.value = res
+    ElMessage.success('刷新成功')
   } catch (error) {
-    console.error('获取系统状态失败:', error)
-    ElMessage.error('获取系统状态失败')
+    ElMessage.error('刷新失败')
   }
 }
+
+onMounted(() => {
+  fetchData()
+  // 每5分钟刷新一次数据
+  setInterval(fetchData, 5 * 60 * 1000)
+})
 </script>
 
 <style scoped>
@@ -348,30 +325,57 @@ const fetchSystemStatus = async () => {
   margin-bottom: 24px;
 }
 
-.statistics-content {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  padding: 20px 0;
+.repairman-status {
+  padding: 10px 0;
 }
 
-.stat-item {
-  text-align: center;
+.repairman-item {
+  padding: 12px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
-.stat-label {
-  font-size: 14px;
-  color: var(--text-secondary);
+.repairman-item:last-child {
+  border-bottom: none;
+}
+
+.repairman-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
 }
 
-.stat-value {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-primary);
+.repairman-info .name {
+  font-weight: 500;
 }
 
-.chart-container {
-  height: 300px;
+.repairman-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.system-status {
+  padding: 10px 0;
+}
+
+.status-item {
+  margin-bottom: 16px;
+}
+
+.status-item:last-child {
+  margin-bottom: 0;
+}
+
+.status-item .label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+
+.status-item .value {
+  font-size: 16px;
+  font-weight: 500;
 }
 </style> 

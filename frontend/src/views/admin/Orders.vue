@@ -69,6 +69,12 @@
         <el-descriptions-item label="问题描述" :span="2">
           {{ currentOrder.problem }}
         </el-descriptions-item>
+        <el-descriptions-item label="维修人员" :span="2">
+          <el-table :data="currentOrder.repairmanBaseInfos" style="width: 100%">
+            <el-table-column prop="repairmanName" label="维修人" />
+            <el-table-column prop="repairmanNumber" label="维修人工号"/>
+          </el-table>
+        </el-descriptions-item>
         <el-descriptions-item label="维修记录" :span="2">
           <el-timeline>
             <el-timeline-item v-for="record in repairRecords" :key="record.recordId" :timestamp="record.createTime"

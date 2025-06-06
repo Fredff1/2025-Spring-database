@@ -11,11 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OverviewDTO {
+public class AdminOverviewDTO {
     private Integer todayOrders;
-    private Integer orderTrend;
-    private Integer pendingOrders;
-    private BigDecimal monthlyIncome;
-    private Integer incomeTrend;
-    private BigDecimal rating;
+    private Integer unfinishedOrders;
+    private BigDecimal monthlyCost;
+    private Integer activeRepairmen;
 }

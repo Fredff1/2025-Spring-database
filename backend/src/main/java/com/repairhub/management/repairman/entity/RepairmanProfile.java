@@ -19,6 +19,6 @@ public class RepairmanProfile {
     private Long userId;
     private FaultType specialty;
     private BigDecimal hourlyMoneyRate;
-
+    private String repairmanNumber;
     private List<OrderAssignment> orderAssignments;
 }

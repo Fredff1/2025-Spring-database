@@ -6,7 +6,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.repairhub.management.admin.dto.AdminIncomeDTO;
+import com.repairhub.management.admin.dto.AdminOverviewDTO;
+import com.repairhub.management.admin.repository.AdminOverviewRepository;
 import com.repairhub.management.auth.repository.UserRepository;
+import com.repairhub.management.order.dto.OrderDTO;
+import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.service.OrderService;
 import com.repairhub.management.repair.dto.LaborFeeLogDTO;
 import com.repairhub.management.repair.entity.LaborFeeLog;
 import com.repairhub.management.repair.repository.LaborFeeLogRepository;
@@ -23,17 +28,23 @@ public class AdminService {
     private final UserRepository userRepository;
     private final LaborFeeLogRepository laborFeeLogRepository;
     private final RepairmanProfileRepository profileRepository;
+    private final AdminOverviewRepository adminOverviewRepository;
+    private final OrderService orderService;
 
     public AdminService(
         VehicleRepository vehicleRepository,
         UserRepository userRepository,
         LaborFeeLogRepository laborFeeLogRepository,
-        RepairmanProfileRepository profileRepository
+        RepairmanProfileRepository profileRepository,
+        AdminOverviewRepository adminOverviewRepository,
+        OrderService orderService
     ) {
         this.vehicleRepository = vehicleRepository;
         this.userRepository = userRepository;
         this.laborFeeLogRepository = laborFeeLogRepository;
         this.profileRepository = profileRepository;
+        this.adminOverviewRepository = adminOverviewRepository;
+        this.orderService = orderService;
     }
 
     public List<VehicleDetailDTO> findAllVehicles() {
@@ -61,5 +72,21 @@ public class AdminService {
         .total(logs.size())
         .build();
         return incomeDTO;
+    }
+
+    public List<OrderDTO> getUnfinishedOrders(Integer limit){
+        List<RepairOrder> orders = adminOverviewRepository.findUnfinishedOrders(limit);
+        List<OrderDTO> dtos = orders.stream().map(order -> orderService.toDTO(order)).collect(Collectors.toList());
+        return dtos;
+    }
+
+    public AdminOverviewDTO getOverview(){
+        AdminOverviewDTO dto = AdminOverviewDTO.builder()
+        .todayOrders(adminOverviewRepository.countTodayOrders())
+        .unfinishedOrders(adminOverviewRepository.countUnfinishedOrders())
+        .activeRepairmen(adminOverviewRepository.countActiveRepairman())
+        .monthlyCost(adminOverviewRepository.countMonthlyCost())
+        .build();
+        return dto;
     }
 }

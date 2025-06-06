@@ -41,7 +41,8 @@ public class RepairmanProfileJdbcRepository implements RepairmanProfileRepositor
         MapSqlParameterSource params = new MapSqlParameterSource()
         .addValue("user_id", profile.getUserId())
         .addValue("specialty", profile.getSpecialty().name())
-        .addValue("hourly_money_rate", profile.getHourlyMoneyRate());
+        .addValue("hourly_money_rate", profile.getHourlyMoneyRate())
+        .addValue("repairman_number", profile.getRepairmanNumber());
         simpleJdbcInsert.execute(params);
         return 1;
     }
@@ -50,7 +51,7 @@ public class RepairmanProfileJdbcRepository implements RepairmanProfileRepositor
     public int update(Long userId,RepairmanProfileUpdateDTO profile){
         String sql = """
             UPDATE repairman_profile
-               SET specialty         = :specialty       
+               SET specialty         = :specialty      
              WHERE user_id = :userId
             """;
 
@@ -64,19 +65,19 @@ public class RepairmanProfileJdbcRepository implements RepairmanProfileRepositor
 
     @Override
     public List<RepairmanProfile> findAll(){
-        String sql = "SELECT user_id, specialty, hourly_money_rate FROM repairman_profile";
+        String sql = "SELECT * FROM repairman_profile";
         return jdbc.query(sql, mapper);
     }
 
     @Override
     public Optional<RepairmanProfile> findByUserId(Long userId){
-        String sql = "SELECT user_id, specialty, hourly_money_rate FROM repairman_profile WHERE user_id = :userId";
+        String sql = "SELECT * FROM repairman_profile WHERE user_id = :userId";
         return jdbc.query(sql, Map.of("userId", userId), mapper).stream().findFirst();
     }
 
     @Override
     public List<RepairmanProfile> findBySpecialty(FaultType specialty){
-        String sql = "SELECT user_id, specialty, hourly_money_rate FROM repairman_profile WHERE specialty = :specialty";
+        String sql = "SELECT * FROM repairman_profile WHERE specialty = :specialty";
         return jdbc.query(sql, Map.of("specialty", specialty.name()), mapper);
     }
 }

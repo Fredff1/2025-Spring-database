@@ -14,4 +14,5 @@ public interface RepairmanProfileRepository {
     public List<RepairmanProfile> findAll();
     public Optional<RepairmanProfile> findByUserId(Long userId);
     public List<RepairmanProfile> findBySpecialty(FaultType specialty);
+    
 }

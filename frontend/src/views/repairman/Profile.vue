@@ -15,6 +15,7 @@
           </template>
           <el-descriptions :column="1" border>
             <el-descriptions-item label="用户名">{{ form.username }}</el-descriptions-item>
+            <el-descriptions-item label="工号">{{ form.repairmanNumber }}</el-descriptions-item>
             <el-descriptions-item label="手机号">{{ form.phone }}</el-descriptions-item>
             <el-descriptions-item label="邮箱">{{ form.email }}</el-descriptions-item>
             <el-descriptions-item label="账号状态">

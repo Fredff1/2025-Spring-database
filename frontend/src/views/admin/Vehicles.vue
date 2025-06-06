@@ -43,12 +43,12 @@
             {{ formatDate(row.registerDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="150">
+        <!-- <el-table-column label="操作" fixed="right" width="150">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
             <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
 
       <!-- 分页 -->

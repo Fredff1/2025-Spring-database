@@ -46,6 +46,5 @@ public class AdminUserController {
             repairmen.size());
         return ResponseEntity.ok(resp);
     }
-    
-    
+
 }

@@ -25,4 +25,5 @@ public class RepairmanProfileDTO {
     private UserStatus userStatus;
     private FaultType specialty;
     private BigDecimal hourlyMoneyRate;
+    private String repairmanNumber;
 }

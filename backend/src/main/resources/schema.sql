@@ -40,6 +40,7 @@ CREATE TABLE `repairman_profile` (
   user_id           BIGINT PRIMARY KEY,
   specialty         VARCHAR(30),
   hourly_money_rate DECIMAL(10,2),
+  repairman_number  VARCHAR(50) NOT NULL, 
   CHECK (specialty IN ('MAINTENANCE','REPAIR','PAINT','TIRE','ELECTRICAL','BODYWORK','ENGINE','OTHER')),
   CONSTRAINT fk_rm_user FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );

@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.repairhub.management.admin.dto.AdminIncomeDTO;
 import com.repairhub.management.admin.dto.AdminInfoDTO;
-import com.repairhub.management.admin.dto.OverviewDTO;
+import com.repairhub.management.admin.dto.AdminSystemStatusDTO;
+import com.repairhub.management.admin.dto.AdminOverviewDTO;
 import com.repairhub.management.admin.dto.StatisticsDTO;
 import com.repairhub.management.admin.service.AdminService;
 import com.repairhub.management.auth.entity.User;
@@ -95,6 +96,20 @@ public class AdminController {
         AdminIncomeDTO incomeDTO = adminService.getIncome(page, size);
         return ResponseEntity.ok(incomeDTO);
     }
+
+    @GetMapping("/overview")
+    public ResponseEntity<AdminOverviewDTO> getOverview() {
+        AdminOverviewDTO dto = adminService.getOverview();
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/system/status")
+    public ResponseEntity<AdminSystemStatusDTO> getSystemStatus() {
+        var dto = AdminSystemStatusDTO.toDefault();
+        return ResponseEntity.ok(dto);
+    }
+    
+    
     
 
 

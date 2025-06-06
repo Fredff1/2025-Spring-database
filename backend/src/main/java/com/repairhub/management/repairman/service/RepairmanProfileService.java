@@ -32,6 +32,7 @@ import com.repairhub.management.repair.enums.FaultType;
 import com.repairhub.management.repair.repository.LaborFeeLogRepository;
 import com.repairhub.management.repair.repository.RepairFeedbackRepository;
 import com.repairhub.management.repair.repository.RepairRecordRepository;
+import com.repairhub.management.repairman.dto.RepairmanBaseInfoDTO;
 import com.repairhub.management.repairman.dto.RepairmanIncomeDTO;
 import com.repairhub.management.repairman.dto.RepairmanOverviewDTO;
 import com.repairhub.management.repairman.dto.RepairmanProfileDTO;
@@ -144,8 +145,15 @@ public class RepairmanProfileService {
                 .userStatus(repairman.getStatus())
                 .specialty(profile.getSpecialty())
                 .hourlyMoneyRate(profile.getHourlyMoneyRate())
+                .repairmanNumber(profile.getRepairmanNumber())
                 .build();
         return dto;
+    }
+
+    public RepairmanBaseInfoDTO getBaseInfoDTO(Long repairmanId){
+        RepairmanProfile profile = repairmanProfileRepository.findByUserId(repairmanId).get();
+        User repairman = userRepository.findById(repairmanId).get();
+        return RepairmanBaseInfoDTO.from(profile, repairman);
     }
 
     public RepairmanStatisticDTO getStatistics(User repairman, LocalDateTime startDateTime) {

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.repairhub.management.admin.service.AdminService;
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.common.dto.CommonResponse;
 import com.repairhub.management.common.dto.PageResponse;
@@ -40,18 +41,21 @@ public class AdminOrderController {
     private final RepairOrderRepository repairOrderRepository;
     private final RepairmanProfileService repairmanProfileService;
     private final OrderService orderService;
+    private final AdminService adminService;
     
 
     public AdminOrderController(
         RepairService repairService,
         RepairOrderRepository repairOrderRepository,
         RepairmanProfileService repairmanProfileService,
-        OrderService orderService
+        OrderService orderService,
+        AdminService adminService
     ){
         this.repairService = repairService;
         this.repairOrderRepository = repairOrderRepository;
         this.repairmanProfileService = repairmanProfileService;
         this.orderService = orderService;
+        this.adminService = adminService;
     }
 
     @GetMapping("")
@@ -67,6 +71,13 @@ public class AdminOrderController {
         PageResponse<OrderDTO> resp = new PageResponse<>(dtos, orders.size());
         return new ResponseEntity<>(resp,HttpStatus.OK);
     }
+
+    @GetMapping("/unfinished")
+    public ResponseEntity<List<OrderDTO>> getUnfinishedOrders() {
+        List<OrderDTO> dtos = adminService.getUnfinishedOrders(10);
+        return ResponseEntity.ok(dtos);
+    }
+    
 
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderDTO> getOrder(

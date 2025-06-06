@@ -20,33 +20,37 @@ INSERT INTO `users` (
   ('nancy',     'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'nancy@repairhub.com', '100-200-3012', 'ACTIVE', NOW(), NOW());
 -- === 2. 维修人员档案（repairman_profile）示例 ===
 -- eve 擅长 MAINTENANCE，时薪 90.00
-INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate) VALUES
+INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate,repairman_number) VALUES
   (
     (SELECT user_id FROM users WHERE username = 'eve'),
     'MAINTENANCE',
-    90.00
+    90.00,
+    "he83kvhd63gslkhf"
   );
 -- frank 擅长 REPAIR，时薪 80.00
-INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate) VALUES
+INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate,repairman_number) VALUES
   (
     (SELECT user_id FROM users WHERE username = 'frank'),
     'REPAIR',
-    80.00
+    80.00,
+    "jd0euh8cmhd3vao4"
+
   );
 -- grace 擅长 PAINT，时薪 75.00
-INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate) VALUES
+INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate,repairman_number) VALUES
   (
     (SELECT user_id FROM users WHERE username = 'grace'),
     'PAINT',
-    75.00
+    75.00,
+    "ksie7few9ise7ghx"
   );
 -- jack,mike,nancy 擅长 ELECTRICAL，时薪如下
 -- kate 擅长 BODYWORK，时薪 78.00
-INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate) VALUES
-  ((SELECT user_id FROM users WHERE username = 'jack'), 'ELECTRICAL', 85.00),
-  ((SELECT user_id FROM users WHERE username = 'kate'), 'BODYWORK', 78.00),
-  ((SELECT user_id FROM users WHERE username = 'mike'), 'ELECTRICAL', 88.00),
-  ((SELECT user_id FROM users WHERE username = 'nancy'), 'ELECTRICAL', 82.00);
+INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate,repairman_number) VALUES
+  ((SELECT user_id FROM users WHERE username = 'jack'), 'ELECTRICAL', 85.00, "dik4hg9xhs82ur4m"),
+  ((SELECT user_id FROM users WHERE username = 'kate'), 'BODYWORK', 78.00, "pc84hf74j29xkqde"),
+  ((SELECT user_id FROM users WHERE username = 'mike'), 'ELECTRICAL', 88.00, "kd84ur7cyfm39fuc"),
+  ((SELECT user_id FROM users WHERE username = 'nancy'), 'ELECTRICAL', 82.00, "91kd3c7si30vjfur");
 
 
 -- === 3. 车辆（vehicle）示例 === sedan即小轿车 suv即多功能 pickup即皮卡 待选包括Van卡车  Hatchback小型车 Coupe 跑车 Convertible敞篷车
@@ -518,7 +522,6 @@ INSERT INTO `repair_record` (
 UPDATE repair_order
 SET status = 'COMPLETED'
 WHERE description IN (
-  '发动机异响，需要全面检查',
   '轮胎鼓包',
   '车窗升降失灵',
   '刹车片磨损，应更换',
@@ -533,7 +536,6 @@ WHERE description IN (
 UPDATE repair_order
 SET status = 'PROCESSING'
 WHERE description IN (
-  '刹车片再次磨损，仍需更换',
   '常规保养浙A111AA',
   '日常检修浙A333CC'
 );
