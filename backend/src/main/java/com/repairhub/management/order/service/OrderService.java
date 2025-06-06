@@ -170,22 +170,32 @@ public class OrderService {
         return dto;
     }
 
+    @Transactional
     public void assignOrder(RepairOrder order){
-        //TODO: 实现订单分配逻辑
         List<Long> filter = new ArrayList<>();
         List<OrderAssignment> assignments = orderAssignmentRepository.findByOrderId(order.getOrderId());
         if (assignments != null && !assignments.isEmpty()) {
             for (OrderAssignment assignment : assignments) {
-                if(assignment.getStatus().isAccepted()){
-                    continue;
-                }
                 filter.add(assignment.getRepairmanId());
             }
         }
 
         List<RepairmanProfile> profiles = repairmanProfileService.findAllWithFilter(order.getFaultType(), filter);
         if(profiles.isEmpty()){
-            profiles = repairmanProfileService.findAllWithFilter(null, List.of());
+            profiles = repairmanProfileService.findAllWithFilter(null, filter);
+            if(profiles.isEmpty()){
+                // 兜底维修人
+                User repairman = userRepository.findByUsername("duty_repair").get();
+                OrderAssignment assignment = OrderAssignment.builder()
+                    .orderId(order.getOrderId())
+                    .repairmanId(repairman.getUserId())
+                    .assignmentTime(LocalDateTime.now())
+                    .status(AssignmentStatus.ACCEPTED)
+                    .build();
+                orderAssignmentRepository.insert(assignment);
+                order.setStatus(OrderStatus.PROCESSING);
+                repairOrderRepository.update(order);
+            }
         }
         if(assignType.equals("ALL")){
             for(RepairmanProfile selectedProfile : profiles){

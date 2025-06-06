@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.entity.OrderAssignment;
+import com.repairhub.management.order.enums.AssignmentStatus;
+
 
 public interface OrderAssignmentRepository {
     // 新增一条订单分配记录
@@ -26,6 +28,8 @@ public interface OrderAssignmentRepository {
     public List<OrderAssignment> findByRepairmanId(Long repairmanId);
 
     public List<OrderAssignment> findAll();
+
+    public Boolean existByOrderIdAndStatus(Long orderId,AssignmentStatus status);
 
     public PageResponse<OrderAssignment> findAllWithPage(int pageNum,int pageSize);
 

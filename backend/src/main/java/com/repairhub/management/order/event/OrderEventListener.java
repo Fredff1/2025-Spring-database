@@ -11,6 +11,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.enums.AssignmentStatus;
 import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.order.service.OrderService;
@@ -51,7 +52,15 @@ public class OrderEventListener {
             orderService.findById(assignment.getOrderId()).ifPresent(order -> {
                 // order.setStatus(OrderStatus.PENDING);
                 // orderService.getRepairOrderRepository().update(order);
-                orderService.assignOrder(order);
+                var asgRepo = orderService.getOrderAssignmentRepository();
+                Long orderId = order.getOrderId();
+                if(asgRepo.existByOrderIdAndStatus(orderId,AssignmentStatus.ACCEPTED) 
+                  || asgRepo.existByOrderIdAndStatus(orderId,AssignmentStatus.PENDING)){
+
+                }else{
+                    orderService.assignOrder(order);
+                }
+                
             });
         } else {
             orderService.findById(assignment.getOrderId()).ifPresent(order -> {

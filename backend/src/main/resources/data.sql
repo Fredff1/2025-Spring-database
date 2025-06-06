@@ -17,7 +17,8 @@ INSERT INTO `users` (
   ('kate',      'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'kate@repairhub.com', '100-200-3008', 'ACTIVE', NOW(), NOW()),
   ('lily',      'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'lily@example.com', '100-200-3010', 'ACTIVE', NOW(), NOW()),
   ('mike',      'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'mike@repairhub.com', '100-200-3011', 'ACTIVE', NOW(), NOW()),
-  ('nancy',     'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'nancy@repairhub.com', '100-200-3012', 'ACTIVE', NOW(), NOW());
+  ('nancy',     'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'nancy@repairhub.com', '100-200-3012', 'ACTIVE', NOW(), NOW()),
+  ('duty_repair', 'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'duty_repair@repairhub.com', '100-200-3002', 'ACTIVE', NOW(), NOW());
 -- === 2. 维修人员档案（repairman_profile）示例 ===
 -- eve 擅长 MAINTENANCE，时薪 90.00
 INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate,repairman_number) VALUES
@@ -43,6 +44,14 @@ INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate,repairman
     'PAINT',
     75.00,
     "ksie7few9ise7ghx"
+  );
+
+INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate,repairman_number) VALUES
+  (
+    (SELECT user_id FROM users WHERE username = 'duty_repair'),
+    'OTHER',
+    225.00,
+    "f9i27few9ik6tghx"
   );
 -- jack,mike,nancy 擅长 ELECTRICAL，时薪如下
 -- kate 擅长 BODYWORK，时薪 78.00

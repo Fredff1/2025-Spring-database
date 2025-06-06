@@ -17,6 +17,8 @@ import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.OrderAssignmentRowMapper;
 import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.enums.AssignmentStatus;
+import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.utils.PageUtils;
 
 @Repository
@@ -156,5 +158,22 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
         Integer total = jdbc.queryForObject(countSql,queryParams,Integer.class);
         PageResponse<OrderAssignment> resp = new PageResponse<>(orders, total);
         return resp;
+    }
+
+    @Override
+    public Boolean existByOrderIdAndStatus(Long orderId,AssignmentStatus status){
+        String sql = """
+        SELECT EXISTS(
+          SELECT 1
+          FROM assignment
+          WHERE order_id = :orderId
+            AND assignment_status = :status
+        )
+        """;
+        SqlParameterSource queryParams = new MapSqlParameterSource()
+        .addValue("orderId", orderId)
+        .addValue("status", status.name());
+        Integer exists = jdbc.queryForObject(sql, queryParams, Integer.class);
+        return exists != null && exists == 1;
     }
 }

@@ -16,7 +16,6 @@ public interface RepairOrderRepository {
     public int countByUserId(Long userId);
     public List<RepairOrder> findAll();
     public PageResponse<RepairOrder> findAllWithPage(int pageNum,int pageSize);
-
     public PageResponse<RepairOrder> findByUserIdWithPage(Long userId,int pageNum,int pageSize);
     public PageResponse<RepairOrder> findByRepairmanIdWithPage(Long repairmanId,int pageNum,int pageSize);
 }
