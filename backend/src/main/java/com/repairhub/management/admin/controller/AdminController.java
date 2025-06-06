@@ -79,7 +79,7 @@ public class AdminController {
         @RequestParam(defaultValue = "5")   int limit
     ){
         List<OrderAssignment> assignments = orderAssignmentService.getAllAssignments();
-        List<OrderAssignment> pageAssignments = PageUtils.paginate(assignments, page, assignments.size());
+        List<OrderAssignment> pageAssignments = PageUtils.paginate(assignments, page, limit);
         List<OrderAssignmentDTO> dtos = pageAssignments.stream()
         .map(assignment -> orderAssignmentService.convertAssignmentToDTO(assignment))
         .collect(Collectors.toList());

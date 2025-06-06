@@ -13,7 +13,11 @@
       <el-table :data="vehicles" style="width: 100%">
         <el-table-column prop="licensePlate" label="车牌号" width="120" />
         <el-table-column prop="brand" label="品牌" width="120" />
-        <el-table-column prop="model" label="型号" width="120" />
+        <el-table-column prop="model" label="型号" width="120" >
+           <template #default="{ row }">
+            {{getModelText(row.model)}}
+           </template>
+        </el-table-column>
         <el-table-column prop="registerDate" label="注册日期" width="120" />
         <!-- <el-table-column prop="year" label="年份" width="100" />
         <el-table-column prop="color" label="颜色" width="100" />
@@ -154,6 +158,20 @@ const fetchVehicles = async () => {
     console.error('获取车辆列表失败:', error)
     ElMessage.error('获取车辆列表失败')
   }
+}
+
+const getModelText = (model) => {
+    const map = {
+        SUV: '多用途车',
+        Sedan: '轿车',
+        Pickup: '皮卡',
+        Van: '货车',
+        Hatchback: '小型车',
+        Coupe:'跑车',
+        Convertible:'敞篷车'
+
+   }
+  return map[model] || type
 }
 
 // 显示添加对话框

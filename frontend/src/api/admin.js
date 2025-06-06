@@ -51,4 +51,15 @@ export const updateInventorySettings = data => http.put('/admin/settings/invento
 
 // 通知设置
 export const getNotificationSettings = () => http.get('/admin/settings/notification')
-export const updateNotificationSettings = data => http.put('/admin/settings/notification', data) 
+export const updateNotificationSettings = data => http.put('/admin/settings/notification', data)
+
+// 统计相关
+export const getNegativeFeedbackStats = params => http.get('/admin/stats/feedback/negative', { params })
+export const getCostProportionStats = params => http.get('/admin/stats/cost/proportion', { params })
+export const getVehicleOrderStats = params => http.get('/admin/stats/vehicle/order-stat', { params })
+export const getVehicleFaultTypeStats = params => http.get('/admin/stats/vehicle/fault-type', { params })
+export const getOrderProcessStats = params => http.get('/admin/stats/repair-orders/process', { params })
+export const getOrderMismatchStats = () => http.get('/admin/stats/repair-orders/mismatch')
+export const getUnfinishedOrderFaultTypeStats = () => http.get('/admin/stats/repair-orders/unfinished/fault-type')
+export const getUnfinishedOrderRepairmanStats = () => http.get('/admin/stats/repair-orders/unfinished/repairman')
+export const getUnfinishedOrderVehicleStats = () => http.get('/admin/stats/repair-orders/unfinished/vehicle') 

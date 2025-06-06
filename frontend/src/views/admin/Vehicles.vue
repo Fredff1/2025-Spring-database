@@ -32,7 +32,11 @@
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="licensePlate" label="车牌号" width="120" />
         <el-table-column prop="brand" label="品牌" width="120" />
-        <el-table-column prop="model" label="型号" width="120" />
+        <el-table-column prop="model" label="型号" width="120" >
+          <template #default="{ row }">
+            {{getModelText(row.model)}}
+           </template>
+        </el-table-column>
         <el-table-column prop="ownerName" label="拥有者" width="180" />
         <el-table-column prop="registerDate" label="注册日期" width="120">
           <template #default="{ row }">
@@ -182,6 +186,20 @@ const rules = {
   registerDate: [
     { required: true, message: '请选择注册日期', trigger: 'change' }
   ]
+}
+
+const getModelText = (model) => {
+    const map = {
+        SUV: '多用途车',
+        Sedan: '轿车',
+        Pickup: '皮卡',
+        Van: '货车',
+        Hatchback: '小型车',
+        Coupe:'跑车',
+        Convertible:'敞篷车'
+
+   }
+  return map[model] || type
 }
 
 // 格式化日期

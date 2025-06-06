@@ -1,350 +1,668 @@
 <template>
   <div class="statistics">
-    <div class="page-header">
-      <h2 class="page-title">统计报表</h2>
-      <div class="header-actions">
-        <el-button type="primary" @click="handleExport">
-          <el-icon><download /></el-icon>
-          导出报表
-        </el-button>
-      </div>
-    </div>
+    <!-- 1. 负面反馈统计（带 period 切换） -->
+    <el-row :gutter="20" style="margin-bottom: 48px;">
+      <el-col :span="24">
+        <el-card class="stat-card-large">
+          <template #header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>负面反馈统计</span>
+              <!-- period 切换 -->
+              <el-radio-group 
+              v-model="negativeFeedbackPeriod" 
+              size="small"
+              @change="fetchNegativeFeedback">
+                <el-radio-button label="recent">最近</el-radio-button>
+                <el-radio-button label="all">全部</el-radio-button>
+              </el-radio-group>
+            </div>
+          </template>
 
-    <!-- 时间范围选择 -->
-    <el-card shadow="hover" class="filter-card">
-      <el-form :inline="true" :model="filterForm">
-        <el-form-item label="时间范围">
-          <el-date-picker
-            v-model="filterForm.dateRange"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            :shortcuts="dateShortcuts"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleFilter">查询</el-button>
-          <el-button @click="resetFilter">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
-
-    <!-- 概览数据 -->
-    <div class="overview">
-      <el-row :gutter="20">
-        <el-col :span="6">
-          <el-card shadow="hover" class="overview-card">
-            <template #header>
-              <div class="card-header">
-                <span>总订单数</span>
-                <el-tag type="info">累计</el-tag>
-              </div>
-            </template>
-            <div class="card-content">
-              <div class="value">{{ overview.totalOrders }}</div>
-              <div class="trend" :class="{ 'up': overview.orderTrend > 0 }">
-                {{ overview.orderTrend > 0 ? '+' : '' }}{{ overview.orderTrend }}%
-                <el-icon><arrow-up /></el-icon>
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="6">
-          <el-card shadow="hover" class="overview-card">
-            <template #header>
-              <div class="card-header">
-                <span>总收入</span>
-                <el-tag type="success">累计</el-tag>
-              </div>
-            </template>
-            <div class="card-content">
-              <div class="value">¥{{ overview.totalIncome.toFixed(2) }}</div>
-              <div class="trend" :class="{ 'up': overview.incomeTrend > 0 }">
-                {{ overview.incomeTrend > 0 ? '+' : '' }}{{ overview.incomeTrend }}%
-                <el-icon><arrow-up /></el-icon>
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="6">
-          <el-card shadow="hover" class="overview-card">
-            <template #header>
-              <div class="card-header">
-                <span>总支出</span>
-                <el-tag type="danger">累计</el-tag>
-              </div>
-            </template>
-            <div class="card-content">
-              <div class="value">¥{{ overview.totalExpense.toFixed(2) }}</div>
-              <div class="trend" :class="{ 'up': overview.expenseTrend > 0 }">
-                {{ overview.expenseTrend > 0 ? '+' : '' }}{{ overview.expenseTrend }}%
-                <el-icon><arrow-up /></el-icon>
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="6">
-          <el-card shadow="hover" class="overview-card">
-            <template #header>
-              <div class="card-header">
-                <span>净利润</span>
-                <el-tag type="warning">累计</el-tag>
-              </div>
-            </template>
-            <div class="card-content">
-              <div class="value">¥{{ overview.totalProfit.toFixed(2) }}</div>
-              <div class="trend" :class="{ 'up': overview.profitTrend > 0 }">
-                {{ overview.profitTrend > 0 ? '+' : '' }}{{ overview.profitTrend }}%
-                <el-icon><arrow-up /></el-icon>
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </div>
-
-    <!-- 图表区域 -->
-    <div class="charts">
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-card shadow="hover" class="chart-card">
-            <template #header>
-              <div class="card-header">
-                <span>订单趋势</span>
-                <el-radio-group v-model="orderTrendType" size="small">
-                  <el-radio-button label="day">日</el-radio-button>
-                  <el-radio-button label="week">周</el-radio-button>
-                  <el-radio-button label="month">月</el-radio-button>
-                </el-radio-group>
-              </div>
-            </template>
-            <div class="chart-container">
-              <!-- 这里放置订单趋势图表 -->
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="12">
-          <el-card shadow="hover" class="chart-card">
-            <template #header>
-              <div class="card-header">
-                <span>收支趋势</span>
-                <el-radio-group v-model="financeTrendType" size="small">
-                  <el-radio-button label="day">日</el-radio-button>
-                  <el-radio-button label="week">周</el-radio-button>
-                  <el-radio-button label="month">月</el-radio-button>
-                </el-radio-group>
-              </div>
-            </template>
-            <div class="chart-container">
-              <!-- 这里放置收支趋势图表 -->
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </div>
-
-    <!-- 详细数据 -->
-    <div class="details">
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-card shadow="hover" class="detail-card">
-            <template #header>
-              <div class="card-header">
-                <span>维修类型分布</span>
-              </div>
-            </template>
-            <div class="chart-container">
-              <!-- 这里放置维修类型分布图表 -->
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="12">
-          <el-card shadow="hover" class="detail-card">
-            <template #header>
-              <div class="card-header">
-                <span>收入构成</span>
-              </div>
-            </template>
-            <div class="chart-container">
-              <!-- 这里放置收入构成图表 -->
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </div>
-
-    <!-- 排行榜 -->
-    <div class="rankings">
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-card shadow="hover" class="ranking-card">
-            <template #header>
-              <div class="card-header">
-                <span>维修人员业绩排行</span>
-              </div>
-            </template>
-            <el-table :data="repairmanRanking" style="width: 100%">
-              <el-table-column type="index" label="排名" width="80" />
-              <el-table-column prop="name" label="姓名" width="120" />
-              <el-table-column prop="orderCount" label="订单数" width="100" />
-              <el-table-column prop="income" label="收入">
+          <div class="table-wrapper">
+            <el-table
+              :data="negativeFeedbackList"
+              border stripe
+              style="width: 90%;"
+              :row-key="row => row.feedbackId"
+            >
+              <el-table-column prop="customerName" label="用户" width="100" />
+              <el-table-column prop="faultType"    label="故障类型" width="120" >
                 <template #default="{ row }">
-                  ¥{{ row.income.toFixed(2) }}
+                    <el-tag :type="getRepairTypeTag(row.faultType)">
+                    {{ getRepairTypeText(row.faultType) }}
+                    </el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="rating" label="评分" width="100">
+              <el-table-column label="评分" width="120">
                 <template #default="{ row }">
-                  <el-rate v-model="row.rating" disabled show-score />
+                  <span v-if="row.rating == null">未给出</span>
+                  <el-rate v-else v-model="row.rating" disabled show-score />
+                </template>
+              </el-table-column>
+              <el-table-column prop="technicians" label="技师" min-width="150" />
+              <el-table-column prop="content"     label="内容" min-width="200" />
+              <el-table-column prop="date"        label="时间" width="180">
+                <template #default="{ row }">
+                  {{ formatDateTime(row.date) }}
                 </template>
               </el-table-column>
             </el-table>
-          </el-card>
-        </el-col>
-        <el-col :span="12">
-          <el-card shadow="hover" class="ranking-card">
-            <template #header>
-              <div class="card-header">
-                <span>配件使用排行</span>
-              </div>
-            </template>
-            <el-table :data="partsRanking" style="width: 100%">
-              <el-table-column type="index" label="排名" width="80" />
-              <el-table-column prop="name" label="配件名称" min-width="150" />
-              <el-table-column prop="type" label="类型" width="120">
-                <template #default="{ row }">
-                  {{ getTypeText(row.type) }}
+          </div>
+
+          <div style="text-align: right; margin-top: 12px;">
+            <el-pagination
+              v-model:current-page="negativeFeedbackPage"
+              :page-size="negativeFeedbackLimit"
+              :total="negativeFeedbackTotal"
+              layout="prev, pager, next"
+              @current-change="fetchNegativeFeedback"
+            />
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 2. 成本分析 & 车辆维修：一行两个，并带 period 切换 -->
+    <el-row :gutter="20" style="margin-bottom: 24px;">
+      <el-col :span="12">
+        <el-card class="stat-card">
+          <template #header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>成本分析</span>
+              <el-radio-group v-model="costPeriod" size="small" @change="fetchCostProportion">
+                <el-radio-button label="recent">最近</el-radio-button>
+                <el-radio-button label="all">全部</el-radio-button>
+              </el-radio-group>
+            </div>
+          </template>
+          <div ref="costPieChart" class="chart-container"></div>
+        </el-card>
+      </el-col>
+
+      <el-col :span="12">
+        <el-card class="stat-card">
+          <template #header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>车辆维修统计</span>
+              <el-radio-group 
+              v-model="vehiclePeriod" 
+              size="small"
+              @change="fetchVehicleOrderStats">
+                <el-radio-button label="recent">最近</el-radio-button>
+                <el-radio-button label="all">全部</el-radio-button>
+              </el-radio-group>
+            </div>
+          </template>
+          <div ref="vehicleBarChart" class="chart-container"></div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 3. 故障类型统计 & 订单流程统计：一行两个，并带 period 切换 -->
+    <el-row :gutter="20" style="margin-bottom: 24px;">
+      <el-col :span="12">
+        <el-card class="stat-card">
+          <template #header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>故障类型统计</span>
+              <el-radio-group 
+              v-model="faultTypePeriod" 
+              size="small"
+              @change="fetchFaultTypeStats">
+                <el-radio-button label="recent">最近</el-radio-button>
+                <el-radio-button label="all">全部</el-radio-button>
+              </el-radio-group>
+            </div>
+          </template>
+          <div ref="faultTypePieChart" class="chart-container"></div>
+        </el-card>
+      </el-col>
+
+      <el-col :span="12">
+        <el-card class="stat-card">
+          <template #header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>订单流程统计</span>
+              <el-radio-group 
+              v-model="orderProcessPeriod" 
+              size="small"
+               @change="fetchOrderProcessStats">
+                <el-radio-button label="recent">最近</el-radio-button>
+                <el-radio-button label="all">全部</el-radio-button>
+              </el-radio-group>
+            </div>
+          </template>
+          <div ref="orderProcessBarChart" class="chart-container"></div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <el-row :gutter="20" style="margin-bottom: 24px;">
+      <el-col :span="12">
+        <el-card class="stat-card">
+          <template #header>维修类型不匹配统计</template>
+          <div class="table-wrapper">
+            <el-table :data="mismatchList" border stripe style="width: 90%;">
+              <el-table-column prop="orderId"            label="订单ID"     width="120" />
+              <el-table-column prop="orderFaultType"     label="期望类型"   width="120" >
+                 <template #default="{ row }">
+                    <el-tag :type="getRepairTypeTag(row.orderFaultType)">
+                    {{ getRepairTypeText(row.orderFaultType) }}
+                    </el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="usageCount" label="使用次数" width="100" />
-              <el-table-column prop="amount" label="金额">
-                <template #default="{ row }">
-                  ¥{{ row.amount.toFixed(2) }}
+              <el-table-column prop="repairmanSpecialty" label="实际类型"   width="120" >
+                 <template #default="{ row }">
+                    <el-tag :type="getRepairTypeTag(row.repairmanSpecialty)">
+                    {{ getRepairTypeText(row.repairmanSpecialty) }}
+                    </el-tag>
                 </template>
               </el-table-column>
+              <el-table-column prop="repairmanName"      label="维修人员"   width="150" />
             </el-table>
-          </el-card>
-        </el-col>
-      </el-row>
-    </div>
+          </div>
+        </el-card>
+      </el-col>
+
+      <el-col :span="12">
+        <el-card class="stat-card">
+          <template #header>按故障类型 - 未完成订单统计</template>
+          <div class="table-wrapper">
+            <el-table :data="unfinishedByFaultType" border stripe style="width: 90%;">
+              <el-table-column prop="name"  label="故障类型" />
+              <el-table-column prop="count" label="数量"     width="100" />
+            </el-table>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <el-row :gutter="20" style="margin-bottom: 24px;">
+      <el-col :span="12">
+        <el-card class="stat-card">
+          <template #header>按维修人员 - 未完成订单统计</template>
+          <div class="table-wrapper">
+            <el-table :data="unfinishedByRepairman" border stripe style="width: 90%;">
+              <el-table-column prop="repairmanName" label="维修人员" width="150" />
+              <el-table-column prop="specialty"     label="专业类型" width="120" >
+                <template #default="{ row }">
+                    <el-tag :type="getRepairTypeTag(row.specialty)">
+                    {{ getRepairTypeText(row.specialty) }}
+                    </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="count"         label="数量"     width="100" />
+            </el-table>
+          </div>
+        </el-card>
+      </el-col>
+
+      <el-col :span="12">
+        <el-card class="stat-card">
+          <template #header>按车辆 - 未完成订单统计</template>
+          <div class="table-wrapper">
+            <el-table :data="unfinishedByVehicle" border stripe style="width: 90%;">
+              <el-table-column prop="licensePlate" label="车牌号"   width="150" />
+              <el-table-column prop="brand"        label="品牌"     width="100" />
+              <el-table-column prop="model"        label="型号"     width="120" >
+                <template #default="{ row }">
+                    {{ getModelText(row.model) }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="count"        label="数量"     width="100" />
+            </el-table>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Download, ArrowUp } from '@element-plus/icons-vue'
-import { admin } from '@/api'
+import * as echarts from 'echarts'
+import * as admin from '@/api/admin'
 
-// 时间范围选择
-const filterForm = ref({
-  dateRange: []
-})
+// 负面反馈统计
+const negativeFeedbackList = ref([])
+const negativeFeedbackTotal = ref(0)
+const negativeFeedbackPage = ref(1)
+const negativeFeedbackLimit = ref(10)
+const negativeFeedbackPeriod = ref('all')
 
-// 日期快捷选项
-const dateShortcuts = [
-  {
-    text: '最近一周',
-    value: () => {
-      const end = new Date()
-      const start = new Date()
-      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-      return [start, end]
-    }
-  },
-  {
-    text: '最近一个月',
-    value: () => {
-      const end = new Date()
-      const start = new Date()
-      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-      return [start, end]
-    }
-  },
-  {
-    text: '最近三个月',
-    value: () => {
-      const end = new Date()
-      const start = new Date()
-      start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-      return [start, end]
-    }
-  }
-]
+// 成本分析
+const costPieChart = ref(null)
+const costPieChartInstance = ref(null)
+const costPeriod = ref('all')
 
-// 图表类型
-const orderTrendType = ref('month')
-const financeTrendType = ref('month')
+// 车辆维修统计
+const vehicleBarChart = ref(null)
+const vehicleBarChartInstance = ref(null)
+const vehiclePeriod = ref('all')
 
-// 概览数据
-const overview = ref({
-  totalOrders: 0,
-  orderTrend: 0,
-  totalIncome: 0,
-  incomeTrend: 0,
-  totalExpense: 0,
-  expenseTrend: 0,
-  totalProfit: 0,
-  profitTrend: 0
-})
+// 故障类型统计
+const faultTypePieChart = ref(null)
+const chartInst = ref(null)
+const chartData = ref({ level1: {}, level2: {} })
+const faultTypePeriod = ref('all')
 
-// 排行榜数据
-const repairmanRanking = ref([])
-const partsRanking = ref([])
+// 订单流程统计
+const orderProcessBarChart = ref(null)
+const orderProcessBarChartInstance = ref(null)
+const orderProcessPeriod = ref('all')
 
-// 获取类型文本
-const getTypeText = (type) => {
+// 维修类型不匹配统计
+const mismatchList = ref([])
+
+
+const unfinishedByFaultType = ref([])
+
+const unfinishedByRepairman = ref([])
+
+const unfinishedByVehicle = ref([])
+
+
+function formatDateString(d) {
+  if (!d) return ''
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+}
+
+// 更新时间：格式化成 "YYYY-MM-DD hh:mm:ss"
+const formatDateTime = dt => {
+  if (!dt) return ''
+  const d = new Date(dt)
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mi = String(d.getMinutes()).padStart(2, '0')
+  const ss = String(d.getSeconds()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`
+}
+
+const getModelText = (model) => {
+    const map = {
+        SUV: '多用途车',
+        Sedan: '轿车',
+        Pickup: '皮卡',
+        Van: '货车',
+        Hatchback: '小型车',
+        Coupe:'跑车',
+        Convertible:'敞篷车'
+
+   }
+  return map[model] || type
+}
+
+const getRepairTypeTag = (type) => {
   const map = {
-    engine: '发动机配件',
-    brake: '制动系统',
-    suspension: '悬挂系统',
-    electrical: '电气系统',
-    other: '其他'
+    MAINTENANCE: 'success',
+    REPAIR: 'danger',
+    PAINT: 'warning',
+    TIRE: 'warning',
+    OTHER: 'info'
+  }
+  return map[type] || 'info'
+}
+
+// 获取维修类型文本
+const getRepairTypeText = (type) => {
+  const map = {
+    MAINTENANCE: '常规保养',
+    REPAIR: '通用维修',
+    PAINT: '钣金喷漆',
+    TIRE: '轮胎更换',
+    ELECTRICAL: '电路系统修复',
+    BODYWORK: '车身修复',
+    ENGINE: '发动机维修',
+    OTHER: '其他'
   }
   return map[type] || type
 }
 
-// 获取统计数据
-const fetchStatistics = async () => {
+// 获取状态标签
+const getOrderStatusTag = (status) => {
+  const map = {
+    PENDING: 'info',
+    PROCESSING: 'success',
+    COMPLETED: 'success',
+    CANCELLED: 'danger'
+  }
+  return map[status] || 'info'
+}
+
+// 获取状态文本
+const getOrderStatusText = (status) => {
+  const map = {
+    PENDING: '待处理',
+    PROCESSING: '维修中',
+    COMPLETED: '已完成',
+    CANCELLED: '已取消'
+  }
+  return map[status] || status
+}
+
+// 负面反馈统计
+const fetchNegativeFeedback = async () => {
   try {
-    const [overviewRes, repairmanRes, partsRes] = await Promise.all([
-      admin.getStatisticsOverview(filterForm.value),
-      admin.getRepairmanRanking(filterForm.value),
-      admin.getPartsRanking(filterForm.value)
+    const res = await admin.getNegativeFeedbackStats({
+      page: negativeFeedbackPage.value,
+      limit: negativeFeedbackLimit.value,
+      period: negativeFeedbackPeriod.value 
+    });
+    // 假设 res = { list: [...], total: 6 }
+
+    // 1) 把后端原始字段映射到 table props 对应的字段：
+    negativeFeedbackList.value = (res.list || []).map(item => ({
+      customerName: item.customerName,         // 用户名
+      content:      item.feedbackContent,      // 反馈内容，映射到 prop="content"
+      date:         item.feedbackTime,         // 反馈时间，映射到 prop="date"
+      technicians:  item.repairmanName.join('、'), // 把技师列表转成 “mike、nancy” 这种字符串
+      rating:       item.rating,               // 评分 (比如 later 用 el-rate 展示)
+      faultType:    item.faultType,            // 故障类型
+      orderId:      item.orderId               // 如果想展示订单ID 也可以加一列
+    }));
+    console.log(negativeFeedbackList.value)
+    negativeFeedbackTotal.value = res.total || 0;
+  } catch (e) {
+    ElMessage.error('获取负面反馈统计失败');
+  }
+};
+
+const fetchCostProportion = async () => {
+  try {
+    const res = await admin.getCostProportionStats({ period: costPeriod.value });
+    // 组装 ECharts 期望的 data 数组
+    const chartData = [
+      { name: '材料成本', value: res.materialCost },
+      { name: '人工成本', value: res.laborCost }
+    ];
+
+    // 等 DOM 更新完毕后再初始化/更新图表
+    await nextTick();
+    if (!costPieChartInstance.value) {
+      costPieChartInstance.value = echarts.init(costPieChart.value);
+    } else {
+      // 如果已有实例，先清空旧配置
+      costPieChartInstance.value.clear();
+    }
+    costPieChartInstance.value.setOption({
+      title: { text: '成本分析', left: 'center' },
+      tooltip: { trigger: 'item', formatter: '{a} <br/>{b}: {c} ({d}%)' },
+      legend: { bottom: 0 },
+      series: [
+        {
+          name: '成本占比(￥)',
+          type: 'pie',
+          radius: '50%',
+          data: chartData,
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+          }
+        }
+      ]
+    });
+  } catch (e) {
+    // 如果请求失败，销毁旧实例
+    if (costPieChartInstance.value) {
+      costPieChartInstance.value.dispose();
+      costPieChartInstance.value = null;
+    }
+    ElMessage.error('获取成本分析失败');
+  }
+};
+
+// 车辆维修统计
+const fetchVehicleOrderStats = async () => {
+  try {
+    const res = await admin.getVehicleOrderStats({ period: vehiclePeriod.value })
+    const xData = res.map(i => getModelText(i.model))
+    const yData = res.map(i => i.repairCount)
+    nextTick(() => {
+      if (!vehicleBarChartInstance.value) {
+        vehicleBarChartInstance.value = echarts.init(vehicleBarChart.value)
+      }
+      vehicleBarChartInstance.value.setOption({
+        title: { text: '车型维修统计', left: 'center' },
+        xAxis: { type: 'category', data: xData },
+        yAxis: { type: 'value', minInterval: 1},
+        series: [{ data: yData, type: 'bar' }]
+      })
+    })
+  } catch (e) {
+    ElMessage.error('获取车辆维修统计失败')
+  }
+}
+
+function renderLevel1() {
+  const level1 = chartData.value.level1
+  chartInst.value.clear()
+  chartInst.value.setOption({
+    title: { text: '故障类型分布', left: 'center' },
+    tooltip: { trigger: 'item' },
+    legend: { bottom: 0 },
+    series: [
+      {
+        name: '故障类型',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        label: { formatter: '{b}: {d}%' },
+        data: Object.entries(level1).map(([type, count]) => ({
+          name: getRepairTypeText(type),
+          value: count,
+          rawType: type
+        }))
+      }
+    ]
+  })
+}
+
+// 点击事件：根据 rawType 下钻到车型，或点击“← 返回”回到第一级
+function bindClick() {
+  chartInst.value.off('click')
+  chartInst.value.on('click', (params) => {
+    if (params.name === '← 返回') {
+      renderLevel1()
+      return
+    }
+    const t = params.data.rawType
+    if (!t) return
+    const models = chartData.value.level2[t] || []
+    chartInst.value.setOption({
+      title: { text: `${getRepairTypeText(t)} - 车型分布`, left: 'center' },
+      legend: { bottom: 0 },
+      series: [
+        {
+          name: '车型',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          label: { formatter: '{b}: {d}%' },
+          data: models
+        },
+        {
+          type: 'pie',
+          radius: ['0', '30%'],
+          labelLine: { show: false },
+          data: [
+            {
+              value: 1,
+              name: '← 返回',
+              itemStyle: { color: 'rgba(0,0,0,0)' },
+              label: { show: true, position: 'center', fontSize: 14, color: '#666' }
+            }
+          ]
+        }
+      ]
+    })
+  })
+}
+
+// 拉取并组织数据
+const fetchFaultTypeStats = async () => {
+  try {
+    const raw = await admin.getVehicleFaultTypeStats({ period: faultTypePeriod.value })
+    // raw 格式：[{ model, faultType, count }, ...]
+    const level1 = {}
+    const level2 = {}
+    raw.forEach(r => {
+      level1[r.faultType] = (level1[r.faultType] || 0) + r.count
+      if (!level2[r.faultType]) level2[r.faultType] = []
+      level2[r.faultType].push({
+        name: getModelText(r.model),
+        value: r.count
+      })
+    })
+    chartData.value = { level1, level2 }
+
+    await nextTick()
+    if (!chartInst.value) {
+      chartInst.value = echarts.init(faultTypePieChart.value)
+    } else {
+      chartInst.value.clear()
+    }
+    renderLevel1()
+    bindClick()
+    // 在短延迟后触发一次 resize，确保容器稳定
+    setTimeout(() => {
+      chartInst.value && chartInst.value.resize()
+    }, 100)
+  } catch (e) {
+    ElMessage.error('获取故障类型统计失败')
+  }
+}
+
+// 订单流程统计
+const fetchOrderProcessStats = async () => {
+  try {
+    const end = new Date()
+    const begin = new Date()
+    if (orderProcessPeriod.value === 'recent') {
+      begin.setDate(end.getDate() - 30)
+    } else {
+      begin.setFullYear(end.getFullYear() - 10) 
+    }
+    const beginStr = begin.toISOString().slice(0, 10)
+    const endStr   = end.toISOString().slice(0, 10)
+    const res = await admin.getOrderProcessStats({
+      begin: beginStr,
+      end:   endStr
+    })
+    const xData      = res.map(i => getRepairTypeText(i.faultType)) 
+    const finished   = res.map(i => i.completedOrders)
+    const processing = res.map(i => i.processingOrders)
+
+    await nextTick()
+
+    if (!orderProcessBarChartInstance.value) {
+      orderProcessBarChartInstance.value = echarts.init(orderProcessBarChart.value)
+    } else {
+      orderProcessBarChartInstance.value.clear()
+    }
+
+    orderProcessBarChartInstance.value.setOption({
+      title: { text: '订单流程统计', left: 'center' },
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      legend: { data: ['已完成', '处理中'], bottom: 10 },
+      grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+      xAxis: {
+        type: 'category',
+        data: xData,
+        axisLabel: { rotate: 30, interval: 0 } 
+      },
+      yAxis: { type: 'value',minInterval: 1 },
+      series: [
+        {
+          name: '已完成',
+          type: 'bar',
+          data: finished,
+          coordinateSystem: 'cartesian2d',
+          barWidth: '30%',
+          itemStyle: {
+            color: '#4caf50'
+          }
+        },
+        {
+          name: '处理中',
+          type: 'bar',
+          data: processing,
+          coordinateSystem: 'cartesian2d',
+          barWidth: '30%',
+          itemStyle: {
+            color: '#ff9800'
+          }
+        }
+      ]
+    })
+
+    // 可选：在绘制完之后让图表自适应容器大小
+    // setTimeout(() => {
+    //   orderProcessBarChartInstance.value.resize()
+    // }, 100)
+  } catch (e) {
+    ElMessage.error('获取订单流程统计失败')
+  }
+}
+
+// 维修类型不匹配统计
+const fetchMismatchStats = async () => {
+  try {
+    const res = await admin.getOrderMismatchStats()
+    mismatchList.value = res || []
+  } catch (e) {
+    ElMessage.error('获取维修类型不匹配统计失败')
+  }
+}
+
+const fetchUnfinishedOrderStats = async () => {
+  try {
+    // 同时并行请求三条接口
+    const [faultTypeRes, repairmanRes, vehicleRes] = await Promise.all([
+      admin.getUnfinishedOrderFaultTypeStats(),
+      admin.getUnfinishedOrderRepairmanStats(),
+      admin.getUnfinishedOrderVehicleStats()
     ])
-    overview.value = overviewRes
-    repairmanRanking.value = repairmanRes
-    partsRanking.value = partsRes
-  } catch (error) {
-    console.error('获取统计数据失败:', error)
-    ElMessage.error('获取统计数据失败')
+
+
+    unfinishedByFaultType.value = faultTypeRes.map(item => ({
+      name: item.faultType,
+      count: item.count
+    }))
+
+    unfinishedByRepairman.value = repairmanRes.map(item => ({
+      repairmanName: item.repairmanName,
+      specialty: item.specialty,
+      count: item.count
+    }))
+
+
+    unfinishedByVehicle.value = vehicleRes.map(item => ({
+      licensePlate: item.licensePlate,
+      brand: item.brand,
+      model: item.model,
+      count: item.count
+    }))
+  } catch (e) {
+    ElMessage.error('获取未完成订单统计失败')
   }
 }
 
-// 查询
-const handleFilter = () => {
-  fetchStatistics()
-}
-
-// 重置
-const resetFilter = () => {
-  filterForm.value.dateRange = []
-  fetchStatistics()
-}
-
-// 导出报表
-const handleExport = async () => {
-  try {
-    await admin.exportStatistics(filterForm.value)
-    ElMessage.success('导出成功')
-  } catch (error) {
-    console.error('导出失败:', error)
-    ElMessage.error('导出失败')
-  }
-}
 
 onMounted(() => {
-  fetchStatistics()
+  fetchNegativeFeedback()
+  fetchCostProportion()
+  fetchVehicleOrderStats()
+  fetchFaultTypeStats()
+  fetchOrderProcessStats()
+  fetchMismatchStats()
+  fetchUnfinishedOrderStats()
 })
 </script>
 
@@ -353,83 +671,34 @@ onMounted(() => {
   padding: 20px;
 }
 
+/* 页面标题 */
 .page-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
 }
-
 .page-title {
   font-size: 24px;
   font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
 }
 
-.filter-card {
-  margin-bottom: 24px;
+/* 各卡片宽度 100%，由 el-col 控制栅格 */
+.stat-card-large {
+  width: 100%;
+}
+.stat-card {
+  width: 100%;
 }
 
-.overview {
-  margin-bottom: 24px;
-}
-
-.overview-card {
-  height: 100%;
-}
-
-.card-header {
+/* 表格水平居中 */
+.table-wrapper {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center;
+  padding: 16px 0;
 }
 
-.card-content {
-  text-align: center;
-}
-
-.value {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.trend {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.trend.up {
-  color: var(--el-color-success);
-}
-
-.charts {
-  margin-bottom: 24px;
-}
-
-.chart-card {
-  height: 400px;
-}
-
+/* 图表容器固定高度 */
 .chart-container {
-  height: 320px;
+  height: 300px;
 }
-
-.details {
-  margin-bottom: 24px;
-}
-
-.detail-card {
-  height: 400px;
-}
-
-.rankings {
-  margin-bottom: 24px;
-}
-
-.ranking-card {
-  height: 100%;
-}
-</style> 
+</style>
