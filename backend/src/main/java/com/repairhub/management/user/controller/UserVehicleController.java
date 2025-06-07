@@ -85,7 +85,7 @@ public class UserVehicleController {
         @PathVariable Long vehicleId,
         @AuthenticationPrincipal User user
     ) {
-        vehicleService.deleteVehicle(vehicleId, user);
+        vehicleService.deleteVehicle(vehicleId);
         CommonResponse<Boolean> response = CommonResponse.<Boolean>builder()
             .code(200)
             .message("Vehicle deleted successfully")

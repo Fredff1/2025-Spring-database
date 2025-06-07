@@ -54,7 +54,7 @@ public class MaterialUsageJdbcRepository implements MaterialUsageRepository {
     }
 
     @Override
-    public int delete(int materialId){
+    public int delete(Long materialId){
         String sql = "DELETE FROM material_usage WHERE material_id = :materialId";
         return jdbcTemplate.update(sql, Map.of("materialId", materialId));
     }

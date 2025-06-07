@@ -79,6 +79,21 @@ public class UserService {
         return LogoutResponseDTO.builder().success(true).build();
     }
 
-    
+    public int deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+        return userRepository.deleteById(user.getUserId());
+    }
+
+    public Long findUserIdByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return user.getUserId();
+    }
+
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
 
 }

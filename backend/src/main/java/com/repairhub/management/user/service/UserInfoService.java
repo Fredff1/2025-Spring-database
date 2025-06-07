@@ -63,4 +63,5 @@ public class UserInfoService {
             .orElseThrow(() -> new RuntimeException("User not found"));
         return getProfile(updatedUser);
     }
+
 }

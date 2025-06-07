@@ -149,6 +149,12 @@ public class OrderService {
         repairOrderRepository.update(order);
     }
 
+    public void updateOrderStatus(Long orderId, OrderStatus status) {
+        RepairOrder order = repairOrderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        order.setStatus(status);
+        repairOrderRepository.update(order);
+    }
+
     public OrderDTO toDTO(RepairOrder order){
         User user = userRepository.findById(order.getUserId()).orElse(null);
         Vehicle vehicle = vehicleRepository.findById(order.getVehicleId()).get();
@@ -221,8 +227,24 @@ public class OrderService {
             orderAssignmentRepository.insert(assignment);
             
         }
+    }
 
-        
+    @Transactional
+    public void assignOrderToCertainRepairman(RepairOrder order, Long repairmanId) {
+        // 检查维修工是否存在
+        User repairman = userRepository.findById(repairmanId)
+                .orElseThrow(() -> new IllegalArgumentException("Repairman not found"));
+        // 检查订单是否存在
+        RepairOrder existingOrder = repairOrderRepository.findById(order.getOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        // 创建订单分配
+        OrderAssignment assignment = OrderAssignment.builder()
+                .orderId(existingOrder.getOrderId())
+                .repairmanId(repairman.getUserId())
+                .assignmentTime(LocalDateTime.now())
+                .status(AssignmentStatus.PENDING) // 初始状态为 PENDING
+                .build();
+        orderAssignmentRepository.insert(assignment);
     }
 
     @Transactional

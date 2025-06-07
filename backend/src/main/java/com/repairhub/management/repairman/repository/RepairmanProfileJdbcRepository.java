@@ -51,14 +51,15 @@ public class RepairmanProfileJdbcRepository implements RepairmanProfileRepositor
     public int update(Long userId,RepairmanProfileUpdateDTO profile){
         String sql = """
             UPDATE repairman_profile
-               SET specialty         = :specialty      
+               SET specialty         = :specialty,
+                   hourly_money_rate = :hourlyMoneyRate      
              WHERE user_id = :userId
             """;
 
         MapSqlParameterSource params = new MapSqlParameterSource()
             .addValue("userId",userId)
-            .addValue("specialty", profile.getSpecialty().name());
-
+            .addValue("specialty", profile.getSpecialty().name())
+            .addValue("hourlyMoneyRate", profile.getHourlyMoneyRate());
 
         return jdbc.update(sql, params);
     }

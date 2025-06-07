@@ -27,7 +27,7 @@ public class VehicleService {
         return vehicles;
     }
 
-    public void deleteVehicle(Long vehicleId, User user) {
+    public void deleteVehicle(Long vehicleId) {
         vehicleRepository.deleteById(vehicleId);    
     }
 

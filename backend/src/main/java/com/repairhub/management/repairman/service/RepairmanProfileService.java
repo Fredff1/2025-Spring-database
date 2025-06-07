@@ -240,6 +240,13 @@ public class RepairmanProfileService {
             .build();
     }
 
-   
+    public int insertProfile(RepairmanProfile profile) {
+        RepairmanProfile existingProfile = repairmanProfileRepository.findByUserId(profile.getUserId())
+                .orElse(null);
+        if (existingProfile != null) {
+            throw new RuntimeException("维修工档案已存在");
+        }
+        return repairmanProfileRepository.insert(profile);
+    }
 
 }

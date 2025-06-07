@@ -81,6 +81,24 @@ public class RepairService {
     }
 
     @Transactional
+    public void deleteMaterialUsage(Long materialId){
+        materialUsageRepository.delete(materialId);
+    }
+
+    @Transactional
+    public MaterialUsage updateMaterialUsage(Long materialId,CreateMaterialUsageDTO dto){
+        MaterialUsage materialUsage = 
+            materialUsageRepository.findById(materialId)
+                .orElseThrow(() -> new IllegalArgumentException("Material usage not found"));
+        materialUsage.setMaterialName(dto.getMaterialName());
+        materialUsage.setQuantity(dto.getQuantity());
+        materialUsage.setUnitPrice(dto.getUnitPrice());
+        materialUsage.setCreateTime(LocalDateTime.now());
+        materialUsageRepository.update(materialUsage);
+        return materialUsage;
+    }
+
+    @Transactional
     public RepairRecord submitRepairRecord(CreateRepairRecordDTO dto,User repairman){
         
         RepairRecord repairRecord = RepairRecord.builder()

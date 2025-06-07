@@ -10,7 +10,7 @@ public interface MaterialUsageRepository {
 
     public int update(MaterialUsage materialUsage);
 
-    public int delete(int materialId);
+    public int delete(Long materialId);
 
     public Optional<MaterialUsage> findById(Long materialId);
 

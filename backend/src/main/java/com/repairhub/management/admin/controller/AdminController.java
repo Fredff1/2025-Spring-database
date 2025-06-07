@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +22,14 @@ import com.repairhub.management.admin.dto.AdminSystemStatusDTO;
 import com.repairhub.management.admin.dto.AdminOverviewDTO;
 import com.repairhub.management.admin.dto.StatisticsDTO;
 import com.repairhub.management.admin.service.AdminService;
+import com.repairhub.management.auth.domain.enums.UserStatus;
+import com.repairhub.management.auth.dto.RegisterRequestDTO;
+import com.repairhub.management.auth.dto.RegisterResponseDTO;
+import com.repairhub.management.auth.dto.UserStatusDTO;
 import com.repairhub.management.auth.entity.User;
+import com.repairhub.management.auth.service.UserProfileService;
+import com.repairhub.management.auth.service.UserService;
+import com.repairhub.management.common.dto.CommonErrorResponse;
 import com.repairhub.management.common.dto.CommonResponse;
 import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.dto.OrderDTO;
@@ -43,14 +52,20 @@ public class AdminController {
     private final AdminService adminService;
     private final UserInfoService userInfoService;
     private final OrderAssignmentService orderAssignmentService;
+    private final UserService userService;
+    private final UserProfileService userProfileService;
 
     public AdminController(
         AdminService adminService,
         UserInfoService userInfoService,
-        OrderAssignmentService orderAssignmentService) {
+        OrderAssignmentService orderAssignmentService,
+        UserService userService,
+        UserProfileService userProfileService) {
         this.adminService = adminService;
         this.userInfoService = userInfoService;
         this.orderAssignmentService = orderAssignmentService;
+        this.userService = userService;
+        this.userProfileService = userProfileService;
     }
 
     @GetMapping("/profile")
@@ -106,8 +121,7 @@ public class AdminController {
         return ResponseEntity.ok(dto);
     }
     
-    
-    
+
 
 
 }

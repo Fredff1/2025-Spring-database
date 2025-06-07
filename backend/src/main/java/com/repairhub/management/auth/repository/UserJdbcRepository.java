@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import com.repairhub.management.auth.domain.enums.UserRole;
+import com.repairhub.management.auth.domain.enums.UserStatus;
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.entity.UserRowMapper;
 import com.repairhub.management.common.dto.PageResponse;
@@ -66,13 +67,16 @@ public class UserJdbcRepository implements UserRepository{
     }
 
     @Override
-    public int updateStatus(Long userId, String status) {
+    public int updateStatus(Long userId, UserStatus status) {
         String sql = """
           UPDATE `users`
              SET status = :status
            WHERE user_id = :userId
         """;
-        return jdbc.update(sql, Map.of("userId", userId, "status", status));
+        MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue("userId", userId)
+            .addValue("status", status.name());
+        return jdbc.update(sql, params);
     }
 
     @Override
@@ -131,4 +135,12 @@ public class UserJdbcRepository implements UserRepository{
         int total = jdbc.queryForObject(countSql, queryParams, Integer.class);
         return new PageResponse<>(users, total);
     }
+
+    @Override
+    public int deleteById(Long userId) {
+        String sql = "DELETE FROM `users` WHERE user_id = :userId";
+        SqlParameterSource params = new MapSqlParameterSource("userId", userId);
+        return jdbc.update(sql, params);
+    }
+
 }

@@ -93,7 +93,7 @@ public class RepairOrderStatisticRepository {
               ON u.user_id = rp.user_id
             JOIN repair_order ro 
               ON rr.order_id = ro.order_id
-            WHERE ro.fault_type <> rp.specialty
+            WHERE ro.fault_type <> rp.specialty COLLATE utf8mb4_unicode_ci
             ORDER BY rr.completion_time DESC;
             """;
         MapSqlParameterSource params = new MapSqlParameterSource();
