@@ -19,6 +19,7 @@ public class RepairFeedbackRowMapper implements RowMapper<RepairFeedback> {
                 .description(rs.getString("description"))
                 .feedbackTime(rs.getTimestamp("feedback_time").toLocalDateTime())
                 .feedbackType(FeedbackType.valueOf(rs.getString("feed_back_type")))
+                .adminResponse(rs.getString("admin_response"))
                 .build();
     }
     

@@ -41,7 +41,8 @@ public class RepairFeedbackJdbcRepository implements RepairFeedbackRepository{
         .addValue("rating", feedback.getRating())
         .addValue("feed_back_type", feedback.getFeedbackType().name())
         .addValue("description", feedback.getDescription())
-        .addValue("feedback_time", feedback.getFeedbackTime());
+        .addValue("feedback_time", feedback.getFeedbackTime())
+        .addValue("admin_response", feedback.getAdminResponse());
         Number key = simpleJdbcInsert.executeAndReturnKey(params);
         long feedbackId = key.longValue();
         feedback.setFeedbackId(feedbackId);
@@ -87,5 +88,14 @@ public class RepairFeedbackJdbcRepository implements RepairFeedbackRepository{
         return jdbcTemplate.query(sql, mapper);
     }
 
-   
+    @Override
+    public int insertAdminResponse(Long repairFeedbackId, String adminResponse) {
+        String sql = "UPDATE feedback SET admin_response = :adminResponse WHERE feedback_id = :feedbackId";
+        Map<String, Object> params = Map.of(
+            "adminResponse", adminResponse,
+            "feedbackId", repairFeedbackId
+        );
+        return jdbcTemplate.update(sql, params);
+
+    }
 }

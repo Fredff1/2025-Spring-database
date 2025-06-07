@@ -75,7 +75,7 @@ public class LaborFeeLogJdbcRepository implements LaborFeeLogRepository{
     }
 
     @Override
-    public int delete(int id){
+    public int delete(Long id){
         String sql = "DELETE FROM labor_fee_log WHERE labor_fee_log_id = :id";
         return jdbcTemplate.update(sql, Map.of("id", id));
     }

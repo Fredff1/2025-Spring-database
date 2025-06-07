@@ -40,6 +40,19 @@ public class RepairFeeService {
             .build();
         laborFeeLogRepository.insert(laborFeeLog);
         return laborFeeLog;
+    }    
+
+    @Transactional
+    public int updateLaborFeeLog(Long laborFeeLogId,CreateLaborFeeLogDTO updateFeeLogDto) {
+        LaborFeeLog laborFeeLog = laborFeeLogRepository.findById(laborFeeLogId)
+            .orElseThrow(() -> new IllegalArgumentException("Labor fee log not found"));
+
+        return laborFeeLogRepository.update(laborFeeLog);
+    }
+
+    @Transactional
+    public int deleteLaborFeeLog(Long laborFeeLogId) {
+        return laborFeeLogRepository.delete(laborFeeLogId);
     }
 
     public BigDecimal calculateFeeByOrder(RepairOrder order){
