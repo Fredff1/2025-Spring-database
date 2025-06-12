@@ -23,6 +23,8 @@ import com.repairhub.management.repair.dto.CreateRepairRecordDTO;
 import com.repairhub.management.repair.dto.MaterialUsageDTO;
 import com.repairhub.management.repair.dto.RepairFeedbackDTO;
 import com.repairhub.management.repair.dto.RepairRecordDTO;
+import com.repairhub.management.repair.dto.UpdateRepairRecordDTO;
+import com.repairhub.management.repair.entity.LaborFeeLog;
 import com.repairhub.management.repair.entity.MaterialUsage;
 import com.repairhub.management.repair.entity.RepairFeedback;
 import com.repairhub.management.repair.entity.RepairRecord;
@@ -45,7 +47,9 @@ public class RepairService {
     private final MaterialUsageRepository materialUsageRepository;
     private final RepairFeedbackRepository feedbackRepository;
     private final RepairOrderRepository repairOrderRepository;
+    private final LaborFeeLogRepository laborFeeLogRepository;
     private final OrderService orderService;
+    private final RepairFeeService repairFeeService;
     private final ApplicationEventPublisher eventPublisher;
 
 
@@ -56,7 +60,9 @@ public class RepairService {
         MaterialUsageRepository materialUsageRepository,
         RepairFeedbackRepository feedbackRepository,
         RepairOrderRepository repairOrderRepository,
+        LaborFeeLogRepository laborFeeLogRepository,
         OrderService orderService,
+        RepairFeeService repairFeeService,
         ApplicationEventPublisher eventPublisher
     ) { 
         this.userRepository = userRepository;
@@ -65,8 +71,10 @@ public class RepairService {
         this.materialUsageRepository = materialUsageRepository;
         this.feedbackRepository = feedbackRepository;
         this.repairOrderRepository = repairOrderRepository;
+        this.laborFeeLogRepository = laborFeeLogRepository;
         this.orderService = orderService;
         this.eventPublisher = eventPublisher;
+        this.repairFeeService = repairFeeService;
     }
     
     @Transactional
@@ -84,7 +92,14 @@ public class RepairService {
 
     @Transactional
     public void deleteMaterialUsage(Long materialId){
+        MaterialUsage materialUsage = 
+            materialUsageRepository.findById(materialId)
+                .orElseThrow(() -> new IllegalArgumentException("Material usage not found"));
         materialUsageRepository.delete(materialId);
+        RepairOrder order = repairOrderRepository.findById(materialUsage.getOrderId()).get();
+        var result = repairFeeService.calculateFeeByOrder(order);
+        order.setTotalFee(result);
+        repairOrderRepository.update(order);
     }
 
     @Transactional
@@ -97,6 +112,10 @@ public class RepairService {
         materialUsage.setUnitPrice(dto.getUnitPrice());
         materialUsage.setCreateTime(LocalDateTime.now());
         materialUsageRepository.update(materialUsage);
+        RepairOrder order = repairOrderRepository.findById(materialUsage.getOrderId()).get();
+        var result = repairFeeService.calculateFeeByOrder(order);
+        order.setTotalFee(result);
+        repairOrderRepository.update(order);
         return materialUsage;
     }
 
@@ -126,7 +145,7 @@ public class RepairService {
         }
         RepairmanProfile profile = profileRepository.findByUserId(repairman.getUserId()).get();
         CreateLaborFeeLogDTO createLaborFeeLogDTO = CreateLaborFeeLogDTO.from
-        (dto.getOrderId(), repairman.getUserId(), dto.getActualWorkHour(), profile.getHourlyMoneyRate());
+        (dto.getOrderId(), repairman.getUserId(),repairRecord.getRecordId(), dto.getActualWorkHour(), profile.getHourlyMoneyRate());
         
 
         if(dto.getStatus() != null) {
@@ -134,7 +153,7 @@ public class RepairService {
                 order.setStatus(dto.getStatus());
                 order.setUpdateTime(LocalDateTime.now());
                 repairOrderRepository.update(order);
-                OrderDealtEvent event = new OrderDealtEvent(this, order,createLaborFeeLogDTO);
+                OrderDealtEvent event = new OrderDealtEvent(this, order,createLaborFeeLogDTO,repairRecord);
                 eventPublisher.publishEvent(event);
             });
         }
@@ -166,10 +185,45 @@ public class RepairService {
             .orElseThrow(() -> new IllegalArgumentException("Repair record not found"));
         
         if(record.getOrderStatus() == OrderStatus.COMPLETED) {
-            orderService.updateRepairOrderStatus(recordId, OrderStatus.PROCESSING);
+            orderService.updateRepairOrderStatus(record.getOrderId(), OrderStatus.PROCESSING);
         }
 
         recordRepository.delete(recordId);
+        LaborFeeLog log = laborFeeLogRepository.findByRecordId(recordId).get();
+        laborFeeLogRepository.delete(log.getLaborFeeLogId());
+
+        RepairOrder order = repairOrderRepository.findById(record.getOrderId()).get();
+        var result = repairFeeService.calculateFeeByOrder(order);
+        order.setTotalFee(result);
+        repairOrderRepository.update(order);
+        
+    }
+
+    @Transactional
+    public void updateRepairRecord(Long recordId,UpdateRepairRecordDTO request){
+        RepairRecord record = recordRepository.findById(recordId)
+            .orElseThrow(() -> new IllegalArgumentException("Repair record not found"));
+        record.setActualWorkHour(request.getActualWorkingHours());
+        record.setFaultDescription(request.getFaultDescription());
+        record.setRepairResult(request.getRepairResult());
+        record.setOrderStatus(request.getOrderStatus());
+        record.setCompletionTime(LocalDateTime.now());
+        recordRepository.update(record);
+        if(record.getOrderStatus() == OrderStatus.COMPLETED) {
+            orderService.updateRepairOrderStatus(record.getOrderId(), request.getOrderStatus());
+        }
+
+        LaborFeeLog log = laborFeeLogRepository.findByRecordId(recordId).get();
+        RepairmanProfile profile = profileRepository.findByUserId(log.getRepairmanId()).get();
+        log.setSettleTime(LocalDateTime.now());
+        log.setTotalHours(request.getActualWorkingHours());
+        log.setTotalIncome(request.getActualWorkingHours().multiply(profile.getHourlyMoneyRate()));
+        laborFeeLogRepository.update(log);
+
+        RepairOrder order = repairOrderRepository.findById(record.getOrderId()).get();
+        var result = repairFeeService.calculateFeeByOrder(order);
+        order.setTotalFee(result);
+        repairOrderRepository.update(order);
     }
 
     @Transactional

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.repairhub.management.admin.service.AdminService;
+import com.repairhub.management.auth.domain.enums.UserRole;
 import com.repairhub.management.auth.domain.enums.UserStatus;
 import com.repairhub.management.auth.dto.RegisterRequestDTO;
 import com.repairhub.management.auth.dto.UserStatusDTO;
@@ -28,6 +29,7 @@ import com.repairhub.management.repair.dto.CreateFeedbackAdminResponseDTO;
 import com.repairhub.management.repair.dto.CreateLaborFeeLogDTO;
 import com.repairhub.management.repair.dto.CreateMaterialUsageDTO;
 import com.repairhub.management.repair.dto.CreateRepairRecordDTO;
+import com.repairhub.management.repair.dto.UpdateRepairRecordDTO;
 import com.repairhub.management.repair.service.RepairFeeService;
 import com.repairhub.management.repair.service.RepairService;
 import com.repairhub.management.repairman.dto.RepairmanCreateDTO;
@@ -265,6 +267,9 @@ public class AdminInformationCRUDController {
     ){
         try {
             User user = userService.findUserByUsername(userName);
+            if(!(user.getRole().equals(UserRole.CUSTOMER))){
+                throw new IllegalArgumentException("Can only assign order to customer");
+            }
             orderService.createOrder(user,createOrderRequest);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception e) {
@@ -293,6 +298,17 @@ public class AdminInformationCRUDController {
         }
     }
 
+    @DeleteMapping("/repair-order")
+    public ResponseEntity<?> deleteRepairOrder(@RequestParam Long orderId) {
+        try {
+            orderService.deleteOrder(orderId);
+            return ResponseEntity.ok(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(new CommonErrorResponse(404, e.getMessage()));
+        }
+    }
+
     /**
      * 分配指定的维修订单给指定的维修人员
      * @param orderId
@@ -300,11 +316,12 @@ public class AdminInformationCRUDController {
      */
     @PostMapping("/repair-order/assign")
     public ResponseEntity<?> assignRepairOrder(@RequestParam Long orderId,
-                                               @RequestParam Long repairmanId) {
+                                               @RequestParam String repairmanNumber) {
         try {
+            
             RepairOrder repairOrder = orderService.findById(orderId)
                                                   .orElseThrow(() -> new IllegalArgumentException("RepairOrder not found for id: " + orderId));
-            orderService.assignOrderToCertainRepairman(repairOrder, repairmanId);
+            orderService.assignOrderToCertainRepairman(repairOrder, repairmanNumber);
             return ResponseEntity.ok(HttpStatus.ACCEPTED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -335,7 +352,7 @@ public class AdminInformationCRUDController {
         }
     }
 
-    @PostMapping("/repair-record/create/{repairmanId}")
+    @PostMapping("/repair-record/create")
     public ResponseEntity<?> createRepairRecord(
         @RequestBody CreateRepairRecordDTO createRepairRecordDTO,
         @RequestParam Long repairmanId
@@ -350,7 +367,22 @@ public class AdminInformationCRUDController {
         }
     }
 
-    @DeleteMapping("/repair-record/{id}")
+    //TODO 
+    @PostMapping("/repair-record/update")
+    public ResponseEntity<?> updateRepairRecord(
+        @RequestBody UpdateRepairRecordDTO request,
+        @RequestParam Long recordId
+    ) {
+        try {
+            repairService.updateRepairRecord(recordId, request);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(new CommonErrorResponse(404, e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/repair-record")
     public ResponseEntity<?> deleteRepairRecord(
         @RequestParam Long id
     ) {
@@ -433,7 +465,7 @@ public class AdminInformationCRUDController {
         }
     }
 
-    @PostMapping("/labor-fee-log/{id}/update")
+    @PostMapping("/labor-fee-log/update")
     public ResponseEntity<?> updateLaborFeeLog(
         @RequestBody CreateLaborFeeLogDTO updateDTO
         , @RequestParam Long id
@@ -447,7 +479,7 @@ public class AdminInformationCRUDController {
         }
     }
 
-    @DeleteMapping("/labor-fee-log/{id}")
+    @DeleteMapping("/labor-fee-log")
     public ResponseEntity<?> deleteLaborFeeLog(
         @RequestParam Long id
     ) {
@@ -473,7 +505,7 @@ public class AdminInformationCRUDController {
         }
     }
 
-    @DeleteMapping("/feedback/{id}")
+    @DeleteMapping("/feedback")
     public ResponseEntity<?> deleteFeedback(
         @RequestParam Long id
     ) {

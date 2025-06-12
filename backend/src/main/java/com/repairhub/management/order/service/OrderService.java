@@ -128,6 +128,11 @@ public class OrderService {
         repairOrderRepository.update(order);
     }
 
+    @Transactional
+    public void deleteOrder(Long orderId){
+        repairOrderRepository.deleteById(orderId);
+    }
+
     public Optional<RepairOrder> findById(Long orderId) {
         var order = repairOrderRepository.findById(orderId);
         if(order.isPresent()){
@@ -156,6 +161,7 @@ public class OrderService {
         repairOrderRepository.update(order);
     }
 
+    @Transactional
     public void updateRepairOrder(Long orderId, UpdateOrderRequest request) {
         RepairOrder order = repairOrderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
         order.setStatus(request.getOrderStatus());
@@ -243,9 +249,10 @@ public class OrderService {
     }
 
     @Transactional
-    public void assignOrderToCertainRepairman(RepairOrder order, Long repairmanId) {
+    public void assignOrderToCertainRepairman(RepairOrder order, String repairmanNumber) {
+        RepairmanProfile profile = repairmanProfileService.getRepairmanProfileRepository().findByRepairmanNumber(repairmanNumber).get();
         // 检查维修工是否存在
-        User repairman = userRepository.findById(repairmanId)
+        User repairman = userRepository.findById(profile.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("Repairman not found"));
         // 检查订单是否存在
         RepairOrder existingOrder = repairOrderRepository.findById(order.getOrderId())

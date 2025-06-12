@@ -18,6 +18,7 @@ public class LaborFeeLogRowMapper implements RowMapper<LaborFeeLog> {
                 .totalHours(rs.getBigDecimal("total_hours"))
                 .totalIncome(rs.getBigDecimal("total_income"))
                 .settleTime(rs.getTimestamp("settle_time").toLocalDateTime())
+                .repairRecordId(rs.getLong("repair_record_id"))
                 .build();
     }
     

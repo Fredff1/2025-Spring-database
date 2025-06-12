@@ -57,8 +57,8 @@ public class RepairRecordJdbcRepository implements RepairRecordRepository {
                      repairman_id       = :repairmanId,
                      fault_description  = :faultDescription,
                      repair_result      = :repairResult,
-                     actual_work_hours  = :actualWorkingHours
-                     completion_time    = :completionTime
+                     actual_work_hours  = :actualWorkingHours,
+                     completion_time    = :completionTime,
                      order_status       = :orderStatus
             WHERE repair_record_id = :repairRecordId
                 """;
@@ -69,7 +69,7 @@ public class RepairRecordJdbcRepository implements RepairRecordRepository {
         .addValue("repairResult", repairRecord.getRepairResult())
         .addValue("actualWorkingHours", repairRecord.getActualWorkHour())
         .addValue("completionTime", repairRecord.getCompletionTime())
-        .addValue("orderStatus", repairRecord.getOrderStatus())
+        .addValue("orderStatus", repairRecord.getOrderStatus().name())
         .addValue("repairRecordId", repairRecord.getRecordId());
         return jdbcTemplate.update(sql, source);
     }

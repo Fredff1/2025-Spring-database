@@ -17,6 +17,7 @@ public class LaborFeeLog {
     private Long LaborFeeLogId;
     private Long orderId;
     private Long repairmanId;
+    private Long repairRecordId;
     private Month month;
     private BigDecimal totalHours;
     private BigDecimal totalIncome;

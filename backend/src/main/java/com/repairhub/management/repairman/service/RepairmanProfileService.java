@@ -46,7 +46,10 @@ import com.repairhub.management.repairman.repository.RepairmanProfileRepository;
 import com.repairhub.management.user.dto.UserProfileDTO;
 import com.repairhub.management.utils.PageUtils;
 
+import lombok.Getter;
+
 @Service
+@Getter
 public class RepairmanProfileService {
 
     private final UserRepository userRepository;

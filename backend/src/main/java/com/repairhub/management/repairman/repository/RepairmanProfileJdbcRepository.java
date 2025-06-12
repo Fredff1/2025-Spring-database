@@ -81,4 +81,10 @@ public class RepairmanProfileJdbcRepository implements RepairmanProfileRepositor
         String sql = "SELECT * FROM repairman_profile WHERE specialty = :specialty";
         return jdbc.query(sql, Map.of("specialty", specialty.name()), mapper);
     }
+
+    @Override
+    public Optional<RepairmanProfile> findByRepairmanNumber(String number){
+        String sql = "SELECT * FROM repairman_profile WHERE repairman_number = :repairmanNumber";
+        return jdbc.query(sql, Map.of("repairmanNumber", number), mapper).stream().findFirst();
+    }
 }

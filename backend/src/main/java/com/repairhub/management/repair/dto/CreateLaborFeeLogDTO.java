@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CreateLaborFeeLogDTO {
     private Long orderId;
+    private Long recordId;
     private Long repairmanId;
     private BigDecimal totalHours;
     private BigDecimal totalIncome;
@@ -21,6 +22,7 @@ public class CreateLaborFeeLogDTO {
     public static CreateLaborFeeLogDTO from(
         Long orderId,
         Long repairmanId,
+        Long recordId,
         BigDecimal totalHours,
         BigDecimal hourlyMoneyRate
     ){
@@ -29,6 +31,7 @@ public class CreateLaborFeeLogDTO {
         .repairmanId(repairmanId)
         .totalHours(totalHours)
         .totalIncome(hourlyMoneyRate.multiply(totalHours))
+        .recordId(recordId)
         .build();
         return dto;
     }

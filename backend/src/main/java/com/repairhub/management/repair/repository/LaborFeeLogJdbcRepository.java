@@ -43,7 +43,8 @@ public class LaborFeeLogJdbcRepository implements LaborFeeLogRepository{
         .addValue("total_hours", log.getTotalHours())
         .addValue("total_income", log.getTotalIncome())
         .addValue("settle_time", log.getSettleTime())
-        .addValue("order_id", log.getOrderId());
+        .addValue("order_id", log.getOrderId())
+        .addValue("repair_record_id", log.getRepairRecordId());
         Number key = simpleJdbcInsert.executeAndReturnKey(params);
         long laborFeeLogId = key.longValue();
         log.setLaborFeeLogId(laborFeeLogId);
@@ -55,13 +56,14 @@ public class LaborFeeLogJdbcRepository implements LaborFeeLogRepository{
     public int update(LaborFeeLog log){
         String sql = """
             UPDATE labor_fee_log
-                SET repairman_id  = :repairmanId,
-                     month        = :month,
-                     total_hours  = :totalHours,
-                     total_income = :totalIncome
-                     settle_time  = :settleTime
-                     order_id     = :orderId
-                WHERE labor_fee_log_id = :logId
+                SET
+                    repairman_id  = :repairmanId,
+                    month        = :month,
+                    total_hours  = :totalHours,
+                    total_income = :totalIncome,
+                    settle_time  = :settleTime,
+                    order_id     = :orderId
+            WHERE labor_fee_log_id = :logId
                 """;
         MapSqlParameterSource source = new MapSqlParameterSource()
         .addValue("repairmanId", log.getRepairmanId())
@@ -84,6 +86,14 @@ public class LaborFeeLogJdbcRepository implements LaborFeeLogRepository{
     public Optional<LaborFeeLog> findById(Long LaborFeeLogId){
         String sql = "SELECT * FROM labor_fee_log WHERE labor_fee_log_id = :laborFeeLogId";
         return jdbcTemplate.query(sql, Map.of("laborFeeLogId", LaborFeeLogId), mapper)
+                           .stream()
+                           .findFirst();
+    }
+
+
+    public Optional<LaborFeeLog> findByRecordId(Long recordId){
+        String sql = "SELECT * FROM labor_fee_log WHERE repair_record_id = :recordId";
+        return jdbcTemplate.query(sql, Map.of("recordId", recordId), mapper)
                            .stream()
                            .findFirst();
     }

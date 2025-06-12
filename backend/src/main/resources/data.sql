@@ -623,81 +623,102 @@ INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, cre
 
 -- === 8. 工时费日志（labor_fee_log）示例 ===
 -- charlie 的工单由 grace 完成，用时 2.50h，时薪 75.00，收入合计 187.50
-INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time) VALUES
+INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id) VALUES
   (
     (SELECT order_id FROM repair_order WHERE description LIKE '%发动机异响%'),
     (SELECT user_id FROM users WHERE username = 'grace'),
-    'JUNE', 2.50, 187.50, '2025-05-09 12:15:07'
+    'JUNE', 2.50, 187.50, '2025-05-09 12:15:07',
+    (SELECT repair_record_id FROM repair_record WHERE repair_result LIKE '%更换完成，试车无异响%')
   );
 
 -- diana 的工单由 frank 完成，合计工时 1.50h，时薪 80.00，收入合计 120.00
-INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time) VALUES
+INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id) VALUES
   (
     (SELECT order_id FROM repair_order WHERE description LIKE '%刹车片磨损%'),
     (SELECT user_id FROM users WHERE username = 'frank'),
-    'JUNE', 1, 120.00, '2025-04-04 11:11:11'
+    'JUNE', 1, 120.00, '2025-04-04 11:11:11',
+    (SELECT repair_record_id FROM repair_record WHERE repair_result LIKE '%刹车片安装并测试正常%')
   );
 
-INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time) VALUES
+INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id) VALUES
   (
     (SELECT order_id FROM repair_order WHERE description LIKE '%刹车片磨损%'),
     (SELECT user_id FROM users WHERE username = 'frank'),
-    'JUNE', 0.5, 120.00, NOW()
+    'JUNE', 0.5, 120.00, NOW(),
+    (SELECT repair_record_id FROM repair_record WHERE repair_result LIKE '%维修完成并试车合格%')
   );
 
-INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time) VALUES
+INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id) VALUES
   ((SELECT order_id FROM repair_order WHERE description LIKE '%车灯%'),
    (SELECT user_id FROM users WHERE username = 'jack'),
-   'JUNE', 1.5, 127.50, NOW());
+   'JUNE', 1.5, 127.50, NOW(),
+   (SELECT repair_record_id FROM repair_record WHERE repair_result LIKE '%测试完成，车灯工作正常%')
+   );
 
-INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time) VALUES
+INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id) VALUES
   ((SELECT order_id FROM repair_order WHERE description LIKE '%划痕%'),
    (SELECT user_id FROM users WHERE username = 'kate'),
-   'JUNE', 3.0, 234.00, NOW());
+   'JUNE', 3.0, 234.00, NOW(),
+   (SELECT repair_record_id FROM repair_record WHERE repair_result LIKE '%车门表面恢复光亮如新%'));
 
-INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time) VALUES
+INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id) VALUES
   ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
    (SELECT user_id FROM users WHERE username = 'mike'),
-   'JUNE', 3.5, 308.00, NOW());
+   'JUNE', 1.5, 308.00, NOW(),
+   (SELECT repair_record_id FROM repair_record WHERE repair_result LIKE '%问题未完全解决，仍有部分模块无响应%')
+   );
+
+INSERT INTO `labor_fee_log` (order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id) VALUES
+  ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
+   (SELECT user_id FROM users WHERE username = 'mike'),
+   'JUNE', 2.0, 308.00, NOW(),
+   (SELECT repair_record_id FROM repair_record WHERE repair_result LIKE '%问题彻底解决%')
+   );
+
 
 INSERT INTO `labor_fee_log` (
-  order_id, repairman_id, month, total_hours, total_income, settle_time
+  order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id
 ) VALUES (
   (SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
   (SELECT user_id FROM users WHERE username = 'nancy'),
-  'JUNE', 2.5, 187.5, '2025-05-08 23:45:07'
+  'JUNE', 2.5, 187.5, '2025-05-08 23:45:07',
+  (SELECT repair_record_id FROM repair_record WHERE fault_description LIKE '%电池电量掉得快 检查后完成维修%')
 );
 
 INSERT INTO `labor_fee_log` (
-  order_id, repairman_id, month, total_hours, total_income, settle_time
+  order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id
 ) VALUES (
   (SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
   (SELECT user_id FROM users WHERE username = 'frank'),
-  'JUNE', 2.5, 193.75, '2025-05-26 23:45:07'
+  'JUNE', 2.5, 193.75, '2025-05-26 23:45:07',
+  (SELECT repair_record_id FROM repair_record WHERE fault_description LIKE '%轮胎鼓包 检查后完成维修%')
 );
 
 INSERT INTO `labor_fee_log` (
-  order_id, repairman_id, month, total_hours, total_income, settle_time
+  order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id
 ) VALUES (
   (SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
   (SELECT user_id FROM users WHERE username = 'mike'),
-  'JUNE', 2.5, 200.0, '2025-05-07 23:45:07'
+  'JUNE', 2.5, 200.0, '2025-05-07 23:45:07',
+  (SELECT repair_record_id FROM repair_record WHERE fault_description LIKE '%导航系统崩溃 检查后完成维修%')
 );
 
 INSERT INTO `labor_fee_log` (
-  order_id, repairman_id, month, total_hours, total_income, settle_time
+  order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id
 ) VALUES (
   (SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
   (SELECT user_id FROM users WHERE username = 'nancy'),
-  'JUNE', 2.5, 206.25, '2025-05-11 23:45:07'
+  'JUNE', 2.5, 206.25, '2025-05-11 23:45:07',
+  (SELECT repair_record_id FROM repair_record WHERE fault_description LIKE '%车窗升降失灵 检查后完成维修%')
 );
 
 INSERT INTO `labor_fee_log` (
-  order_id, repairman_id, month, total_hours, total_income, settle_time
+  order_id, repairman_id, month, total_hours, total_income, settle_time,repair_record_id
 ) VALUES (
   (SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
   (SELECT user_id FROM users WHERE username = 'eve'),
-  'JUNE', 2.5, 212.5, '2025-05-27 23:45:07'
+  'JUNE', 2.5, 212.5, '2025-05-27 23:45:07',
+  (SELECT repair_record_id FROM repair_record WHERE fault_description LIKE '%车漆开裂，需要喷涂 检查后完成维修%')
 );
 
 -- === 9. 反馈（feedback）示例 ===
