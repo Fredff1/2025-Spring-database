@@ -18,6 +18,7 @@ import com.repairhub.management.auth.service.UserProfileService;
 import com.repairhub.management.auth.service.UserService;
 import com.repairhub.management.common.dto.CommonErrorResponse;
 import com.repairhub.management.order.dto.CreateOrderRequest;
+import com.repairhub.management.order.dto.UpdateOrderRequest;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.service.OrderAssignmentService;
@@ -94,7 +95,7 @@ public class AdminInformationCRUDController {
      * @param status
      * @return
      */
-    @PostMapping("/users/{id}/status")
+    @PostMapping("/users/status")
     public ResponseEntity<?> updateUserStatus(
         @RequestParam Long userId,
         @RequestParam String status
@@ -117,7 +118,7 @@ public class AdminInformationCRUDController {
      * @param userId
      * @return
      */
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/users")
     public ResponseEntity<?> deleteUser(
         @RequestParam Long userId
     ) {
@@ -173,7 +174,7 @@ public class AdminInformationCRUDController {
      * @param repairmanProfileDTO
      * @return
      */
-    @PostMapping("/repairmen/{id}/profile")
+    @PostMapping("/repairmen/profile")
     public ResponseEntity<?> updateRepairmanProfile(
         @RequestParam Long userId,
         RepairmanProfileUpdateDTO updateDTO) {
@@ -193,7 +194,7 @@ public class AdminInformationCRUDController {
      * @param createVehicleRequest
      * @return
      */
-    @PostMapping("/vehicles/{name}")
+    @PostMapping("/vehicles")
     public ResponseEntity<?> createVehicle(@RequestParam String name, 
                                             @RequestBody CreateVehicleRequest createVehicleRequest) {
         try {
@@ -213,7 +214,7 @@ public class AdminInformationCRUDController {
      * @param createVehicleRequest
      * @return
      */
-    @PostMapping("/vehicles/{id}/update")
+    @PostMapping("/vehicles/update")
     public ResponseEntity<?> updateVehicle(
         @RequestParam Long vehicleId,
         @RequestBody UpdateVehicleRequest createVehicleRequest) {
@@ -231,7 +232,7 @@ public class AdminInformationCRUDController {
      * @param vehicleId
      * @return
      */
-    @DeleteMapping("/vehicles/{id}")
+    @DeleteMapping("/vehicles")
     public ResponseEntity<?> deleteVehicle(
         @RequestParam Long vehicleId
     ) {
@@ -249,7 +250,7 @@ public class AdminInformationCRUDController {
      * @param userName
      * @return
      */
-    @PostMapping("/repairOrder/{userName}/create")
+    @PostMapping("/repair-order/create")
     public ResponseEntity<?> createRepairOrder(
         @RequestParam String userName,
         @RequestBody CreateOrderRequest createOrderRequest
@@ -270,14 +271,13 @@ public class AdminInformationCRUDController {
      * @param orderId
      * @return
      */
-    @PostMapping("/repairOrder/{orderId}/status")
+    @PostMapping("/repair-order/status")
     public ResponseEntity<?> updateRepairOrderStatus(
         @RequestParam Long orderId,
-        @RequestParam String status
+        @RequestBody UpdateOrderRequest request
     ) {
         try {
-            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
-            orderService.updateOrderStatus(orderId,orderStatus);
+            orderService.updateOrderStatus(orderId,request);
             return ResponseEntity.ok(HttpStatus.ACCEPTED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -290,7 +290,7 @@ public class AdminInformationCRUDController {
      * @param orderId
      * @return
      */
-    @PostMapping("/repairOrder/{orderId}/assign/{repairmanId}")
+    @PostMapping("/repair-order/assign")
     public ResponseEntity<?> assignRepairOrder(@RequestParam Long orderId,
                                                @RequestParam Long repairmanId) {
         try {
@@ -329,7 +329,7 @@ public class AdminInformationCRUDController {
      * @param materialUsage
      * @return
      */
-    @PostMapping("material-usage/{id}/update")
+    @PostMapping("material-usage/update")
     public ResponseEntity<?> updateMaterialUsage(
         @RequestParam Long materialUsageId,
         @RequestBody CreateMaterialUsageDTO materialUsage
@@ -348,7 +348,7 @@ public class AdminInformationCRUDController {
      * @param materialUsageId
      * @return
      */
-    @DeleteMapping("material-usage/{id}")
+    @DeleteMapping("material-usage")
     public ResponseEntity<?> deleteMaterialUsage(
         @RequestParam Long materialUsageId
     ) {

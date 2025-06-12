@@ -20,6 +20,7 @@ import com.repairhub.management.auth.repository.UserRepository;
 import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.dto.CreateOrderRequest;
 import com.repairhub.management.order.dto.OrderDTO;
+import com.repairhub.management.order.dto.UpdateOrderRequest;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.AssignmentStatus;
@@ -149,9 +150,13 @@ public class OrderService {
         repairOrderRepository.update(order);
     }
 
-    public void updateOrderStatus(Long orderId, OrderStatus status) {
+    public void updateOrderStatus(Long orderId, UpdateOrderRequest request) {
         RepairOrder order = repairOrderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        order.setStatus(status);
+        order.setStatus(request.getOrderStatus());
+        order.setDescription(request.getDescription());
+        order.setFaultType(request.getFaultType());
+        order.setTotalFee(request.getTotalFee());
+        order.setIsPaid(request.getIsPaid());
         repairOrderRepository.update(order);
     }
 
