@@ -8,9 +8,7 @@
 -- 原始表insert/delete/update就往对应的历史表插入操作记录
 -- 所有的历史表和触发器结构都很相似
 
-DROP TRIGGER IF EXISTS tr_repair_order_after_insert$$
-DROP TRIGGER IF EXISTS tr_repair_order_after_update$$
-DROP TRIGGER IF EXISTS tr_repair_order_after_delete$$
+
 
 DROP TABLE IF EXISTS `repair_order_history`$$
 
@@ -32,6 +30,10 @@ CREATE TABLE `repair_order_history` (
   INDEX idx_ro_his_order(order_id),
   INDEX idx_ro_his_time(changed_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
+
+DROP TRIGGER IF EXISTS tr_repair_order_after_insert$$
+DROP TRIGGER IF EXISTS tr_repair_order_after_update$$
+DROP TRIGGER IF EXISTS tr_repair_order_after_delete$$
 
 CREATE TRIGGER tr_repair_order_after_insert
 AFTER INSERT ON `repair_order`
@@ -111,6 +113,12 @@ BEGIN
 END
 $$
 
+DROP TABLE IF EXISTS `users_history`$$
+
+DROP TRIGGER IF EXISTS tr_users_after_insert$$
+DROP TRIGGER IF EXISTS tr_users_after_update$$
+DROP TRIGGER IF EXISTS tr_users_after_delete$$
+
 
 CREATE TABLE IF NOT EXISTS `users_history` (
   history_id   BIGINT      NOT NULL AUTO_INCREMENT,
@@ -130,29 +138,6 @@ CREATE TABLE IF NOT EXISTS `users_history` (
   INDEX idx_users_his_time(changed_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
 
-
-
-CREATE TABLE IF NOT EXISTS `repairman_profile_history` (
-  history_id         BIGINT      NOT NULL AUTO_INCREMENT,
-  user_id            BIGINT      NOT NULL,
-  operation          ENUM('INSERT','UPDATE','DELETE') NOT NULL,
-  changed_at         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  specialty          VARCHAR(30)   NULL,
-  hourly_money_rate  DECIMAL(10,2) NULL,
-  repairman_number   VARCHAR(50)   NULL,
-  PRIMARY KEY (`history_id`),
-  INDEX idx_rp_his_user(user_id),
-  INDEX idx_rp_his_time(changed_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
-
-
-DROP TRIGGER IF EXISTS tr_users_after_insert$$
-DROP TRIGGER IF EXISTS tr_users_after_update$$
-DROP TRIGGER IF EXISTS tr_users_after_delete$$
-
-DROP TRIGGER IF EXISTS tr_rp_after_insert$$
-DROP TRIGGER IF EXISTS tr_rp_after_update$$
-DROP TRIGGER IF EXISTS tr_rp_after_delete$$
 
 
 CREATE TRIGGER tr_users_after_insert
@@ -253,6 +238,25 @@ BEGIN
 END
 $$
 
+DROP TABLE IF EXISTS `repairman_profile_history`$$
+
+DROP TRIGGER IF EXISTS tr_rp_after_insert$$
+DROP TRIGGER IF EXISTS tr_rp_after_update$$
+DROP TRIGGER IF EXISTS tr_rp_after_delete$$
+
+CREATE TABLE IF NOT EXISTS `repairman_profile_history` (
+  history_id         BIGINT      NOT NULL AUTO_INCREMENT,
+  user_id            BIGINT      NOT NULL,
+  operation          ENUM('INSERT','UPDATE','DELETE') NOT NULL,
+  changed_at         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  specialty          VARCHAR(30)   NULL,
+  hourly_money_rate  DECIMAL(10,2) NULL,
+  repairman_number   VARCHAR(50)   NULL,
+  PRIMARY KEY (`history_id`),
+  INDEX idx_rp_his_user(user_id),
+  INDEX idx_rp_his_time(changed_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
+
 
 CREATE TRIGGER tr_rp_after_insert
 AFTER INSERT ON `repairman_profile`
@@ -322,6 +326,8 @@ BEGIN
 END
 $$
 
+DROP TABLE IF EXISTS `vehicle_history`$$
+
 CREATE TABLE IF NOT EXISTS `vehicle_history` (
   history_id    BIGINT     NOT NULL AUTO_INCREMENT,
   vehicle_id    BIGINT     NOT NULL,
@@ -337,33 +343,9 @@ CREATE TABLE IF NOT EXISTS `vehicle_history` (
   INDEX idx_vehicle_his_time(changed_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
 
-
-CREATE TABLE IF NOT EXISTS `repair_record_history` (
-  history_id       BIGINT      NOT NULL AUTO_INCREMENT,
-  repair_record_id BIGINT      NOT NULL,
-  operation        ENUM('INSERT','UPDATE','DELETE') NOT NULL,
-  changed_at       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  order_id         BIGINT      NULL,
-  repairman_id     BIGINT      NULL,
-  fault_description TEXT       NULL,
-  repair_result     TEXT       NULL,
-  order_status      VARCHAR(20) NULL,
-  actual_work_hours DECIMAL(5,2) NULL,
-  completion_time   DATETIME    NULL,
-  PRIMARY KEY (`history_id`),
-  INDEX idx_rr_his_record(repair_record_id),
-  INDEX idx_rr_his_time(changed_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
-
-
 DROP TRIGGER IF EXISTS tr_vehicle_after_insert$$
 DROP TRIGGER IF EXISTS tr_vehicle_after_update$$
 DROP TRIGGER IF EXISTS tr_vehicle_after_delete$$
-
-DROP TRIGGER IF EXISTS tr_rr_after_insert$$
-DROP TRIGGER IF EXISTS tr_rr_after_update$$
-DROP TRIGGER IF EXISTS tr_rr_after_delete$$
-
 
 CREATE TRIGGER tr_vehicle_after_insert
 AFTER INSERT ON `vehicle`
@@ -444,6 +426,34 @@ BEGIN
   );
 END
 $$
+
+DROP TABLE IF EXISTS `repair_record_history`$$
+
+
+CREATE TABLE IF NOT EXISTS `repair_record_history` (
+  history_id       BIGINT      NOT NULL AUTO_INCREMENT,
+  repair_record_id BIGINT      NOT NULL,
+  operation        ENUM('INSERT','UPDATE','DELETE') NOT NULL,
+  changed_at       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  order_id         BIGINT      NULL,
+  repairman_id     BIGINT      NULL,
+  fault_description TEXT       NULL,
+  repair_result     TEXT       NULL,
+  order_status      VARCHAR(20) NULL,
+  actual_work_hours DECIMAL(5,2) NULL,
+  completion_time   DATETIME    NULL,
+  PRIMARY KEY (`history_id`),
+  INDEX idx_rr_his_record(repair_record_id),
+  INDEX idx_rr_his_time(changed_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
+
+
+
+
+DROP TRIGGER IF EXISTS tr_rr_after_insert$$
+DROP TRIGGER IF EXISTS tr_rr_after_update$$
+DROP TRIGGER IF EXISTS tr_rr_after_delete$$
+
 
 
 CREATE TRIGGER tr_rr_after_insert
@@ -538,6 +548,7 @@ BEGIN
 END
 $$
 
+DROP TABLE IF EXISTS `material_usage_history`$$
 
 CREATE TABLE IF NOT EXISTS `material_usage_history` (
   history_id         BIGINT      NOT NULL AUTO_INCREMENT,
@@ -554,72 +565,9 @@ CREATE TABLE IF NOT EXISTS `material_usage_history` (
   INDEX idx_mu_his_time(changed_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
 
-CREATE TABLE IF NOT EXISTS `feedback_history` (
-  history_id      BIGINT      NOT NULL AUTO_INCREMENT,
-  feedback_id     BIGINT      NOT NULL,
-  operation       ENUM('INSERT','UPDATE','DELETE') NOT NULL,
-  changed_at      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  order_id        BIGINT      NULL,
-  user_id         BIGINT      NULL,
-  rating          INT         NULL,
-  feed_back_type  VARCHAR(20) NULL,
-  description     TEXT        NULL,
-  feedback_time   DATETIME    NULL,
-  PRIMARY KEY (`history_id`),
-  INDEX idx_fb_his_feedback(feedback_id),
-  INDEX idx_fb_his_time(changed_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
-
-CREATE TABLE IF NOT EXISTS `assignment_history` (
-  history_id         BIGINT      NOT NULL AUTO_INCREMENT,
-  assignment_id      BIGINT      NOT NULL,
-  operation          ENUM('INSERT','UPDATE','DELETE') NOT NULL,
-  changed_at         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  order_id           BIGINT      NULL,
-  repairman_id       BIGINT      NULL,
-  assignment_time    DATETIME    NULL,
-  assignment_status  VARCHAR(20) NULL,
-  PRIMARY KEY (`history_id`),
-  INDEX idx_asg_his_assignment(assignment_id),
-  INDEX idx_asg_his_time(changed_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
-
-CREATE TABLE IF NOT EXISTS `labor_fee_log_history` (
-  history_id        BIGINT      NOT NULL AUTO_INCREMENT,
-  labor_fee_log_id  BIGINT      NOT NULL,
-  operation         ENUM('INSERT','UPDATE','DELETE') NOT NULL,
-  changed_at        DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  order_id          BIGINT      NULL,
-  repairman_id      BIGINT      NULL,
-  month             VARCHAR(7)  NULL,
-  total_hours       DECIMAL(7,2) NULL,
-  total_income      DECIMAL(10,2) NULL,
-  settle_time       DATETIME    NULL,
-  PRIMARY KEY (`history_id`),
-  INDEX idx_lf_his_log(labor_fee_log_id),
-  INDEX idx_lf_his_time(changed_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
-
-
-
-
 DROP TRIGGER IF EXISTS tr_mu_after_insert$$
 DROP TRIGGER IF EXISTS tr_mu_after_update$$
 DROP TRIGGER IF EXISTS tr_mu_after_delete$$
-
-DROP TRIGGER IF EXISTS tr_fb_after_insert$$
-DROP TRIGGER IF EXISTS tr_fb_after_update$$
-DROP TRIGGER IF EXISTS tr_fb_after_delete$$
-
-DROP TRIGGER IF EXISTS tr_asg_after_insert$$
-DROP TRIGGER IF EXISTS tr_asg_after_update$$
-DROP TRIGGER IF EXISTS tr_asg_after_delete$$
-
-DROP TRIGGER IF EXISTS tr_lf_after_insert$$
-DROP TRIGGER IF EXISTS tr_lf_after_update$$
-DROP TRIGGER IF EXISTS tr_lf_after_delete$$
-
-
 
 CREATE TRIGGER tr_mu_after_insert
 AFTER INSERT ON `material_usage`
@@ -699,6 +647,28 @@ BEGIN
 END
 $$
 
+DROP TABLE IF EXISTS `feedback_history`$$
+
+CREATE TABLE IF NOT EXISTS `feedback_history` (
+  history_id      BIGINT      NOT NULL AUTO_INCREMENT,
+  feedback_id     BIGINT      NOT NULL,
+  operation       ENUM('INSERT','UPDATE','DELETE') NOT NULL,
+  changed_at      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  order_id        BIGINT      NULL,
+  user_id         BIGINT      NULL,
+  rating          INT         NULL,
+  feed_back_type  VARCHAR(20) NULL,
+  description     TEXT        NULL,
+  feedback_time   DATETIME    NULL,
+  response        TEXT        NULL,    
+  PRIMARY KEY (`history_id`),
+  INDEX idx_fb_his_feedback(feedback_id),
+  INDEX idx_fb_his_time(changed_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
+
+DROP TRIGGER IF EXISTS tr_fb_after_insert$$
+DROP TRIGGER IF EXISTS tr_fb_after_update$$
+DROP TRIGGER IF EXISTS tr_fb_after_delete$$
 
 CREATE TRIGGER tr_fb_after_insert
 AFTER INSERT ON `feedback`
@@ -713,7 +683,8 @@ BEGIN
     rating,
     feed_back_type,
     description,
-    feedback_time
+    feedback_time,
+    response
   ) VALUES (
     NEW.feedback_id,
     'INSERT',
@@ -723,7 +694,8 @@ BEGIN
     NEW.rating,
     NEW.feed_back_type,
     NEW.description,
-    NEW.feedback_time
+    NEW.feedback_time,
+    NEW.response
   );
 END
 $$
@@ -742,7 +714,8 @@ BEGIN
     rating,
     feed_back_type,
     description,
-    feedback_time
+    feedback_time,
+    response
   ) VALUES (
     NEW.feedback_id,
     'UPDATE',
@@ -752,7 +725,8 @@ BEGIN
     NEW.rating,
     NEW.feed_back_type,
     NEW.description,
-    NEW.feedback_time
+    NEW.feedback_time,
+    NEW.response
   );
 END
 $$
@@ -770,7 +744,8 @@ BEGIN
     rating,
     feed_back_type,
     description,
-    feedback_time
+    feedback_time,
+    response
   ) VALUES (
     OLD.feedback_id,
     'DELETE',
@@ -780,12 +755,32 @@ BEGIN
     OLD.rating,
     OLD.feed_back_type,
     OLD.description,
-    OLD.feedback_time
+    OLD.feedback_time,
+    OLD.response
   );
 END
 $$
 
+DROP TABLE IF EXISTS `assignment_history`$$
 
+
+CREATE TABLE IF NOT EXISTS `assignment_history` (
+  history_id         BIGINT      NOT NULL AUTO_INCREMENT,
+  assignment_id      BIGINT      NOT NULL,
+  operation          ENUM('INSERT','UPDATE','DELETE') NOT NULL,
+  changed_at         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  order_id           BIGINT      NULL,
+  repairman_id       BIGINT      NULL,
+  assignment_time    DATETIME    NULL,
+  assignment_status  VARCHAR(20) NULL,
+  PRIMARY KEY (`history_id`),
+  INDEX idx_asg_his_assignment(assignment_id),
+  INDEX idx_asg_his_time(changed_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
+
+DROP TRIGGER IF EXISTS tr_asg_after_insert$$
+DROP TRIGGER IF EXISTS tr_asg_after_update$$
+DROP TRIGGER IF EXISTS tr_asg_after_delete$$
 
 CREATE TRIGGER tr_asg_after_insert
 AFTER INSERT ON `assignment`
@@ -859,6 +854,28 @@ BEGIN
 END
 $$
 
+DROP TABLE IF EXISTS `labor_fee_log_history`$$
+
+CREATE TABLE IF NOT EXISTS `labor_fee_log_history` (
+  history_id        BIGINT      NOT NULL AUTO_INCREMENT,
+  labor_fee_log_id  BIGINT      NOT NULL,
+  operation         ENUM('INSERT','UPDATE','DELETE') NOT NULL,
+  changed_at        DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  order_id          BIGINT      NULL,
+  repairman_id      BIGINT      NULL,
+  month             VARCHAR(7)  NULL,
+  total_hours       DECIMAL(7,2) NULL,
+  total_income      DECIMAL(10,2) NULL,
+  settle_time       DATETIME    NULL,
+  PRIMARY KEY (`history_id`),
+  INDEX idx_lf_his_log(labor_fee_log_id),
+  INDEX idx_lf_his_time(changed_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4$$
+
+
+DROP TRIGGER IF EXISTS tr_lf_after_insert$$
+DROP TRIGGER IF EXISTS tr_lf_after_update$$
+DROP TRIGGER IF EXISTS tr_lf_after_delete$$
 
 
 CREATE TRIGGER tr_lf_after_insert
