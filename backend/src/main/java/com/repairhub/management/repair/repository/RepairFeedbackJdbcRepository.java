@@ -42,7 +42,7 @@ public class RepairFeedbackJdbcRepository implements RepairFeedbackRepository{
         .addValue("feed_back_type", feedback.getFeedbackType().name())
         .addValue("description", feedback.getDescription())
         .addValue("feedback_time", feedback.getFeedbackTime())
-        .addValue("admin_response", feedback.getAdminResponse());
+        .addValue("response", feedback.getResponse());
         Number key = simpleJdbcInsert.executeAndReturnKey(params);
         long feedbackId = key.longValue();
         feedback.setFeedbackId(feedbackId);
@@ -51,15 +51,27 @@ public class RepairFeedbackJdbcRepository implements RepairFeedbackRepository{
 
     @Override
     public int update(RepairFeedback feedback){
+        SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("orderId", feedback.getOrderId())
+        .addValue("userId", feedback.getUserId())
+        .addValue("rating", feedback.getRating())
+        .addValue("feedbackType", feedback.getFeedbackType().name())
+        .addValue("description", feedback.getDescription())
+        .addValue("feedbackTime", feedback.getFeedbackTime())
+        .addValue("response", feedback.getResponse())
+        .addValue("feedbackId", feedback.getFeedbackId());
         String sql = """
             UPDATE feedback
-               SET repair_order_id = :repairOrderId,
-                   repairman_id     = :repairmanId,
+               SET order_id = :orderId,
+                   user_id     = :userId,
+                   feed_back_type   = :feedbackType,
                    rating           = :rating,
-                   comments         = :comments
+                   description         = :description,
+                   feedback_time   = :feedbackTime
+                   response         = :response
              WHERE feedback_id = :feedbackId
             """;
-        return jdbcTemplate.update(sql, new BeanPropertySqlParameterSource(feedback));
+        return jdbcTemplate.update(sql, params);
     }
 
     @Override
@@ -89,10 +101,10 @@ public class RepairFeedbackJdbcRepository implements RepairFeedbackRepository{
     }
 
     @Override
-    public int insertAdminResponse(Long repairFeedbackId, String adminResponse) {
-        String sql = "UPDATE feedback SET admin_response = :adminResponse WHERE feedback_id = :feedbackId";
+    public int insertResponse(Long repairFeedbackId, String response) {
+        String sql = "UPDATE feedback SET response = :response WHERE feedback_id = :feedbackId";
         Map<String, Object> params = Map.of(
-            "adminResponse", adminResponse,
+            "response", response,
             "feedbackId", repairFeedbackId
         );
         return jdbcTemplate.update(sql, params);

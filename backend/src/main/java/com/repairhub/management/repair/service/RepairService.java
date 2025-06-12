@@ -157,7 +157,7 @@ public class RepairService {
 
     @Transactional
     public void insertAdminResponse(CreateFeedbackAdminResponseDTO dto){
-        feedbackRepository.insertAdminResponse(dto.getFeedbackId(), dto.getAdminResponse());
+        feedbackRepository.insertResponse(dto.getFeedbackId(), dto.getAdminResponse());
     }
 
     @Transactional

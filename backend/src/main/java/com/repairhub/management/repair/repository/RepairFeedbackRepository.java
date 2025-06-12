@@ -18,6 +18,6 @@ public interface RepairFeedbackRepository {
 
     public List<RepairFeedback> findAll();
 
-    public int insertAdminResponse(Long repairFeedbackId, String adminResponse);
+    public int insertResponse(Long repairFeedbackId, String response);
 
 }
