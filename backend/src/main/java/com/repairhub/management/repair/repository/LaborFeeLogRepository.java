@@ -11,7 +11,7 @@ public interface LaborFeeLogRepository {
 
     public int update(LaborFeeLog log);
 
-    public int delete(int id);
+    public int delete(Long id);
 
     public Optional<LaborFeeLog> findById(Long LaborFeeLogId);
 

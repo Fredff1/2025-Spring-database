@@ -21,4 +21,5 @@ public class RepairFeedback {
     private FeedbackType feedbackType;
     private String description;
     private LocalDateTime feedbackTime;
+    private String adminResponse;
 }

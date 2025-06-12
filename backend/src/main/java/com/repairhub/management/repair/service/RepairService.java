@@ -11,9 +11,11 @@ import org.springframework.transaction.reactive.TransactionalEventPublisher;
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.repository.UserRepository;
 import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.event.OrderDealtEvent;
 import com.repairhub.management.order.repository.RepairOrderRepository;
 import com.repairhub.management.order.service.OrderService;
+import com.repairhub.management.repair.dto.CreateFeedbackAdminResponseDTO;
 import com.repairhub.management.repair.dto.CreateLaborFeeLogDTO;
 import com.repairhub.management.repair.dto.CreateMaterialUsageDTO;
 import com.repairhub.management.repair.dto.CreateRepairFeedbackDTO;
@@ -151,6 +153,28 @@ public class RepairService {
             .build();
         feedbackRepository.insert(feedback);
         return feedback;
+    }
+
+    @Transactional
+    public void insertAdminResponse(CreateFeedbackAdminResponseDTO dto){
+        feedbackRepository.insertAdminResponse(dto.getFeedbackId(), dto.getAdminResponse());
+    }
+
+    @Transactional
+    public void deleteRepairRecord(Long recordId){
+        RepairRecord record = recordRepository.findById(recordId)
+            .orElseThrow(() -> new IllegalArgumentException("Repair record not found"));
+        
+        if(record.getOrderStatus() == OrderStatus.COMPLETED) {
+            orderService.updateOrderStatus(record.getOrderId(), OrderStatus.PROCESSING);
+        }
+
+        recordRepository.delete(recordId);
+    }
+
+    @Transactional
+    public void deleteFeedback(Long feedbackId){
+        feedbackRepository.delete(feedbackId);
     }
 
     public List<RepairRecord> getRepairRecords(Long orderId){

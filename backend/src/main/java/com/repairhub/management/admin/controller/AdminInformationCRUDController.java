@@ -23,7 +23,11 @@ import com.repairhub.management.order.entity.RepairOrder;
 import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.service.OrderAssignmentService;
 import com.repairhub.management.order.service.OrderService;
+import com.repairhub.management.repair.dto.CreateFeedbackAdminResponseDTO;
+import com.repairhub.management.repair.dto.CreateLaborFeeLogDTO;
 import com.repairhub.management.repair.dto.CreateMaterialUsageDTO;
+import com.repairhub.management.repair.dto.CreateRepairRecordDTO;
+import com.repairhub.management.repair.service.RepairFeeService;
 import com.repairhub.management.repair.service.RepairService;
 import com.repairhub.management.repairman.dto.RepairmanCreateDTO;
 import com.repairhub.management.repairman.dto.RepairmanProfileDTO;
@@ -47,6 +51,7 @@ public class AdminInformationCRUDController {
     private final UserProfileService userProfileService;
     private final RepairmanProfileService repairmanProfileService;
     private final RepairService repairService;
+    private final RepairFeeService repairFeeService;
 
     public AdminInformationCRUDController(
         AdminService adminService,
@@ -57,7 +62,8 @@ public class AdminInformationCRUDController {
         UserProfileService userProfileService,
         RepairmanProfileService repairmanProfileService,
         VehicleService vehicleService,
-        RepairService repairService) {
+        RepairService repairService,
+        RepairFeeService repairFeeService) {
         this.adminService = adminService;
         this.userInfoService = userInfoService;
         this.orderService = orderService;
@@ -67,6 +73,7 @@ public class AdminInformationCRUDController {
         this.repairmanProfileService = repairmanProfileService;
         this.vehicleService = vehicleService;
         this.repairService = repairService;
+        this.repairFeeService = repairFeeService;
     }
 
     //增量接口放在这
@@ -304,13 +311,41 @@ public class AdminInformationCRUDController {
         }
     }
 
+    @PostMapping("/repair-record/create/{repairmanId}")
+    public ResponseEntity<?> createRepairRecord(
+        @RequestBody CreateRepairRecordDTO createRepairRecordDTO,
+        @RequestParam Long repairmanId
+    ) {
+        try {
+            User repairman = userService.findUserById(repairmanId);
+            repairService.submitRepairRecord(createRepairRecordDTO, repairman);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(new CommonErrorResponse(404, e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/repair-record/{id}")
+    public ResponseEntity<?> deleteRepairRecord(
+        @RequestParam Long id
+    ) {
+        try {
+            repairService.deleteRepairRecord(id);
+            return ResponseEntity.ok(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(new CommonErrorResponse(404, e.getMessage()));
+        }
+    }
+
     /**
      * 新增某一个维修订单的材料使用情况
      * @param orderId
      * @param materialUsage
      * @return
      */
-    @PostMapping("material-usage/create")
+    @PostMapping("/material-usage/create")
     public ResponseEntity<?> createMaterialUsage(
         @RequestBody CreateMaterialUsageDTO materialUsage
     ) {
@@ -361,7 +396,71 @@ public class AdminInformationCRUDController {
         }
     }
 
+    @PostMapping("/labor-fee-log/create")
+    public ResponseEntity<?> createLaborFeeLog(
+        @RequestBody CreateLaborFeeLogDTO createLaborFeeLogDTO
+    ) {
+        try {
+            repairFeeService.createLaborFeeLog(createLaborFeeLogDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(new CommonErrorResponse(404, e.getMessage()));
+        }
+    }
 
+    @PostMapping("/labor-fee-log/{id}/update")
+    public ResponseEntity<?> updateLaborFeeLog(
+        @RequestBody CreateLaborFeeLogDTO updateDTO
+        , @RequestParam Long id
+    ) {
+        try {
+            repairFeeService.updateLaborFeeLog(id, updateDTO);
+            return ResponseEntity.ok(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(new CommonErrorResponse(404, e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/labor-fee-log/{id}")
+    public ResponseEntity<?> deleteLaborFeeLog(
+        @RequestParam Long id
+    ) {
+        try {
+            repairFeeService.deleteLaborFeeLog(id);
+            return ResponseEntity.ok(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(new CommonErrorResponse(404, e.getMessage()));
+        }
+    }
+
+    @PostMapping("/feedback/response")
+    public ResponseEntity<?> insertAdminResponse(
+        @RequestBody CreateFeedbackAdminResponseDTO feedbackAdminResponseDTO
+    ) {
+        try {
+            repairService.insertAdminResponse(feedbackAdminResponseDTO);
+            return ResponseEntity.ok(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(new CommonErrorResponse(404, e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/feedback/{id}")
+    public ResponseEntity<?> deleteFeedback(
+        @RequestParam Long id
+    ) {
+        try {
+            repairService.deleteFeedback(id);
+            return ResponseEntity.ok(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(new CommonErrorResponse(404, e.getMessage()));
+        }
+    }
 
 
 }

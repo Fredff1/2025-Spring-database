@@ -122,6 +122,7 @@ CREATE TABLE `feedback` (
   feed_back_type VARCHAR(20) NOT NULL DEFAULT 'GENERAL',
   description   TEXT,
   feedback_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  admin_response TEXT, 
   PRIMARY KEY(feedback_id),
   INDEX idx_fb_order(order_id),
   CONSTRAINT fk_fb_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id) ON DELETE CASCADE,
