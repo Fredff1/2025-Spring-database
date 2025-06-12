@@ -20,6 +20,7 @@ import com.repairhub.management.common.dto.CommonErrorResponse;
 import com.repairhub.management.order.dto.CreateOrderRequest;
 import com.repairhub.management.order.dto.UpdateOrderRequest;
 import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.enums.AssignmentStatus;
 import com.repairhub.management.order.enums.OrderStatus;
 import com.repairhub.management.order.service.OrderAssignmentService;
 import com.repairhub.management.order.service.OrderService;
@@ -304,6 +305,29 @@ public class AdminInformationCRUDController {
             RepairOrder repairOrder = orderService.findById(orderId)
                                                   .orElseThrow(() -> new IllegalArgumentException("RepairOrder not found for id: " + orderId));
             orderService.assignOrderToCertainRepairman(repairOrder, repairmanId);
+            return ResponseEntity.ok(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(new CommonErrorResponse(404, e.getMessage()));
+        }
+    }
+
+    @PostMapping("/repair-order/assign/update")
+    public ResponseEntity<?> updateAssignment(@RequestParam Long assignmentId,
+                                               @RequestParam AssignmentStatus status) {
+        try {
+           orderAssignmentService.updateAssignment(assignmentId, status);
+            return ResponseEntity.ok(HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(new CommonErrorResponse(404, e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/repair-order/assign")
+    public ResponseEntity<?> deleteAssignment(@RequestParam Long assignmentId) {
+        try {
+            orderAssignmentService.deleteAssignment(assignmentId);
             return ResponseEntity.ok(HttpStatus.ACCEPTED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

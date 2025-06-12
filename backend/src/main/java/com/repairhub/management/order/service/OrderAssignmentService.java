@@ -3,12 +3,14 @@ package com.repairhub.management.order.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.repairhub.management.auth.entity.User;
 import com.repairhub.management.auth.repository.UserRepository;
 import com.repairhub.management.common.dto.PageResponse;
 import com.repairhub.management.order.entity.OrderAssignment;
 import com.repairhub.management.order.entity.RepairOrder;
+import com.repairhub.management.order.enums.AssignmentStatus;
 import com.repairhub.management.order.repository.OrderAssignmentRepository;
 import com.repairhub.management.order.repository.RepairOrderRepository;
 import com.repairhub.management.repair.dto.OrderAssignmentDTO;
@@ -71,5 +73,16 @@ public class OrderAssignmentService {
     public void rejectAssignment(Long assignmentId){
         OrderAssignment assignment = assignmentRepository.findById(assignmentId).get();
         repairmanProfileService.copeWithOrderAssignment(assignment, false);
+    }
+
+        @Transactional
+    public void deleteAssignment(Long AssignmentId){
+        assignmentRepository.deleteById(AssignmentId);
+    }
+
+    public void updateAssignment(Long AssignmentId,AssignmentStatus status){
+        OrderAssignment assignment = assignmentRepository.findById(AssignmentId).get();
+        assignment.setStatus(status);
+        assignmentRepository.update(assignment);
     }
 }
