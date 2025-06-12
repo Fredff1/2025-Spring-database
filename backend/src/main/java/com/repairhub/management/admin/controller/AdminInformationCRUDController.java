@@ -284,7 +284,7 @@ public class AdminInformationCRUDController {
         @RequestBody UpdateOrderRequest request
     ) {
         try {
-            orderService.updateOrderStatus(orderId,request);
+            orderService.updateRepairOrder(orderId,request);
             return ResponseEntity.ok(HttpStatus.ACCEPTED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

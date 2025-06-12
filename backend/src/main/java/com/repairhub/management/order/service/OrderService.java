@@ -150,7 +150,13 @@ public class OrderService {
         repairOrderRepository.update(order);
     }
 
-    public void updateOrderStatus(Long orderId, UpdateOrderRequest request) {
+    public void updateRepairOrderStatus(Long orderId,OrderStatus status){
+        RepairOrder order = repairOrderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        order.setStatus(status);
+        repairOrderRepository.update(order);
+    }
+
+    public void updateRepairOrder(Long orderId, UpdateOrderRequest request) {
         RepairOrder order = repairOrderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
         order.setStatus(request.getOrderStatus());
         order.setDescription(request.getDescription());
@@ -159,6 +165,8 @@ public class OrderService {
         order.setIsPaid(request.getIsPaid());
         repairOrderRepository.update(order);
     }
+
+
 
     public OrderDTO toDTO(RepairOrder order){
         User user = userRepository.findById(order.getUserId()).orElse(null);

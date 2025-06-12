@@ -166,7 +166,7 @@ public class RepairService {
             .orElseThrow(() -> new IllegalArgumentException("Repair record not found"));
         
         if(record.getOrderStatus() == OrderStatus.COMPLETED) {
-            orderService.updateOrderStatus(record.getOrderId(), OrderStatus.PROCESSING);
+            orderService.updateRepairOrderStatus(recordId, OrderStatus.PROCESSING);
         }
 
         recordRepository.delete(recordId);
