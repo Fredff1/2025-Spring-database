@@ -252,4 +252,15 @@ public class RepairmanProfileService {
         return repairmanProfileRepository.insert(profile);
     }
 
+    public int updateSpecialtyAndRate(Long userId, RepairmanProfileUpdateDTO dto) {
+        RepairmanProfileUpdateDTO updateDTO = RepairmanProfileUpdateDTO.builder()
+                .username(dto.getUsername())
+                .phone(dto.getPhone())
+                .email(dto.getEmail())
+                .specialty(dto.getSpecialty())
+                .hourlyMoneyRate(dto.getHourlyMoneyRate())
+                .build();
+        return repairmanProfileRepository.update(userId, updateDTO);
+    }
+
 }

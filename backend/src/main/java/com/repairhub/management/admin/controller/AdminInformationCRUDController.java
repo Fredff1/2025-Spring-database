@@ -1,8 +1,13 @@
 package com.repairhub.management.admin.controller;
 import com.repairhub.management.vehicle.service.VehicleService;
+
+import java.security.SecureRandom;
+import java.util.Random;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,16 +110,12 @@ public class AdminInformationCRUDController {
      * @param status
      * @return
      */
-    @PostMapping("/users/status")
+    @PostMapping("/users/update-status/{id}")
     public ResponseEntity<?> updateUserStatus(
-        @RequestParam Long userId,
-        @RequestParam String status
+        @PathVariable("id") Long userId,
+        @RequestBody UserStatusDTO userStatusDTO
     ) {
         try {
-            UserStatus userStatus = UserStatus.valueOf(status.toUpperCase());
-            UserStatusDTO userStatusDTO = new UserStatusDTO();
-            userStatusDTO.setStatus(userStatus);
-
             userProfileService.updateStatus(userId, userStatusDTO);       
             return ResponseEntity.ok(HttpStatus.ACCEPTED);
         } catch (Exception e) {
@@ -125,15 +126,15 @@ public class AdminInformationCRUDController {
 
     /**
      * 删除用户（包括顾客和维修人员）
-     * @param userId
+     * @param id
      * @return
      */
-    @DeleteMapping("/users")
+    @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUser(
-        @RequestParam Long userId
+        @PathVariable Long id
     ) {
         try {
-            userService.deleteUser(userId);
+            userService.deleteUser(id);
             return ResponseEntity.ok(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -160,13 +161,13 @@ public class AdminInformationCRUDController {
             .role(repairmanCreateDTO.getRole())
             .build();
 
-            userService.registerUser(registerRequestDTO);
+            User newRepair = userService.registerUser(registerRequestDTO);
 
             RepairmanProfile repairmanProfile = RepairmanProfile.builder()
-            .userId(userService.findUserIdByUsername(repairmanCreateDTO.getUsername()))
+            .userId(newRepair.getUserId())
             .hourlyMoneyRate(repairmanCreateDTO.getHourlyMoneyRate())
             .specialty(repairmanCreateDTO.getSpecialty())
-            .repairmanNumber(repairmanCreateDTO.getRepairmanNumber())
+            .repairmanNumber(generateRepairmanNumber())
             .build();
 
             repairmanProfileService.insertProfile(repairmanProfile);
@@ -184,12 +185,14 @@ public class AdminInformationCRUDController {
      * @param repairmanProfileDTO
      * @return
      */
-    @PostMapping("/repairmen/profile")
+    @PostMapping("/repairmen/profile/{id}")
     public ResponseEntity<?> updateRepairmanProfile(
-        @RequestParam Long userId,
-        RepairmanProfileUpdateDTO updateDTO) {
+        @PathVariable Long id,
+        @RequestBody RepairmanProfileUpdateDTO updateDTO) {
         try {
-            repairmanProfileService.updateProfile(userId, updateDTO);
+            //输出dto
+            
+            repairmanProfileService.updateSpecialtyAndRate(id, updateDTO);
             return ResponseEntity.ok(HttpStatus.ACCEPTED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -204,11 +207,15 @@ public class AdminInformationCRUDController {
      * @param createVehicleRequest
      * @return
      */
-    @PostMapping("/vehicles")
-    public ResponseEntity<?> createVehicle(@RequestParam String name, 
+    @PostMapping("/vehicles/{name}/create")
+    public ResponseEntity<?> createVehicle(@PathVariable String name, 
                                             @RequestBody CreateVehicleRequest createVehicleRequest) {
         try {
             User user = userService.findUserByUsername(name);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                     .body(new CommonErrorResponse(404, "User not found"));
+            }
             vehicleService.createVehicle(createVehicleRequest, user);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception e) {
@@ -224,12 +231,12 @@ public class AdminInformationCRUDController {
      * @param createVehicleRequest
      * @return
      */
-    @PostMapping("/vehicles/update")
+    @PostMapping("/vehicles/update/{id}")
     public ResponseEntity<?> updateVehicle(
-        @RequestParam Long vehicleId,
-        @RequestBody UpdateVehicleRequest createVehicleRequest) {
+        @PathVariable Long id,
+        @RequestBody UpdateVehicleRequest updateVehicleRequest) {
         try {
-            vehicleService.updateVehicle(createVehicleRequest,vehicleId);
+            vehicleService.updateVehicle(updateVehicleRequest,id);
             return ResponseEntity.ok(HttpStatus.ACCEPTED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -242,12 +249,12 @@ public class AdminInformationCRUDController {
      * @param vehicleId
      * @return
      */
-    @DeleteMapping("/vehicles")
+    @DeleteMapping("/vehicles/{id}")
     public ResponseEntity<?> deleteVehicle(
-        @RequestParam Long vehicleId
+        @PathVariable Long id
     ) {
         try {
-            vehicleService.deleteVehicle(vehicleId);
+            vehicleService.deleteVehicle(id);
             return ResponseEntity.ok(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -518,6 +525,18 @@ public class AdminInformationCRUDController {
                                  .body(new CommonErrorResponse(404, e.getMessage()));
         }
     }
+
+    private String generateRepairmanNumber() {
+    String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    StringBuilder sb = new StringBuilder(16);
+    Random random = new SecureRandom(); // 更安全的随机数生成器
+
+    for (int i = 0; i < 16; i++) {
+        sb.append(chars.charAt(random.nextInt(chars.length())));
+    }
+
+    return sb.toString();
+}
 
 
 }

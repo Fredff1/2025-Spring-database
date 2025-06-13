@@ -33,7 +33,7 @@ public class RepairmanProfileJdbcRepository implements RepairmanProfileRepositor
         this.jdbc = jdbc;
         this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
             .withTableName("repairman_profile")
-            .usingColumns("user_id","specialty","hourly_money_rate");
+            .usingColumns("user_id","specialty","hourly_money_rate","repairman_number");
     }
 
     @Override

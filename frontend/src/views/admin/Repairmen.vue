@@ -2,7 +2,7 @@
   <div class="repairmen">
     <div class="page-header">
       <h2 class="page-title">维修人员管理</h2>
-      <!-- <el-button type="primary" @click="handleAdd">添加维修人员</el-button> -->
+      <el-button type="primary" @click="handleAdd">添加维修人员</el-button> -->
        <!--暂时不支持增删改-->
     </div>
 
@@ -41,9 +41,10 @@
             {{ formatDateTime(row.updateTime) }}
           </template>
         </el-table-column>
-        <!-- <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column label="操作" fixed="right" width="150">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+            <el-button type="primary" link @click="handleEditStatus(row)">编辑状态</el-button>
+            <el-button type="primary" link @click="handleEdit(row)">编辑信息</el-button>
             <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column> -->
@@ -76,23 +77,35 @@
         :rules="rules"
         label-width="100px"
       >
-        <el-form-item label="用户名" prop="username">
+        <el-form-item label="用户名" prop="username" v-if="dialogType === 'add'">
           <el-input v-model="form.username" />
         </el-form-item>
-        <el-form-item label="手机号" prop="phone">
+        <el-form-item label="手机号" prop="phone" v-if="dialogType === 'add'">
           <el-input v-model="form.phone" />
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item label="邮箱" prop="email" v-if="dialogType === 'add'">
           <el-input v-model="form.email" />
         </el-form-item>
+        <template v-if="dialogType === 'add'">
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="form.password" type="password" show-password />
+          </el-form-item>
+          <el-form-item label="确认密码" prop="confirmPassword">
+            <el-input v-model="form.confirmPassword" type="password" show-password />
+          </el-form-item>
+        </template>
+
+
+        <template v-if="dialogType === 'edit' || dialogType === 'add'">
         <el-form-item label="专长" prop="specialty">
           <el-select v-model="form.specialty" placeholder="请选择专长">
-            <el-option label="发动机" value="ENGINE" />
-            <el-option label="变速箱" value="TRANSMISSION" />
-            <el-option label="制动系统" value="BRAKE" />
-            <el-option label="电气系统" value="ELECTRICAL" />
-            <el-option label="空调系统" value="AC" />
-            <el-option label="轮胎" value="TIRE" />
+            <el-option label="常规保养" value="MAINTENANCE" />
+            <el-option label="通用维修" value="REPAIR" />
+            <el-option label="钣金喷漆" value="PAINT" />
+            <el-option label="轮胎更换" value="TIRE" />
+            <el-option label="电路系统修复" value="ELECTRICAL" />
+            <el-option label="车身修复" value="BODYWORK" />
+            <el-option label="发动机维修" value="ENGINE" />
             <el-option label="其他" value="OTHER" />
           </el-select>
         </el-form-item>
@@ -104,11 +117,13 @@
             :step="10"
           />
         </el-form-item>
-        <el-form-item label="状态" prop="userStatus">
+        </template>
+
+        <el-form-item label="状态" prop="userStatus" v-if="dialogType === 'status'">
           <el-select v-model="form.userStatus" placeholder="请选择状态">
             <el-option label="正常" value="ACTIVE" />
-            <el-option label="未激活" value="INACTIVE" />
-            <el-option label="已封禁" value="BLOCKED" />
+            <el-option label="封禁" value="DISABLED" />
+            <el-option label="锁定" value="LOCKED" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -145,13 +160,26 @@ const formRef = ref(null)
 
 // 表单数据
 const form = reactive({
+  id:'',
   username: '',
   phone: '',
   email: '',
   specialty: '',
   hourlyMoneyRate: 0,
-  userStatus: 'ACTIVE'
+  userStatus: 'ACTIVE',
+  password: '',
+  confirmPassword: '',
+  repairmanNumber: '',
+  role: 'REPAIRMAN' // 默认角色
 })
+
+// 编辑用户状态
+const handleEditStatus = (row) => {
+  dialogType.value = 'status'
+  form.id = row.id
+  form.userStatus = row.userStatus
+  dialogVisible.value = true
+}
 
 // 表单验证规则
 const validatePhone = (rule, value, callback) => {
@@ -223,8 +251,8 @@ const getRepairTypeTag = (type) => {
 const getUserStatusType = (status) => {
   const map = {
     ACTIVE: 'success',
-    INACTIVE: 'info',
-    BLOCKED: 'danger'
+    DISABLED: 'info',
+    LOCKED: 'danger'
   }
   return map[status] || 'info'
 }
@@ -233,8 +261,8 @@ const getUserStatusType = (status) => {
 const getUserStatusText = (status) => {
   const map = {
     ACTIVE: '正常',
-    INACTIVE: '未激活',
-    BLOCKED: '已封禁'
+    DISABLED: '封禁',
+    LOCKED: '锁定'
   }
   return map[status] || status
 }
@@ -278,10 +306,19 @@ const handleAdd = () => {
 
 // 编辑维修人员
 const handleEdit = (row) => {
+  
+
   dialogType.value = 'edit'
-  Object.assign(form, row)
+  form.id = row.id
+  form.username = row.username
+  form.phone = row.phone
+  form.email = row.email
+  form.specialty = row.specialty
+  form.hourlyMoneyRate = row.hourlyMoneyRate
   dialogVisible.value = true
+  console.log('form.specialty:', form.specialty)
 }
+
 
 // 删除维修人员
 const handleDelete = (row) => {
@@ -295,7 +332,7 @@ const handleDelete = (row) => {
     }
   ).then(async () => {
     try {
-      await admin.deleteRepairman(row.id)
+      await admin.deleteUser(row.id)
       ElMessage.success('删除成功')
       fetchRepairmen()
     } catch (error) {
@@ -308,7 +345,7 @@ const handleDelete = (row) => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async (valid) => {
     if (valid) {
       submitting.value = true
@@ -316,10 +353,24 @@ const handleSubmit = async () => {
         if (dialogType.value === 'add') {
           await admin.createRepairman(form)
           ElMessage.success('添加成功')
-        } else {
-          await admin.updateRepairman(form.id, form)
-          ElMessage.success('更新成功')
+        } else if (dialogType.value === 'edit') {
+          // 编辑信息：调用 updateRepairmanProfile
+          const profileData = {
+            username: form.username,
+            phone: form.phone,
+            email: form.email,
+            specialty: form.specialty,
+            hourlyMoneyRate: form.hourlyMoneyRate
+          }
+          console.log(profileData)
+          await admin.updateRepairmanProfile(form.id, profileData)
+          ElMessage.success('信息更新成功')
+        } else if (dialogType.value === 'status') {
+          // 编辑状态：调用 updateUser
+          await admin.updateUser(form.id, { status: form.userStatus })
+          ElMessage.success('状态更新成功')
         }
+
         dialogVisible.value = false
         fetchRepairmen()
       } catch (error) {
@@ -331,6 +382,7 @@ const handleSubmit = async () => {
     }
   })
 }
+
 
 // 分页大小变化
 const handleSizeChange = (val) => {
