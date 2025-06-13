@@ -45,4 +45,38 @@ export const getOrderProcessStats = params => http.get('/admin/stats/repair-orde
 export const getOrderMismatchStats = () => http.get('/admin/stats/repair-orders/mismatch')
 export const getUnfinishedOrderFaultTypeStats = () => http.get('/admin/stats/repair-orders/unfinished/fault-type')
 export const getUnfinishedOrderRepairmanStats = () => http.get('/admin/stats/repair-orders/unfinished/repairman')
-export const getUnfinishedOrderVehicleStats = () => http.get('/admin/stats/repair-orders/unfinished/vehicle') 
+export const getUnfinishedOrderVehicleStats = () => http.get('/admin/stats/repair-orders/unfinished/vehicle')
+
+// Order CRUD
+export const createOrder = (data, userName) => http.post('/admin/repair-order/create', data,{
+    params: { userName }
+  })
+export const deleteOrder = (orderId) => http.delete(`/admin/repair-order?orderId=${orderId}`)
+export const updateOrderStatus = (orderId, data) => http.post(`/admin/repair-order/status?orderId=${orderId}`, data)
+export const assignOrder = (orderId, repairmanNumber) => http.post(`/admin/repair-order/assign?orderId=${orderId}&repairmanNumber=${repairmanNumber}`)
+
+// Repair Record CRUD
+export const createRepairRecord = (repairmanId, data) => http.post(`/admin/repair-record/create`, data, {
+  params: { repairmanId }
+})
+export const updateRepairRecord = (recordId, data) => http.post(`/admin/repair-record/update`, data, {
+  params: { recordId }
+})
+export const deleteRepairRecord = (id) => http.delete(`/admin/repair-record`, {
+  params: { id }
+})
+
+// Material Usage CRUD
+export const createMaterialUsage = (data) => http.post('/admin/material-usage/create', data)
+export const updateMaterialUsage = (materialUsageId, data) => http.post(`/admin/material-usage/update`, data, {
+  params: { materialUsageId }
+})
+export const deleteMaterialUsage = (materialUsageId) => http.delete(`/admin/material-usage`, {
+  params: { materialUsageId }
+})
+
+// Feedback CRUD
+export const deleteFeedback = (id) => http.delete(`/admin/feedback`, {
+    params: { id }
+  })
+export const createFeedbackResponse = (data) => http.post('/admin/feedback/response', data) 

@@ -13,6 +13,7 @@ public interface RepairmanProfileRepository {
     public int update(Long userId,RepairmanProfileUpdateDTO profile);
     public List<RepairmanProfile> findAll();
     public Optional<RepairmanProfile> findByUserId(Long userId);
+    public Optional<RepairmanProfile> findByRepairmanNumber(String number);
     public List<RepairmanProfile> findBySpecialty(FaultType specialty);
     
 }

@@ -15,7 +15,10 @@ import com.repairhub.management.repair.entity.MaterialUsage;
 import com.repairhub.management.repair.repository.LaborFeeLogRepository;
 import com.repairhub.management.repair.repository.MaterialUsageRepository;
 
+import lombok.Getter;
+
 @Service
+@Getter
 public class RepairFeeService {
     
     private final LaborFeeLogRepository laborFeeLogRepository;
@@ -37,6 +40,7 @@ public class RepairFeeService {
             .totalHours(dto.getTotalHours())
             .totalIncome(dto.getTotalIncome())
             .settleTime(LocalDateTime.now())
+            .repairRecordId(dto.getRecordId())
             .build();
         laborFeeLogRepository.insert(laborFeeLog);
         return laborFeeLog;

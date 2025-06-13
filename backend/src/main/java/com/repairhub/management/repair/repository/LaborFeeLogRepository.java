@@ -15,6 +15,8 @@ public interface LaborFeeLogRepository {
 
     public Optional<LaborFeeLog> findById(Long LaborFeeLogId);
 
+    public Optional<LaborFeeLog> findByRecordId(Long recordId);
+
     public List<LaborFeeLog> findAllByRepairOrderId(Long repairOrderId);
 
     public List<LaborFeeLog> findAllByRepairmanId(Long repairmanId);
@@ -22,4 +24,6 @@ public interface LaborFeeLogRepository {
     public List<LaborFeeLog> findAll();
 
     public PageResponse<LaborFeeLog> findAllWithPage(int pageNum,int pageSize);
+
+    
 }

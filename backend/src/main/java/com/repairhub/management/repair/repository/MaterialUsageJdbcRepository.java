@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -44,24 +45,32 @@ public class MaterialUsageJdbcRepository implements MaterialUsageRepository {
     public int update(MaterialUsage materialUsage){
         String sql = """
             UPDATE material_usage
+                SET
                 order_id = :orderId,
                 material_name = :materialName,
                 quantity = :quantity,
-                unit_price = :unitPrice,
+                unit_price = :unitPrice
             WHERE material_usage_id = :materialId
                 """;
-        return jdbcTemplate.update(sql, new BeanPropertySqlParameterSource(materialUsage));
+        MapSqlParameterSource source = new MapSqlParameterSource()
+        .addValue("orderId", materialUsage.getOrderId())
+        .addValue("materialName", materialUsage.getMaterialName())
+        .addValue("quantity", materialUsage.getQuantity())
+        .addValue("unitPrice", materialUsage.getUnitPrice())
+        .addValue("materialId", materialUsage.getMaterialId());
+        
+        return jdbcTemplate.update(sql, source);
     }
 
     @Override
     public int delete(Long materialId){
-        String sql = "DELETE FROM material_usage WHERE material_id = :materialId";
+        String sql = "DELETE FROM material_usage WHERE material_usage_id = :materialId";
         return jdbcTemplate.update(sql, Map.of("materialId", materialId));
     }
 
     @Override
     public Optional<MaterialUsage> findById(Long materialId){
-        String sql = "SELECT * FROM material_usage WHERE material_id = :materialId";
+        String sql = "SELECT * FROM material_usage WHERE material_usage_id = :materialId";
         return jdbcTemplate.query(sql, Map.of("materialId", materialId), mapper)
                            .stream()
                            .findFirst();

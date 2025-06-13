@@ -23,7 +23,7 @@ public class RepairFeedbackDTO {
     private String description;  // 反馈内容
     private LocalDateTime feedbackTime;
     private String username;
-    private String adminResponse;  
+    private String response;  
 
     public static RepairFeedbackDTO from(
         RepairFeedback feedback,
@@ -40,7 +40,7 @@ public class RepairFeedbackDTO {
         .description(feedback.getDescription())
         .feedbackTime(feedback.getFeedbackTime())
         .username(user.getUsername())
-        .adminResponse(feedback.getAdminResponse())
+        .response(feedback.getResponse())
         .build();
         return dto;
     }

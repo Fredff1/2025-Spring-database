@@ -122,7 +122,7 @@ CREATE TABLE `feedback` (
   feed_back_type VARCHAR(20) NOT NULL DEFAULT 'GENERAL',
   description   TEXT,
   feedback_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  admin_response TEXT, 
+  response TEXT, 
   PRIMARY KEY(feedback_id),
   INDEX idx_fb_order(order_id),
   CONSTRAINT fk_fb_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id) ON DELETE CASCADE,
@@ -147,6 +147,7 @@ CREATE TABLE `assignment` (
 
 CREATE TABLE `labor_fee_log` (
   labor_fee_log_id BIGINT      NOT NULL AUTO_INCREMENT,
+  repair_record_id        BIGINT      NOT NULL,
   order_id         BIGINT      NOT NULL,
   repairman_id    BIGINT      NOT NULL,
   month            VARCHAR(7)  NOT NULL,
@@ -156,7 +157,8 @@ CREATE TABLE `labor_fee_log` (
   PRIMARY KEY(labor_fee_log_id),
   INDEX idx_lf_tech(repairman_id),
   CONSTRAINT fk_lf_tech FOREIGN KEY(repairman_id) REFERENCES users(user_id) ON DELETE CASCADE,
-  CONSTRAINT fk_lf_order FOREIGN KEY(order_id)      REFERENCES repair_order(order_id) ON DELETE CASCADE
+  CONSTRAINT fk_lf_order FOREIGN KEY(order_id)      REFERENCES repair_order(order_id) ON DELETE CASCADE,
+  CONSTRAINT fk_lf_record FOREIGN KEY(repair_record_id)      REFERENCES repair_record(repair_record_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
