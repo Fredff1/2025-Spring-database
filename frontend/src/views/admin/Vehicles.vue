@@ -87,10 +87,10 @@
         label-width="100px"
       >
         <el-form-item label="车牌号" prop="licensePlate">
-          <el-input v-model="form.licensePlate" />
+          <el-input v-model="form.licensePlate" placeholder="请输入车牌号" />
         </el-form-item>
         <el-form-item label="品牌" prop="brand">
-          <el-input v-model="form.brand" />
+          <el-input v-model="form.brand" placeholder="请输入车辆品牌"/>
         </el-form-item>
         <el-form-item label="型号" prop="model">
           <el-select v-model="form.model" placeholder="请选择车型">
@@ -103,8 +103,10 @@
             <el-option label="敞篷车" value="Convertible" />
           </el-select>
         </el-form-item>
-        <el-form-item label="拥有者" prop="ownerName">
-          <el-input v-model="form.ownerName" :disabled="dialogType === 'edit'" />
+        <el-form-item label="拥有者" prop="ownerName" >
+          <el-input v-model="form.ownerName" 
+            :disabled="dialogType === 'edit'" 
+            placeholder="请输入拥有者用户名" />
         </el-form-item>
         <el-form-item label="注册日期" prop="registerDate">
           <el-date-picker

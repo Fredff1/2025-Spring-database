@@ -2,10 +2,10 @@
   <div class="repairmen">
     <div class="page-header">
       <h2 class="page-title">维修人员管理</h2>
-      <el-button type="primary" @click="handleAdd">添加维修人员</el-button> -->
+      <el-button type="primary" @click="handleAdd">添加维修人员</el-button>
        <!--暂时不支持增删改-->
     </div>
-
+     
     <!-- 维修人员列表 -->
     <el-card shadow="hover">
       <el-table :data="repairmen" style="width: 100%" v-loading="loading">
@@ -19,7 +19,7 @@
             <el-tag :type="getRepairTypeTag(row.specialty)">{{ getRepairTypeText(row.specialty)}}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="hourlyMoneyRate" label="时薪" width="120">
+        <el-table-column prop="hourlyMoneyRate" label="时薪" width="80">
           <template #default="{ row }">
             ￥{{ row.hourlyMoneyRate }}
           </template>
@@ -41,7 +41,7 @@
             {{ formatDateTime(row.updateTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column label="操作" fixed="right" width="210">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEditStatus(row)">编辑状态</el-button>
             <el-button type="primary" link @click="handleEdit(row)">编辑信息</el-button>

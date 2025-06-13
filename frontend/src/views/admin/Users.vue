@@ -2,7 +2,7 @@
   <div class="users">
     <div class="page-header">
       <h2 class="page-title">用户管理</h2>
-      <el-button type="primary" @click="handleAdd">添加用户</el-button> -->
+      <el-button type="primary" @click="handleAdd">添加用户</el-button> 
     </div>
 
     <!-- 搜索栏 -->

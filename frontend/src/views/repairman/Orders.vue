@@ -196,6 +196,8 @@
             </div>
             <div class="feedback-content"><strong>客户：{{ feedback.username }}</strong></div>
             <div class="feedback-content">{{ feedback.description }}</div>
+            <div class="feedback-content"v-if="feedback.response"><strong>系统回复</strong></div>
+            <div class="feedback-content"v-if="feedback.response">{{ feedback.response }}</div>
           </div>
         </div>
       </div>
