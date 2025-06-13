@@ -6,19 +6,19 @@
 INSERT INTO `users` (
   username, role, password, email, phone, status, created_at, updated_at
 ) VALUES
-  ('charlie',   'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'charlie@example.com', '100-200-3000', 'ACTIVE', NOW(), NOW()),
-  ('diana',     'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',   'diana@example.com',   '100-200-3001', 'ACTIVE', NOW(), NOW()),
-  ('eve',       'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',     'eve@repairhub.com',   '100-200-3002', 'ACTIVE', NOW(), NOW()),
-  ('frank',     'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',   'frank@repairhub.com', '100-200-3003', 'ACTIVE', NOW(), NOW()),
-  ('grace',     'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',   'grace@repairhub.com', '100-200-3004', 'ACTIVE', NOW(), NOW()),
-  ('henry',     'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'henry@example.com', '100-200-3005', 'ACTIVE', NOW(), NOW()),
-  ('irene',     'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'irene@example.com', '100-200-3006', 'ACTIVE', NOW(), NOW()),
-  ('jack',      'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'jack@repairhub.com', '100-200-3007', 'ACTIVE', NOW(), NOW()),
-  ('kate',      'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'kate@repairhub.com', '100-200-3008', 'ACTIVE', NOW(), NOW()),
-  ('lily',      'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'lily@example.com', '100-200-3010', 'ACTIVE', NOW(), NOW()),
-  ('mike',      'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'mike@repairhub.com', '100-200-3011', 'ACTIVE', NOW(), NOW()),
-  ('nancy',     'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'nancy@repairhub.com', '100-200-3012', 'ACTIVE', NOW(), NOW()),
-  ('duty_repair', 'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'duty_repair@repairhub.com', '100-200-3002', 'ACTIVE', NOW(), NOW());
+  ('charlie',   'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'charlie@example.com', '13968038765', 'ACTIVE', NOW(), NOW()),
+  ('diana',     'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',   'diana@example.com',   '13968036745', 'ACTIVE', NOW(), NOW()),
+  ('eve',       'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',     'eve@repairhub.com',   '13968036845', 'ACTIVE', NOW(), NOW()),
+  ('frank',     'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',   'frank@repairhub.com', '13968016845', 'ACTIVE', NOW(), NOW()),
+  ('grace',     'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq',   'grace@repairhub.com', '13145036845', 'ACTIVE', NOW(), NOW()),
+  ('henry',     'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'henry@example.com', '13968063445', 'ACTIVE', NOW(), NOW()),
+  ('irene',     'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'irene@example.com', '13968053245', 'ACTIVE', NOW(), NOW()),
+  ('jack',      'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'jack@repairhub.com', '13968345845', 'ACTIVE', NOW(), NOW()),
+  ('kate',      'REPAIRMAN','$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'kate@repairhub.com', '13968237845', 'ACTIVE', NOW(), NOW()),
+  ('lily',      'CUSTOMER', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'lily@example.com', '13968031475', 'ACTIVE', NOW(), NOW()),
+  ('mike',      'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'mike@repairhub.com', '13962656845', 'ACTIVE', NOW(), NOW()),
+  ('nancy',     'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'nancy@repairhub.com', '13916536845', 'ACTIVE', NOW(), NOW()),
+  ('duty_repair', 'REPAIRMAN', '$2a$10$bD3ySXDVhoz/HBCGztXgq.dSr3WLWEGlz0LOcl8RmWZ4tsZOsCSvq', 'duty_repair@repairhub.com', '13347636845', 'ACTIVE', NOW(), NOW());
 -- === 2. 维修人员档案（repairman_profile）示例 ===
 -- eve 擅长 MAINTENANCE，时薪 90.00
 INSERT INTO `repairman_profile` (user_id, specialty, hourly_money_rate,repairman_number) VALUES
