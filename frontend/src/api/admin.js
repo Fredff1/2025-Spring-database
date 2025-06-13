@@ -15,7 +15,8 @@ export const getOrderStats = () => http.get('/admin/repair-orders/stats')
 // 管理员车辆管理
 export const getVehicles = params => http.get('/admin/vehicles', { params })
 export const getVehicleDetail = id => http.get(`/admin/vehicles/${id}`)
-export const updateVehicle = (id, data) => http.put(`/admin/vehicles/${id}`, data)
+export const createVehicle = (name, data) => http.post(`/admin/vehicles/${name}/create`, data)
+export const updateVehicle = (id, data) => http.post(`/admin/vehicles/update/${id}`, data)
 export const deleteVehicle = id => http.delete(`/admin/vehicles/${id}`)
 
 export const getAssignments = params => http.get('/admin/assignments', { params })
@@ -25,11 +26,15 @@ export const getFeedbackList = orderId => http.get(`/admin/repair-orders/${order
 export const getIncomeStats = params => http.get('/admin/income', { params })
 // 管理员用户管理
 export const getUsers = params => http.get('/admin/account/customers', { params })
-
+export const createUser = data => http.post('/admin/customers', data)
+export const updateUser = (id, data) => http.post(`/admin/users/update-status/${id}`, data)
+export const deleteUser = (userId) => http.delete(`/admin/users/${userId}`)
 
 // 管理员维修人员管理
 export const getRepairmen = params => http.get('/admin/account/repairmen', { params })
 export const getSystemStatus = () => http.get('/admin/system/status')
+export const updateRepairmanProfile = (id, data) => http.post(`/admin/repairmen/profile/${id}`, data)
+export const createRepairman = data => http.post('/admin/repairmen', data)
 
 // 统计相关
 export const getNegativeFeedbackStats = params => http.get('/admin/stats/feedback/negative', { params })

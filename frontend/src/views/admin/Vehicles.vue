@@ -2,6 +2,7 @@
   <div class="vehicles">
     <div class="page-header">
       <h2 class="page-title">车辆管理</h2>
+      <el-button type="primary" @click="handleAdd">添加车辆</el-button>
     </div>
 
     <!-- 搜索栏 -->
@@ -13,8 +14,16 @@
         <el-form-item label="品牌">
           <el-input v-model="searchForm.brand" placeholder="请输入品牌" />
         </el-form-item>
-        <el-form-item label="型号">
-          <el-input v-model="searchForm.model" placeholder="请输入型号" />
+        <el-form-item label="型号" prop="model">
+          <el-select v-model="form.model" placeholder="请选择车型">
+            <el-option label="多用途车" value="SUV" />
+            <el-option label="轿车" value="Sedan" />
+            <el-option label="皮卡" value="Pickup" />
+            <el-option label="货车" value="Van" />
+            <el-option label="小型车" value="Hatchback" />
+            <el-option label="跑车" value="Coupe" />
+            <el-option label="敞篷车" value="Convertible" />
+          </el-select>
         </el-form-item>
         <el-form-item label="车主">
           <el-input v-model="searchForm.ownerName" placeholder="请输入车主姓名" />
@@ -43,7 +52,7 @@
             {{ formatDate(row.registerDate) }}
           </template>
         </el-table-column>
-        <!-- <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column label="操作" fixed="right" width="150">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
             <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
@@ -84,10 +93,18 @@
           <el-input v-model="form.brand" />
         </el-form-item>
         <el-form-item label="型号" prop="model">
-          <el-input v-model="form.model" />
+          <el-select v-model="form.model" placeholder="请选择车型">
+            <el-option label="多用途车" value="SUV" />
+            <el-option label="轿车" value="Sedan" />
+            <el-option label="皮卡" value="Pickup" />
+            <el-option label="货车" value="Van" />
+            <el-option label="小型车" value="Hatchback" />
+            <el-option label="跑车" value="Coupe" />
+            <el-option label="敞篷车" value="Convertible" />
+          </el-select>
         </el-form-item>
         <el-form-item label="拥有者" prop="ownerName">
-          <el-input v-model="form.ownerName" />
+          <el-input v-model="form.ownerName" :disabled="dialogType === 'edit'" />
         </el-form-item>
         <el-form-item label="注册日期" prop="registerDate">
           <el-date-picker
@@ -116,6 +133,8 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { admin } from '@/api'
 import dayjs from 'dayjs'
+
+const dialogType = ref('add')
 
 // 搜索表单
 const searchForm = ref({
@@ -146,6 +165,20 @@ const form = reactive({
   vin: '',
   registerDate: ''
 })
+
+const handleAdd = () => {
+  dialogType.value = 'add'
+  Object.assign(form, {
+    id: null,
+    licensePlate: '',
+    brand: '',
+    model: '',
+    vin: '',
+    registerDate: '',
+    ownerName: ''
+  })
+  dialogVisible.value = true
+}
 
 // 表单验证规则
 const validateLicensePlate = (rule, value, callback) => {
@@ -246,6 +279,7 @@ const resetSearch = () => {
 
 // 编辑车辆
 const handleEdit = (row) => {
+  dialogType.value = 'edit'
   Object.assign(form, row)
   dialogVisible.value = true
 }
@@ -275,13 +309,20 @@ const handleDelete = (row) => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async (valid) => {
     if (valid) {
       submitting.value = true
       try {
-        await admin.updateVehicle(form.id, form)
-        ElMessage.success('更新成功')
+        if (form.id) {
+          // 编辑
+          await admin.updateVehicle(form.id, form)
+          ElMessage.success('更新成功')
+        } else {
+          // 创建（这里传入用户名，假设是 ownerName）
+          await admin.createVehicle(form.ownerName, form)
+          ElMessage.success('创建成功')
+        }
         dialogVisible.value = false
         fetchVehicles()
       } catch (error) {
@@ -293,6 +334,7 @@ const handleSubmit = async () => {
     }
   })
 }
+
 
 // 分页大小变化
 const handleSizeChange = (val) => {

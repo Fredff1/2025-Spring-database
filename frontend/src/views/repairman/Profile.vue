@@ -205,7 +205,8 @@ const editForm = reactive({
   username: '',
   phone: '',
   email: '',
-  specialty: ''
+  specialty: '',
+  hourlyMoneyRate: form.hourlyMoneyRate
 })
 
 // 打开编辑对话框

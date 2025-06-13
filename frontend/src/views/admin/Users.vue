@@ -2,8 +2,7 @@
   <div class="users">
     <div class="page-header">
       <h2 class="page-title">用户管理</h2>
-      <!-- <el-button type="primary" @click="handleAdd">添加用户</el-button> -->
-       <!--暂时不支持增删改-->
+      <el-button type="primary" @click="handleAdd">添加用户</el-button> -->
     </div>
 
     <!-- 搜索栏 -->
@@ -49,13 +48,12 @@
             {{ formatDateTime(row.updateTime) }}
           </template>
         </el-table-column>
-        <!-- <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column label="操作" fixed="right" width="150">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+            <el-button type="primary" link @click="handleEdit(row)">编辑状态</el-button>
             <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column> -->
-        <!--暂时不支持增删改-->
       </el-table>
 
       <!-- 分页 -->
@@ -84,22 +82,34 @@
         :rules="rules"
         label-width="100px"
       >
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" />
-        </el-form-item>
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="form.phone" />
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" />
-        </el-form-item>
+
         <el-form-item label="状态" prop="userStatus">
           <el-select v-model="form.userStatus" placeholder="请选择状态">
             <el-option label="正常" value="ACTIVE" />
-            <el-option label="未激活" value="INACTIVE" />
-            <el-option label="已封禁" value="BLOCKED" />
+            <el-option label="禁用" value="DISABLED" />
+            <el-option label="锁定" value="LOCKED" />
           </el-select>
         </el-form-item>
+        <el-form-item label="用户名" prop="username" v-if="dialogType === 'add'">
+          <el-input v-model="form.username" placeholder="请输入用户名" />
+        </el-form-item>
+
+        <el-form-item label="手机号" prop="phone" v-if="dialogType === 'add'">
+          <el-input v-model="form.phone" placeholder="请输入手机号" />
+        </el-form-item>
+
+        <el-form-item label="邮箱" prop="email" v-if="dialogType === 'add'">
+          <el-input v-model="form.email" placeholder="请输入邮箱" />
+        </el-form-item>
+
+        <el-form-item label="密码" prop="password" v-if="dialogType === 'add'">
+          <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
+        </el-form-item>
+
+        <el-form-item label="确认密码" prop="confirmPassword" v-if="dialogType === 'add'">
+          <el-input v-model="form.confirmPassword" type="password" placeholder="请再次输入密码" show-password />
+        </el-form-item>
+
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -137,7 +147,10 @@ const form = reactive({
   username: '',
   phone: '',
   email: '',
-  userStatus: 'ACTIVE'
+  userStatus: 'ACTIVE',
+  password: '',
+  confirmPassword: '',
+  role: 'CUSTOMER' // 默认就是创建顾客
 })
 
 // 表单验证规则
@@ -179,8 +192,8 @@ const rules = {
 const getUserStatusType = (status) => {
   const map = {
     ACTIVE: 'success',
-    INACTIVE: 'info',
-    BLOCKED: 'danger'
+    DISABLED: 'info',
+    LOCKED: 'danger'
   }
   return map[status] || 'info'
 }
@@ -189,8 +202,8 @@ const getUserStatusType = (status) => {
 const getUserStatusText = (status) => {
   const map = {
     ACTIVE: '正常',
-    INACTIVE: '未激活',
-    BLOCKED: '已封禁'
+    DISABLED: '禁用',
+    LOCKED: '锁定'
   }
   return map[status] || status
 }
@@ -271,8 +284,11 @@ const handleSubmit = async () => {
           await admin.createUser(form)
           ElMessage.success('添加成功')
         } else {
-          await admin.updateUser(form.id, form)
-          ElMessage.success('更新成功')
+          await admin.updateUser(form.id, {
+            status: form.userStatus
+          }
+            )
+          ElMessage.success('状态更新成功')
         }
         dialogVisible.value = false
         fetchUsers()
@@ -285,6 +301,7 @@ const handleSubmit = async () => {
     }
   })
 }
+
 
 // 分页大小变化
 const handleSizeChange = (val) => {
