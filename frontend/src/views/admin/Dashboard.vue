@@ -145,9 +145,6 @@ const overview = ref({
 // 待处理订单
 const unfinishedOrders = ref([])
 
-// 维修人员状态
-
-
 // 系统状态
 const systemStatus = ref({
   cpu: 0,
@@ -164,7 +161,6 @@ const getOrderStatusTag = (status) => {
   return map[status] || 'info'
 }
 
-// 获取状态文本
 const getOrderStatusText = (status) => {
   const map = {
     PENDING: '待处理',
@@ -175,8 +171,6 @@ const getOrderStatusText = (status) => {
   return map[status] || status
 }
 
-
-// 获取维修类型标签
 const getRepairTypeTag = (type) => {
   const map = {
     MAINTENANCE: 'success',
@@ -191,7 +185,6 @@ const getRepairTypeTag = (type) => {
   return map[type] || 'info'
 }
 
-// 获取维修类型文本
 const getRepairTypeText = (type) => {
   const map = {
     MAINTENANCE: '常规保养',
@@ -206,8 +199,6 @@ const getRepairTypeText = (type) => {
   return map[type] || type
 }
 
-
-// 获取进度条状态
 const getProgressStatus = (percentage) => {
   if (percentage >= 90) return 'exception'
   if (percentage >= 70) return 'warning'
@@ -231,17 +222,11 @@ const fetchData = async () => {
   }
 }
 
-// 查看全部订单
 const handleViewAll = () => {
   router.push('/admin/orders')
 }
 
-// 查看全部维修人员
-const handleViewRepairmen = () => {
-  router.push('/admin/repairmen')
-}
 
-// 刷新系统状态
 const handleRefreshStatus = async () => {
   try {
     const res = await admin.getSystemStatus()
@@ -254,7 +239,6 @@ const handleRefreshStatus = async () => {
 
 onMounted(() => {
   fetchData()
-  // 每5分钟刷新一次数据
   setInterval(fetchData, 5 * 60 * 1000)
 })
 </script>

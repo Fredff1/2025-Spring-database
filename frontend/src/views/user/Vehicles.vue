@@ -19,14 +19,6 @@
            </template>
         </el-table-column>
         <el-table-column prop="registerDate" label="注册日期" width="120" />
-        <!-- <el-table-column prop="year" label="年份" width="100" />
-        <el-table-column prop="color" label="颜色" width="100" />
-        <el-table-column prop="mileage" label="里程数" width="120">
-          <template #default="{ row }">
-            {{ row.mileage }} km
-          </template>
-        </el-table-column>
-        <el-table-column prop="vin" label="VIN码" width="180" /> -->
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -57,18 +49,6 @@
           <el-input v-model="form.model" placeholder="请输入型号" />
         </el-form-item> 
         
-        <!-- <el-form-item label="年份" prop="year">
-          <el-input-number v-model="form.year" :min="1900" :max="new Date().getFullYear()" />
-        </el-form-item>
-        <el-form-item label="颜色" prop="color">
-          <el-input v-model="form.color" placeholder="请输入颜色" />
-        </el-form-item> -->
-        <!-- <el-form-item label="里程数" prop="mileage">
-          <el-input-number v-model="form.mileage" :min="0" :step="1000" />
-        </el-form-item> -->
-        <!-- <el-form-item label="VIN码" prop="vin">
-          <el-input v-model="form.vin" placeholder="请输入VIN码" />
-        </el-form-item> -->
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -134,18 +114,7 @@ const rules = {
   model: [
     { required: true, message: '请输入型号', trigger: 'blur' }
   ],
-  // year: [
-  //   { required: true, message: '请选择年份', trigger: 'change' }
-  // ],
-  // color: [
-  //   { required: true, message: '请输入颜色', trigger: 'blur' }
-  // ],
-  // mileage: [
-  //   { required: true, message: '请输入里程数', trigger: 'change' }
-  // ],
-  // vin: [
-  //   { required: true, message: '请输入VIN码', trigger: 'blur' }
-  // ]
+  
 }
 
 // 获取车辆列表
@@ -174,7 +143,6 @@ const getModelText = (model) => {
   return map[model] || type
 }
 
-// 显示添加对话框
 const showAddDialog = () => {
   isEdit.value = false
   form.value = {
@@ -182,28 +150,21 @@ const showAddDialog = () => {
     brand: '',
     model: '',
     registerDate: '',
-    // year: new Date().getFullYear(),
-    // color: '',
-    // mileage: 0,
-    // vin: ''
   }
   dialogVisible.value = true
 }
 
-// 处理编辑
 const handleEdit = (row) => {
   isEdit.value = true
   form.value = { ...row }
   dialogVisible.value = true
 }
 
-// 处理删除
 const handleDelete = (row) => {
   currentVehicle.value = row
   deleteDialogVisible.value = true
 }
 
-// 确认删除
 const confirmDelete = async () => {
   try {
     await user.deleteVehicle(currentVehicle.value.id)
@@ -216,7 +177,6 @@ const confirmDelete = async () => {
   }
 }
 
-// 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
   

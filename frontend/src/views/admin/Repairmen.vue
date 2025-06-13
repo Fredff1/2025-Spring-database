@@ -3,7 +3,6 @@
     <div class="page-header">
       <h2 class="page-title">维修人员管理</h2>
       <el-button type="primary" @click="handleAdd">添加维修人员</el-button>
-       <!--暂时不支持增删改-->
     </div>
      
     <!-- 维修人员列表 -->
@@ -47,7 +46,7 @@
             <el-button type="primary" link @click="handleEdit(row)">编辑信息</el-button>
             <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
           </template>
-        </el-table-column> -->
+        </el-table-column> 
       <!--暂时不支持增删改-->
       </el-table>
 
@@ -170,7 +169,7 @@ const form = reactive({
   password: '',
   confirmPassword: '',
   repairmanNumber: '',
-  role: 'REPAIRMAN' // 默认角色
+  role: 'REPAIRMAN' 
 })
 
 // 编辑用户状态
@@ -354,7 +353,6 @@ const handleSubmit = async () => {
           await admin.createRepairman(form)
           ElMessage.success('添加成功')
         } else if (dialogType.value === 'edit') {
-          // 编辑信息：调用 updateRepairmanProfile
           const profileData = {
             username: form.username,
             phone: form.phone,
@@ -366,7 +364,6 @@ const handleSubmit = async () => {
           await admin.updateRepairmanProfile(form.id, profileData)
           ElMessage.success('信息更新成功')
         } else if (dialogType.value === 'status') {
-          // 编辑状态：调用 updateUser
           await admin.updateUser(form.id, { status: form.userStatus })
           ElMessage.success('状态更新成功')
         }

@@ -3,8 +3,6 @@
     <div class="page-header">
       <h2 class="page-title">收入统计</h2>
     </div>
-
-    <!-- 时间范围选择 -->
     <el-card shadow="hover" class="filter-card">
       <el-form :model="filterForm" inline>
         <el-form-item label="时间范围">
@@ -84,11 +82,6 @@
       </template>
       <el-table :data="details" style="width: 100%" v-loading="loading">
         <el-table-column prop="orderId" label="订单号" width="180" />
-        <!-- <el-table-column prop="settleTime" label="时间" width="240">
-          <template #default="{ row }">
-            {{ formatDateTime(row.settleTime) }}
-          </template>
-        </el-table-column> -->
         <el-table-column prop="hourlyMoneyRate" label="时薪" width="120">
           <template #default="{ row }">
             ¥{{ row.hourlyMoneyRate?.toFixed(2) }}

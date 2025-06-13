@@ -84,7 +84,6 @@ const pageSize = ref(10)
 const total = ref(0)
 const router = useRouter()
 
-// 获取维修类型标签
 const getRepairTypeTag = (type) => {
   const map = {
     MAINTENANCE: 'success',
@@ -96,7 +95,6 @@ const getRepairTypeTag = (type) => {
   return map[type] || 'info'
 }
 
-// 获取维修类型文本
 const getRepairTypeText = (type) => {
   const map = {
     MAINTENANCE: '常规保养',
@@ -111,7 +109,6 @@ const getRepairTypeText = (type) => {
   return map[type] || type
 }
 
-// 获取任务分配状态标签
 const getAssignmentStatusTag = (status) => {
   const map = {
     PENDING: 'warning',
@@ -122,7 +119,6 @@ const getAssignmentStatusTag = (status) => {
   return map[status] || status
 }
 
-// 获取任务分配状态文本
 const getAssignmentStatusText = (status) => {
    const map = {
     PENDING: '待处理',
@@ -133,7 +129,6 @@ const getAssignmentStatusText = (status) => {
   return map[status] || status
 }
 
-// 获取数据
 const fetchData = async () => {
   try {
     const res = await repairman.getAssignments({
@@ -148,7 +143,6 @@ const fetchData = async () => {
   }
 }
 
-// 接受任务分配
 const handleAcceptAssignment = async (row) => {
   try {
     await ElMessageBox.confirm('确定接受此任务分配吗？', '提示', {
@@ -167,7 +161,6 @@ const handleAcceptAssignment = async (row) => {
   }
 }
 
-// 拒绝任务分配
 const handleRejectAssignment = async (row) => {
   try {
     await ElMessageBox.confirm('确定拒绝此任务分配吗？', '提示', {
@@ -186,26 +179,15 @@ const handleRejectAssignment = async (row) => {
   }
 }
 
-// 开始维修
 const handleStartRepair = async (row) => {
   router.push('/repairman/orders')
-  // try {
-  //   await repairman.startRepair(row.orderId)
-  //   ElMessage.success('已开始维修')
-  //   fetchData()
-  // } catch (error) {
-  //   console.error('操作失败:', error)
-  //   ElMessage.error('操作失败')
-  // }
 }
 
-// 分页大小改变
 const handleSizeChange = (val) => {
   pageSize.value = val
   fetchData()
 }
 
-// 页码改变
 const handleCurrentChange = (val) => {
   currentPage.value = val
   fetchData()

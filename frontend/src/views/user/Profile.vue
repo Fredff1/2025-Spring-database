@@ -59,7 +59,6 @@ const form = reactive({
   userStatus: ''
 })
 
-// 获取用户状态类型
 const getUserStatusType = (status) => {
   const map = {
     ACTIVE: 'success',
@@ -69,7 +68,6 @@ const getUserStatusType = (status) => {
   return map[status] || 'info'
 }
 
-// 获取用户状态文本
 const getUserStatusText = (status) => {
   const map = {
     ACTIVE: '正常',
@@ -79,13 +77,11 @@ const getUserStatusText = (status) => {
   return map[status] || status
 }
 
-// 格式化日期时间
 const formatDateTime = (datetime) => {
   if (!datetime) return '-'
   return dayjs(datetime).format('YYYY-MM-DD HH:mm:ss')
 }
 
-// 获取用户信息
 const fetchUserInfo = async () => {
   try {
     const res = await user.getProfile()
@@ -96,7 +92,6 @@ const fetchUserInfo = async () => {
   }
 }
 
-// 编辑资料对话框
 const editDialogVisible = ref(false)
 const editForm = reactive({
   username: '',
@@ -104,7 +99,6 @@ const editForm = reactive({
   email: ''
 })
 
-// 打开编辑对话框
 const openEditDialog = () => {
   Object.assign(editForm, {
     username: form.username,
@@ -114,19 +108,17 @@ const openEditDialog = () => {
   editDialogVisible.value = true
 }
 
-// 提交编辑
+
 const submitEdit = async () => {
   try {
-    const response = await user.updateProfile(editForm) // 需要在 api/user.js 中定义对应方法
+    const response = await user.updateProfile(editForm) 
     console.log('后端返回的 response:', response)
     const token = response.token
 
-
-    // res 是字符串类型的新 token
     if (typeof token === 'string') {
-      localStorage.setItem('token', token) // 替换旧 token
+      localStorage.setItem('token', token) 
       ElMessage.success('更新成功，正在刷新信息...')
-      location.reload() // 强制刷新页面使新 token 生效
+      location.reload() 
     } else {
       ElMessage.warning('更新成功但未收到新 token，请重新登录')
     }
@@ -138,7 +130,6 @@ const submitEdit = async () => {
   }
 }
 
-// 初始化
 fetchUserInfo()
 </script>
 

@@ -470,16 +470,12 @@ const feedbackList = ref([])
 // 维修人员列表
 const repairmen = ref([])
 
-// 分页相关
 const pagination = reactive({
   currentPage: 1,
   pageSize: 10
 })
 
-// 获取维修人员列表
 
-
-// 获取维修类型标签
 const getRepairTypeTag = (type) => {
   const map = {
     MAINTENANCE: 'success',
@@ -491,7 +487,6 @@ const getRepairTypeTag = (type) => {
   return map[type] || 'info'
 }
 
-// 获取维修类型文本
 const getRepairTypeText = (type) => {
   const map = {
     MAINTENANCE: '常规保养',
@@ -506,7 +501,6 @@ const getRepairTypeText = (type) => {
   return map[type] || type
 }
 
-// 获取状态标签
 const getOrderStatusTag = (status) => {
   const map = {
     PENDING: 'info',
@@ -517,7 +511,6 @@ const getOrderStatusTag = (status) => {
   return map[status] || 'info'
 }
 
-// 获取状态文本
 const getOrderStatusText = (status) => {
   const map = {
     PENDING: '待处理',
@@ -528,7 +521,6 @@ const getOrderStatusText = (status) => {
   return map[status] || status
 }
 
-// 获取订单列表
 const fetchOrders = async () => {
   loading.value = true
   try {
@@ -547,7 +539,6 @@ const fetchOrders = async () => {
   }
 }
 
-// 查看订单详情
 const handleView = async (row) => {
   try {
     const [orderRes, recordsRes, materialsRes] = await Promise.all([

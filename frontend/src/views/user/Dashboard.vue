@@ -102,7 +102,6 @@ const stats = ref({
 const recentOrders = ref([])
 
 
-// 跳转到订单页面
 const goToOrders = () => {
   router.push('/user/repair-orders')
 }
@@ -141,14 +140,11 @@ const getStatusText = (status) => {
   return map[status] || status
 }
 
-// 获取数据
 const fetchData = async () => {
   try {
-    // 获取统计数据
     const statsRes = await user.getStats()
     stats.value = statsRes
 
-    // 获取最近订单
     const ordersRes = await user.getRepairOrders({ page: 1, limit: 5 })
     recentOrders.value = ordersRes.list
     

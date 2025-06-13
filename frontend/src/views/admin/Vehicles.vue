@@ -4,38 +4,6 @@
       <h2 class="page-title">车辆管理</h2>
       <el-button type="primary" @click="handleAdd">添加车辆</el-button>
     </div>
-
-    <!-- 搜索栏 -->
-    <!-- <el-card shadow="hover" class="search-card">
-      <el-form :inline="true" :model="searchForm">
-        <el-form-item label="车牌号">
-          <el-input v-model="searchForm.plateNumber" placeholder="请输入车牌号" />
-        </el-form-item>
-        <el-form-item label="品牌">
-          <el-input v-model="searchForm.brand" placeholder="请输入品牌" />
-        </el-form-item>
-        <el-form-item label="型号" prop="model">
-          <el-select v-model="form.model" placeholder="请选择车型">
-            <el-option label="多用途车" value="SUV" />
-            <el-option label="轿车" value="Sedan" />
-            <el-option label="皮卡" value="Pickup" />
-            <el-option label="货车" value="Van" />
-            <el-option label="小型车" value="Hatchback" />
-            <el-option label="跑车" value="Coupe" />
-            <el-option label="敞篷车" value="Convertible" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="车主">
-          <el-input v-model="searchForm.ownerName" placeholder="请输入车主姓名" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card> -->
-
-    <!-- 车辆列表 -->
     <el-card shadow="hover">
       <el-table :data="vehicles" style="width: 100%" v-loading="loading">
         <el-table-column prop="id" label="ID" width="80" />
@@ -317,11 +285,9 @@ const handleSubmit = async () => {
       submitting.value = true
       try {
         if (form.id) {
-          // 编辑
           await admin.updateVehicle(form.id, form)
           ElMessage.success('更新成功')
         } else {
-          // 创建（这里传入用户名，假设是 ownerName）
           await admin.createVehicle(form.ownerName, form)
           ElMessage.success('创建成功')
         }
@@ -338,13 +304,11 @@ const handleSubmit = async () => {
 }
 
 
-// 分页大小变化
 const handleSizeChange = (val) => {
   pageSize.value = val
   fetchVehicles()
 }
 
-// 页码变化
 const handleCurrentChange = (val) => {
   currentPage.value = val
   fetchVehicles()

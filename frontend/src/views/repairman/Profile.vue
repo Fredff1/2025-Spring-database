@@ -209,7 +209,6 @@ const editForm = reactive({
   hourlyMoneyRate: form.hourlyMoneyRate
 })
 
-// 打开编辑对话框
 const openEditDialog = () => {
   Object.assign(editForm, {
     username: form.username,
@@ -220,7 +219,6 @@ const openEditDialog = () => {
   editDialogVisible.value = true
 }
 
-// 提交编辑
 const submitEdit = async () => {
   try {
     const response = await repairman.updateProfile(editForm)
@@ -228,11 +226,10 @@ const submitEdit = async () => {
     const token = response.token
 
 
-    // res 是字符串类型的新 token
     if (typeof token === 'string') {
-      localStorage.setItem('token', token) // 替换旧 token
+      localStorage.setItem('token', token) 
       ElMessage.success('更新成功，正在刷新信息...')
-      location.reload() // 强制刷新页面使新 token 生效
+      location.reload() 
     } else {
       ElMessage.warning('更新成功但未收到新 token，请重新登录')
     }
@@ -244,18 +241,16 @@ const submitEdit = async () => {
 }
 
 
-// 监听统计时间范围变化
 watch(statsTimeRange, () => {
   fetchStats()
 })
 
 onMounted(() => {
   fetchProfile()
-fetchStats()
+  fetchStats()
 })
 
 
-// 初始化
 
 </script>
 

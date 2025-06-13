@@ -5,26 +5,6 @@
       <el-button type="primary" @click="handleAdd">添加用户</el-button> 
     </div>
 
-    <!-- 搜索栏 -->
-    <!-- <el-card shadow="hover" class="search-card">
-      <el-form :inline="true" :model="searchForm">
-        <el-form-item label="用户名">
-          <el-input v-model="searchForm.username" placeholder="请输入用户名" />
-        </el-form-item>
-        <el-form-item label="姓名">
-          <el-input v-model="searchForm.name" placeholder="请输入姓名" />
-        </el-form-item>
-        <el-form-item label="手机号">
-          <el-input v-model="searchForm.phone" placeholder="请输入手机号" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card> -->
-
-    <!-- 用户列表 -->
     <el-card shadow="hover">
       <el-table :data="users" style="width: 100%" v-loading="loading">
         <el-table-column prop="id" label="ID" width="80" />
@@ -150,7 +130,7 @@ const form = reactive({
   userStatus: 'ACTIVE',
   password: '',
   confirmPassword: '',
-  role: 'CUSTOMER' // 默认就是创建顾客
+  role: 'CUSTOMER' 
 })
 
 // 表单验证规则
@@ -208,13 +188,11 @@ const getUserStatusText = (status) => {
   return map[status] || status
 }
 
-// 格式化日期时间
 const formatDateTime = (datetime) => {
   if (!datetime) return '-'
   return dayjs(datetime).format('YYYY-MM-DD HH:mm:ss')
 }
 
-// 获取用户列表
 const fetchUsers = async () => {
   loading.value = true
   try {
@@ -233,7 +211,6 @@ const fetchUsers = async () => {
   }
 }
 
-// 添加用户
 const handleAdd = () => {
   dialogType.value = 'add'
   form.username = ''
@@ -303,13 +280,11 @@ const handleSubmit = async () => {
 }
 
 
-// 分页大小变化
 const handleSizeChange = (val) => {
   pageSize.value = val
   fetchUsers()
 }
 
-// 页码变化
 const handleCurrentChange = (val) => {
   currentPage.value = val
   fetchUsers()

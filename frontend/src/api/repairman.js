@@ -1,7 +1,6 @@
 import http from './http'
 
 // 维修人员认证
-// export const updateProfile = data => http.put('/repairman/profile', data)
 export const getProfile = () => http.get('/repairman/profile')
 export const getOverview = () => http.get('/repairman/overview')
 export const getStats = params => http.get('/repairman/statistics', { params })

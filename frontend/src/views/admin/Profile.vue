@@ -18,51 +18,6 @@
         <el-descriptions-item label="更新时间">{{ formatDateTime(form.updateTime) }}</el-descriptions-item>
       </el-descriptions>
     </el-card>
-
-    <!-- <el-card shadow="hover" class="password-card">
-      <template #header>
-        <div class="card-header">
-          <span>修改密码</span>
-        </div>
-      </template>
-      <el-form
-        ref="passwordFormRef"
-        :model="passwordForm"
-        :rules="passwordRules"
-        label-width="100px"
-      >
-        <el-form-item label="原密码" prop="oldPassword">
-          <el-input
-            v-model="passwordForm.oldPassword"
-            type="password"
-            show-password
-          />
-        </el-form-item>
-        <el-form-item label="新密码" prop="newPassword">
-          <el-input
-            v-model="passwordForm.newPassword"
-            type="password"
-            show-password
-          />
-        </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input
-            v-model="passwordForm.confirmPassword"
-            type="password"
-            show-password
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            @click="handlePasswordChange"
-            :loading="passwordLoading"
-          >
-            修改密码
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </el-card> -->
   </div>
 </template>
 
@@ -192,50 +147,7 @@ const fetchUserInfo = async () => {
   }
 }
 
-// 提交表单
-const handleSubmit = async () => {
-  if (!formRef.value) return
-  
-  await formRef.value.validate(async (valid) => {
-    if (valid) {
-      loading.value = true
-      try {
-        await admin.updateInfo(form)
-        ElMessage.success('保存成功')
-      } catch (error) {
-        console.error('保存失败:', error)
-        ElMessage.error('保存失败')
-      } finally {
-        loading.value = false
-      }
-    }
-  })
-}
 
-// 修改密码
-const handlePasswordChange = async () => {
-  if (!passwordFormRef.value) return
-  
-  await passwordFormRef.value.validate(async (valid) => {
-    if (valid) {
-      passwordLoading.value = true
-      try {
-        await admin.changePassword(passwordForm.value)
-        ElMessage.success('密码修改成功')
-        passwordForm.value = {
-          oldPassword: '',
-          newPassword: '',
-          confirmPassword: ''
-        }
-      } catch (error) {
-        console.error('密码修改失败:', error)
-        ElMessage.error('密码修改失败')
-      } finally {
-        passwordLoading.value = false
-      }
-    }
-  })
-}
 
 onMounted(() => {
   fetchUserInfo()

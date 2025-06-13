@@ -17,10 +17,6 @@
             </template>
             <div class="card-content">
               <div class="value">{{ overview.totalAssignments }}个待处理分配</div>
-              <!-- <div class="trend" :class="{ 'up': overview.orderTrend > 0 }">
-                {{ overview.orderTrend > 0 ? '+' : '' }}{{ overview.orderTrend }}%
-                <el-icon><arrow-up /></el-icon>
-              </div> -->
             </div>
           </el-card>
         </el-col>
@@ -47,10 +43,6 @@
             </template>
             <div class="card-content">
               <div class="value">¥{{ overview.monthlyIncome.toFixed(2) }}</div>
-              <!-- <div class="trend" :class="{ 'up': overview.incomeTrend > 0 }">
-                {{ overview.incomeTrend > 0 ? '+' : '' }}{{ overview.incomeTrend }}%
-                <el-icon><arrow-up /></el-icon>
-              </div> -->
             </div>
           </el-card>
         </el-col>
@@ -204,17 +196,10 @@ const pendingOrders = ref([])
 
 // 工作统计
 const statisticsType = ref('week')
-const statistics = ref({
-  completedOrders: 0,
-  repairHours: 0,
-  income: 0,
-  rating: 0
-})
 
 // 任务分配列表
 const assignments = ref([])
 
-// 获取维修类型标签
 const getRepairTypeTag = (type) => {
   const map = {
     MAINTENANCE: 'success',
@@ -226,7 +211,6 @@ const getRepairTypeTag = (type) => {
   return map[type] || 'info'
 }
 
-// 获取维修类型文本
 const getRepairTypeText = (type) => {
   const map = {
     MAINTENANCE: '常规保养',
@@ -241,7 +225,6 @@ const getRepairTypeText = (type) => {
   return map[type] || type
 }
 
-// 获取任务分配状态标签
 const getAssignmentStatusTag = (status) => {
   const map = {
     PENDING: 'warning',
@@ -252,7 +235,6 @@ const getAssignmentStatusTag = (status) => {
   return map[status] || status
 }
 
-// 获取任务分配状态文本
 const getAssignmentStatusText = (status) => {
   const map = {
     PENDING: '待处理',
@@ -263,7 +245,6 @@ const getAssignmentStatusText = (status) => {
   return map[status] || status
 }
 
-// 获取状态标签
 const getOrderStatusTag = (status) => {
   const map = {
     PENDING: 'info',
@@ -274,7 +255,6 @@ const getOrderStatusTag = (status) => {
   return map[status] || 'info'
 }
 
-// 获取状态文本
 const getOrderStatusText = (status) => {
   const map = {
     PENDING: '待处理',
@@ -285,7 +265,6 @@ const getOrderStatusText = (status) => {
   return map[status] || status
 }
 
-// 获取数据
 const fetchData = async () => {
   try {
     const [overviewRes, pendingRes, assignmentsRes] = await Promise.all([
@@ -302,12 +281,10 @@ const fetchData = async () => {
   }
 }
 
-// 开始维修
 const handleShowDetail = async (row) => {
   router.push('/repairman/orders')
 }
 
-// 接受任务分配
 const handleAcceptAssignment = async (row) => {
   try {
     await ElMessageBox.confirm('确定接受此任务分配吗？', '提示', {
@@ -326,7 +303,6 @@ const handleAcceptAssignment = async (row) => {
   }
 }
 
-// 拒绝任务分配
 const handleRejectAssignment = async (row) => {
   try {
     await ElMessageBox.confirm('确定拒绝此任务分配吗？', '提示', {
@@ -345,17 +321,14 @@ const handleRejectAssignment = async (row) => {
   }
 }
 
-// 查看全部任务分配
 const handleViewAllAssignments = () => {
   router.push('/repairman/assignments')
 }
 
-// 查看全部订单
 const handleViewAll = () => {
   router.push('/repairman/orders')
 }
 
-// 监听统计类型变化
 watch(statisticsType, () => {
   fetchData()
 })

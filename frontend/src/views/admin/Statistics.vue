@@ -270,13 +270,7 @@ const unfinishedByRepairman = ref([])
 const unfinishedByVehicle = ref([])
 
 
-function formatDateString(d) {
-  if (!d) return ''
-  const yyyy = d.getFullYear()
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const dd = String(d.getDate()).padStart(2, '0')
-  return `${yyyy}-${mm}-${dd}`
-}
+
 
 // 更新时间：格式化成 "YYYY-MM-DD hh:mm:ss"
 const formatDateTime = dt => {
@@ -371,7 +365,7 @@ const getOrderStatusText = (status) => {
   return map[status] || status
 }
 
-// 负面反馈统计
+
 const fetchNegativeFeedback = async () => {
   try {
     const res = await admin.getNegativeFeedbackStats({
@@ -379,18 +373,16 @@ const fetchNegativeFeedback = async () => {
       limit: negativeFeedbackLimit.value,
       period: negativeFeedbackPeriod.value 
     });
-    // 假设 res = { list: [...], total: 6 }
 
-    // 1) 把后端原始字段映射到 table props 对应的字段：
     negativeFeedbackList.value = (res.list || []).map(item => ({
       feedbackType: item.feedbackType,
-      customerName: item.customerName,         // 用户名
-      content:      item.feedbackContent,      // 反馈内容，映射到 prop="content"
-      date:         item.feedbackTime,         // 反馈时间，映射到 prop="date"
-      technicians:  item.repairmanName.join('、'), // 把技师列表转成 “mike、nancy” 这种字符串
-      rating:       item.rating,               // 评分 (比如 later 用 el-rate 展示)
-      faultType:    item.faultType,            // 故障类型
-      orderId:      item.orderId               // 如果想展示订单ID 也可以加一列
+      customerName: item.customerName,         
+      content:      item.feedbackContent,      
+      date:         item.feedbackTime,         
+      technicians:  item.repairmanName.join('、'), 
+      rating:       item.rating,             
+      faultType:    item.faultType,            
+      orderId:      item.orderId              
     }));
     console.log(negativeFeedbackList.value)
     negativeFeedbackTotal.value = res.total || 0;
@@ -402,18 +394,15 @@ const fetchNegativeFeedback = async () => {
 const fetchCostProportion = async () => {
   try {
     const res = await admin.getCostProportionStats({ period: costPeriod.value });
-    // 组装 ECharts 期望的 data 数组
     const chartData = [
       { name: '材料成本', value: res.materialCost },
       { name: '人工成本', value: res.laborCost }
     ];
 
-    // 等 DOM 更新完毕后再初始化/更新图表
     await nextTick();
     if (!costPieChartInstance.value) {
       costPieChartInstance.value = echarts.init(costPieChart.value);
     } else {
-      // 如果已有实例，先清空旧配置
       costPieChartInstance.value.clear();
     }
     costPieChartInstance.value.setOption({
@@ -437,7 +426,6 @@ const fetchCostProportion = async () => {
       ]
     });
   } catch (e) {
-    // 如果请求失败，销毁旧实例
     if (costPieChartInstance.value) {
       costPieChartInstance.value.dispose();
       costPieChartInstance.value = null;
@@ -531,7 +519,7 @@ function renderLevel1() {
   })
 }
 
-// 点击事件：根据 rawType 下钻到车型，或点击“← 返回”回到第一级
+// 点击事件
 function bindClick() {
   chartInst.value.off('click')
   chartInst.value.on('click', (params) => {
@@ -575,7 +563,6 @@ function bindClick() {
 const fetchFaultTypeStats = async () => {
   try {
     const raw = await admin.getVehicleFaultTypeStats({ period: faultTypePeriod.value })
-    // raw 格式：[{ model, faultType, count }, ...]
     const level1 = {}
     const level2 = {}
     raw.forEach(r => {
@@ -596,7 +583,6 @@ const fetchFaultTypeStats = async () => {
     }
     renderLevel1()
     bindClick()
-    // 在短延迟后触发一次 resize，确保容器稳定
     setTimeout(() => {
       chartInst.value && chartInst.value.resize()
     }, 100)
@@ -710,7 +696,6 @@ const fetchOrderProcessStats = async () => {
   }
 }
 
-// 维修类型不匹配统计
 const fetchMismatchStats = async () => {
   try {
     const res = await admin.getOrderMismatchStats()
@@ -722,7 +707,6 @@ const fetchMismatchStats = async () => {
 
 const fetchUnfinishedOrderStats = async () => {
   try {
-    // 同时并行请求三条接口
     const [faultTypeRes, repairmanRes, vehicleRes] = await Promise.all([
       admin.getUnfinishedOrderFaultTypeStats(),
       admin.getUnfinishedOrderRepairmanStats(),
@@ -770,7 +754,6 @@ onMounted(() => {
   padding: 20px;
 }
 
-/* 页面标题 */
 .page-header {
   display: flex;
   align-items: center;
@@ -781,7 +764,6 @@ onMounted(() => {
   font-weight: 600;
 }
 
-/* 各卡片宽度 100%，由 el-col 控制栅格 */
 .stat-card-large {
   width: 100%;
 }
@@ -789,7 +771,6 @@ onMounted(() => {
   width: 100%;
 }
 
-/* 表格水平居中 */
 .table-wrapper {
   display: flex;
   justify-content: center;
@@ -799,7 +780,6 @@ onMounted(() => {
   overflow-y: auto;
 }
 
-/* 图表容器固定高度 */
 .chart-container {
   height: 300px;
 }

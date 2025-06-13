@@ -27,14 +27,6 @@
           />
         </el-form-item>
 
-        <!-- <el-form-item label="角色" prop="role">
-          <el-select v-model="form.role" placeholder="请选择角色">
-            <el-option label="管理员" value="ADMIN" />
-            <el-option label="维修人员" value="REPAIRMAN" />
-            <el-option label="客户" value="CUSTOMER" />
-          </el-select>
-        </el-form-item> -->
-
         <el-form-item>
           <el-button type="primary" native-type="submit" :loading="loading">
             登录
@@ -75,9 +67,6 @@ const rules = {
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
   ],
-  // role: [
-  //   { required: true, message: '请选择角色', trigger: 'change' }
-  // ]
 }
 
 const handleLogin = async () => {
@@ -98,11 +87,9 @@ const handleLogin = async () => {
     
     if (response.ok) {
       const data = await response.json()
-      // 保存token和角色信息
       setToken(data.token)
       ElMessage.success('登录成功')
       
-      // 根据角色跳转到不同页面
       switch (data.role) {
         case 'ADMIN':
           router.push('/admin/dashboard')

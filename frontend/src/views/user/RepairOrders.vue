@@ -238,24 +238,6 @@
           <el-empty v-else description="暂无维修记录" />
         </el-tab-pane>
 
-        <!-- 材料使用 -->
-        <!-- <el-tab-pane label="材料使用" name="materials">
-          <el-table :data="materialUsages" style="width: 100%">
-            <el-table-column prop="materialName" label="材料名称" />
-            <el-table-column prop="quantity" label="数量" width="100" />
-            <el-table-column prop="unitPrice" label="单价" width="120">
-              <template #default="{ row }">
-                ¥{{ row.unitPrice?.toFixed(2) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="小计" width="120">
-              <template #default="{ row }">
-                ¥{{ (row.quantity * row.unitPrice)?.toFixed(2) }}
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-tab-pane> -->
-
         <!-- 反馈记录 -->
         <el-tab-pane label="反馈记录" name="feedback">
           <template v-if="feedbackList.length > 0">
@@ -447,7 +429,6 @@ const getStatusText = (status) => {
   return map[status] || status
 }
 
-// 获取订单列表
 const fetchOrders = async () => {
   try {
     const res = await user.getRepairOrders({
@@ -462,7 +443,6 @@ const fetchOrders = async () => {
   }
 }
 
-// 获取车辆列表
 const fetchVehicles = async () => {
   try {
     const res = await user.getVehicles()
@@ -494,9 +474,7 @@ const getRepairTypeText = (type) => {
   return map[type] || type
 }
 
-// 显示创建订单对话框
 const showCreateDialog = async () => {
-  // 重置表单
   orderForms.value = [{
     vehicleId: '',
     faultType: '',
@@ -504,7 +482,6 @@ const showCreateDialog = async () => {
   }]
   formRefs.value = []
   
-  // 确保车辆列表已加载
   if (vehicles.value.length === 0) {
     await fetchVehicles()
   }
@@ -512,7 +489,6 @@ const showCreateDialog = async () => {
   createDialogVisible.value = true
 }
 
-// 添加订单
 const addOrder = () => {
   orderForms.value.push({
     vehicleId: '',
@@ -521,15 +497,13 @@ const addOrder = () => {
   })
 }
 
-// 删除订单
+
 const removeOrder = (index) => {
   orderForms.value.splice(index, 1)
 }
 
-// 处理创建订单
 const handleCreate = async () => {
   try {
-    // 验证所有表单
     const validations = await Promise.all(
       formRefs.value.map(form => form.validate())
     )
@@ -549,10 +523,8 @@ const handleCreate = async () => {
   }
 }
 
-// 处理取消订单
 const handleCancel = async (row) => {
   try {
-    // 弹出确认对话框
     await ElMessageBox.confirm(
       `你确定要取消订单 ${row.orderNo} 吗？`,
       '确认取消',
@@ -562,12 +534,10 @@ const handleCancel = async (row) => {
         type: 'warning',
       }
     )
-    // 如果用户点了「确定」，继续下面的取消逻辑
     await user.cancelOrder(row.id)
     ElMessage.success('取消成功')
     fetchOrders()
   } catch (err) {
-    // 如果用户点「取消」，err 会是一个取消的异常，我们不需要做任何处理
     if (err !== 'cancel') {
       console.error('取消失败:', err)
       ElMessage.error('取消失败')
@@ -575,13 +545,11 @@ const handleCancel = async (row) => {
   }
 }
 
-// 处理支付
 const handlePay = (row) => {
   currentOrder.value = row
   payDialogVisible.value = true
 }
 
-// 确认支付
 const confirmPay = async () => {
   try {
     await user.payOrder(currentOrder.value.id)
@@ -594,7 +562,6 @@ const confirmPay = async () => {
   }
 }
 
-// 分页处理
 const handleSizeChange = (val) => {
   pageSize.value = val
   fetchOrders()
@@ -605,7 +572,6 @@ const handleCurrentChange = (val) => {
   fetchOrders()
 }
 
-// 获取反馈类型标签
 const getFeedbackTypeTag = (type) => {
   const map = {
     RATING: 'success',
@@ -615,7 +581,6 @@ const getFeedbackTypeTag = (type) => {
   return map[type] || 'info'
 }
 
-// 获取反馈类型文本
 const getFeedbackTypeText = (type) => {
   const map = {
     RATING: '评分反馈',
@@ -625,7 +590,6 @@ const getFeedbackTypeText = (type) => {
   return map[type] || type
 }
 
-// 获取维修记录类型标签
 const getRecordTypeTag = (status) => {
   const map = {
     '待处理': 'info',
@@ -635,13 +599,8 @@ const getRecordTypeTag = (status) => {
   return map[status] || 'info'
 }
 
-// 获取维修人员姓名
-const getRepairmanName = (repairmanId) => {
-  // 这里需要从后端获取维修人员信息
-  return `维修人员${repairmanId}`
-}
 
-// 查看详情
+
 const handleView = async (row) => {
   try {
     const [records, materials, feedbacks] = await Promise.all([
@@ -660,7 +619,7 @@ const handleView = async (row) => {
   }
 }
 
-// 获取反馈内容占位符
+
 const getFeedbackPlaceholder = (type) => {
   const placeholders = {
     RATING: '请输入您的评价内容',
@@ -670,7 +629,7 @@ const getFeedbackPlaceholder = (type) => {
   return placeholders[type] || '请输入反馈内容'
 }
 
-// 处理反馈
+
 const handleFeedback = (row) => {
   currentOrder.value = row
   feedbackForm.orderId = row.id
@@ -680,7 +639,7 @@ const handleFeedback = (row) => {
   feedbackDialogVisible.value = true
 }
 
-// 提交反馈
+
 const submitFeedback = async () => {
   if (!feedbackFormRef.value) return
   await feedbackFormRef.value.validate(async (valid) => {
@@ -695,7 +654,6 @@ const submitFeedback = async () => {
         await user.submitFeedback(submitData)
         ElMessage.success('反馈提交成功')
         feedbackDialogVisible.value = false
-        // 刷新反馈列表
         if (viewDialogVisible.value) {
           const feedbacks = await user.getFeedbackList(currentOrder.value.id)
           feedbackList.value = feedbacks

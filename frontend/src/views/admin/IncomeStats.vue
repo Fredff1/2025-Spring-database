@@ -3,77 +3,6 @@
     <div class="page-header">
       <h2 class="page-title">财务管理</h2>
     </div>
-
-    <!-- 时间范围选择 -->
-    <!-- <el-card shadow="hover" class="filter-card">
-      <el-form :model="filterForm" inline>
-        <el-form-item label="时间范围">
-          <el-date-picker
-            v-model="filterForm.dateRange"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            value-format="YYYY-MM-DD"
-            :shortcuts="dateShortcuts"
-            @change="handleDateRangeChange"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleFilter">查询</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card> -->
-
-    <!-- 收入概览 -->
-    <!-- <div class="overview">
-      <el-row :gutter="20">
-        <el-col :span="8">
-          <el-card shadow="hover" class="overview-card">
-            <template #header>
-              <div class="card-header">
-                <span>总收入</span>
-                <el-tag type="success">总计</el-tag>
-              </div>
-            </template>
-            <div class="card-content">
-              <div class="value">¥{{ overview.totalIncome?.toFixed(2) || '0.00' }}</div>
-              <div class="sub-value">累计收入</div>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="8">
-          <el-card shadow="hover" class="overview-card">
-            <template #header>
-              <div class="card-header">
-                <span>总工时</span>
-                <el-tag type="primary">总计</el-tag>
-              </div>
-            </template>
-            <div class="card-content">
-              <div class="value">{{ overview.totalHours?.toFixed(1) || '0.0' }}h</div>
-              <div class="sub-value">累计工时</div>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="8">
-          <el-card shadow="hover" class="overview-card">
-            <template #header>
-              <div class="card-header">
-                <span>平均时薪</span>
-                <el-tag type="warning">统计</el-tag>
-              </div>
-            </template>
-            <div class="card-content">
-              <div class="value">¥{{ overview.averageHourlyRate?.toFixed(2) || '0.00' }}</div>
-              <div class="sub-value">/小时</div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </div> -->
-
     <!-- 收入明细 -->
     <el-card shadow="hover" class="table-card">
       <template #header>
@@ -132,36 +61,7 @@ import { ElMessage } from 'element-plus'
 import { admin } from '@/api'
 import dayjs from 'dayjs'
 
-// 日期快捷选项
-const dateShortcuts = [
-  {
-    text: '最近一周',
-    value: () => {
-      const end = new Date()
-      const start = new Date()
-      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-      return [start, end]
-    }
-  },
-  {
-    text: '最近一个月',
-    value: () => {
-      const end = new Date()
-      const start = new Date()
-      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-      return [start, end]
-    }
-  },
-  {
-    text: '最近三个月',
-    value: () => {
-      const end = new Date()
-      const start = new Date()
-      start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-      return [start, end]
-    }
-  }
-]
+
 
 // 筛选表单
 const filterForm = reactive({
@@ -187,7 +87,7 @@ const overview = ref({
 const loading = ref(false)
 const details = ref([])
 
-// 格式化月份
+
 const formatMonth = (month) => {
   if (!month) return '-'
   return dayjs(month).format('YYYY年MM月')
@@ -199,7 +99,6 @@ const formatDateTime = (datetime) => {
   return dayjs(datetime).format('YYYY-MM-DDTHH:mm:ss')
 }
 
-// 获取数据
 const fetchData = async () => {
   loading.value = true
   try {
@@ -211,12 +110,7 @@ const fetchData = async () => {
     details.value = res.list || []
     total.value = res.total || 0
     
-    // 更新概览数据
-    // overview.value = {
-    //   totalIncome: res.totalIncome || 0,
-    //   totalHours: res.totalHours || 0,
-    //   averageHourlyRate: res.averageHourlyRate || 0
-    // }
+
   } catch (error) {
     console.error('获取数据失败:', error)
     ElMessage.error('获取数据失败')
@@ -225,18 +119,15 @@ const fetchData = async () => {
   }
 }
 
-// 日期范围变化
 const handleDateRangeChange = () => {
   currentPage.value = 1
   handleFilter()
 }
 
-// 筛选
 const handleFilter = () => {
   fetchData()
 }
 
-// 重置筛选
 const handleReset = () => {
   filterForm.dateRange = [
     dayjs().subtract(30, 'day').format('YYYY-MM-DD'),
@@ -262,13 +153,13 @@ const handleExport = async () => {
   }
 }
 
-// 分页大小变化
+
 const handleSizeChange = (val) => {
   pageSize.value = val
   fetchData()
 }
 
-// 页码变化
+
 const handleCurrentChange = (val) => {
   currentPage.value = val
   fetchData()

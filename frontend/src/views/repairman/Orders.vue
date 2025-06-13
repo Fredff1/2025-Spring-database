@@ -248,13 +248,12 @@ const recordRules = {
   ],
 }
 
-// 反馈相关
 const feedbackDialogVisible = ref(false)
 const feedbackLoading = ref(false)
 const feedbackList = ref([])
 const currentOrderId = ref(null)
 
-// 获取维修类型标签
+
 const getRepairTypeTag = (type) => {
   const map = {
     MAINTENANCE: 'success',
@@ -266,7 +265,6 @@ const getRepairTypeTag = (type) => {
   return map[type] || 'info'
 }
 
-// 获取维修类型文本
 const getRepairTypeText = (type) => {
   const map = {
    MAINTENANCE: '常规保养',
@@ -281,7 +279,6 @@ const getRepairTypeText = (type) => {
   return map[type] || type
 }
 
-// 获取状态标签
 const getOrderStatusTag = (status) => {
   const map = {
     PENDING: 'info',
@@ -292,7 +289,6 @@ const getOrderStatusTag = (status) => {
   return map[status] || 'info'
 }
 
-// 获取状态文本
 const getOrderStatusText = (status) => {
   const map = {
     PENDING: '待处理',
@@ -303,7 +299,6 @@ const getOrderStatusText = (status) => {
   return map[status] || status
 }
 
-// 获取订单列表
 const fetchOrders = async () => {
   loading.value = true
   try {
@@ -321,7 +316,6 @@ const fetchOrders = async () => {
   }
 }
 
-// 查看订单详情
 const handleView = async (row) => {
   try {
     const [orderRes, recordsRes, materialsRes] = await Promise.all([
@@ -339,7 +333,6 @@ const handleView = async (row) => {
   }
 }
 
-// 查看反馈
 const handleFeedback = async (row) => {
   currentOrderId.value = row.id
   feedbackDialogVisible.value = true
@@ -355,7 +348,6 @@ const handleFeedback = async (row) => {
   }
 }
 
-// 添加材料
 const handleAddMaterial = () => {
   recordForm.materials.push({
     materialName: '',
@@ -365,12 +357,10 @@ const handleAddMaterial = () => {
   })
 }
 
-// 删除材料
 const handleRemoveMaterial = (index) => {
   recordForm.materials.splice(index, 1)
 }
 
-// 提交维修记录
 const handleSubmitRecord = (row) => {
   currentOrder.value = row
   recordForm.status = 'PROCESSING'
@@ -381,7 +371,6 @@ const handleSubmitRecord = (row) => {
   recordDialogVisible.value = true
 }
 
-// 更新订单状态
 const handleUpdateStatus = async (row) => {
   try {
     const newStatus = row.status === 'PENDING' ? 'PROCESSING' : 'COMPLETED'
@@ -394,7 +383,6 @@ const handleUpdateStatus = async (row) => {
   }
 }
 
-// 提交维修记录
 const handleRecordSubmit = async () => {
   if (!recordFormRef.value) return
   await recordFormRef.value.validate(async (valid) => {
@@ -421,7 +409,6 @@ const handleRecordSubmit = async () => {
   })
 }
 
-// 分页
 const handleSizeChange = (val) => {
   pageSize.value = val
   fetchOrders()
