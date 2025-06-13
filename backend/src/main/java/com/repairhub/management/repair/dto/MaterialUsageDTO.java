@@ -17,9 +17,9 @@ import lombok.NoArgsConstructor;
 public class MaterialUsageDTO {
     private Long usageId;
     private Long orderId;
-    private String materialName;  // 材料名称
-    private Integer quantity;  // 使用数量
-    private BigDecimal unitPrice;  // 单价
+    private String materialName;  
+    private Integer quantity;  
+    private BigDecimal unitPrice;  
     private LocalDateTime createTime;
 
     public static MaterialUsageDTO from(MaterialUsage materialUsage){

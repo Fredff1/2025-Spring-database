@@ -13,6 +13,4 @@ public class UpdateVehicleRequest {
     private String licensePlate;
     private String brand;
     private String model;
-    // private Integer year;
-    // private String vin;
 }

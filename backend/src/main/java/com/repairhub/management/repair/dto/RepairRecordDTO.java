@@ -24,10 +24,10 @@ public class RepairRecordDTO {
     private Long recordId;
     private Long orderId;
     private Long repairmanId;
-    private String repairmanName;  // 维修人员姓名
-    private String faultDescription;  // 故障描述
-    private String repairResult;  // 维修结果
-    private String status;  // 维修状态：待处理、处理中、已完成
+    private String repairmanName;  
+    private String faultDescription;  
+    private String repairResult;  
+    private String status; 
     private BigDecimal actualWorkingHour;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

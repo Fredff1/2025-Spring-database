@@ -32,7 +32,7 @@ public class RepairRecordJdbcRepository implements RepairRecordRepository {
             .withTableName("repair_record")
             .usingGeneratedKeyColumns("repair_record_id");
     }
-    // Implement the methods from RepairRecordRepository interface
+
     @Override
     public int insert(RepairRecord repairRecord) {
         SqlParameterSource params = new MapSqlParameterSource()

@@ -29,7 +29,7 @@ public class VehicleDetailDTO {
         .model(vehicle.getModel())
         .brand(vehicle.getBrand())
         .ownerName(owner.getUsername())
-        .registerDate(vehicle.getRegisterDate()) //TODO time
+        .registerDate(vehicle.getRegisterDate()) 
 
         .build();
         return dto;

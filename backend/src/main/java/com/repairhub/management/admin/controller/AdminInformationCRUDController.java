@@ -529,7 +529,7 @@ public class AdminInformationCRUDController {
     private String generateRepairmanNumber() {
     String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     StringBuilder sb = new StringBuilder(16);
-    Random random = new SecureRandom(); // 更安全的随机数生成器
+    Random random = new SecureRandom(); 
 
     for (int i = 0; i < 16; i++) {
         sb.append(chars.charAt(random.nextInt(chars.length())));

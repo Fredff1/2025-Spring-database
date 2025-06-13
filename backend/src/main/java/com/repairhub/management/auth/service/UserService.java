@@ -38,7 +38,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
     }
-
+    
     public User registerUser(RegisterRequestDTO createUserDTO){
         String username = createUserDTO.getUsername();
         if(userRepository.findByUsername(username).isPresent()){

@@ -46,7 +46,6 @@ public class RepairFeeService {
         return laborFeeLog;
     }    
 
-    @Transactional
     public int updateLaborFeeLog(Long laborFeeLogId,CreateLaborFeeLogDTO updateFeeLogDto) {
         LaborFeeLog laborFeeLog = laborFeeLogRepository.findById(laborFeeLogId)
             .orElseThrow(() -> new IllegalArgumentException("Labor fee log not found"));

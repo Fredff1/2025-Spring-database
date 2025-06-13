@@ -38,7 +38,6 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
             .usingGeneratedKeyColumns("assignment_id");
     }
 
-    // 新增一条订单分配记录
     @Override
     public int insert(OrderAssignment orderAssignment){
         SqlParameterSource params = new MapSqlParameterSource()
@@ -52,7 +51,6 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
         return 1;
     }
 
-    // 更新订单分配记录（如接受或拒绝）
     @Override
     public int update(OrderAssignment orderAssignment){
         String sql = """
@@ -74,14 +72,12 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
         return jdbc.update(sql, params);
     }
 
-    // 删除订单分配记录
     @Override
     public int deleteById(Long assignmentId){
         String sql = "DELETE FROM assignment WHERE assignment_id = :assignmentId";
         return jdbc.update(sql, Map.of("assignmentId", assignmentId));
     }
 
-    // 根据主键查找订单分配记录
     @Override
     public Optional<OrderAssignment> findById(Long assignmentId){
         String sql = "SELECT * FROM assignment WHERE assignment_id = :assignmentId";
@@ -89,14 +85,12 @@ public class OrderAssignmentJdbcRepository implements OrderAssignmentRepository{
                    .stream().findFirst();
     }
 
-    // 查询某个订单的所有分配记录
     @Override
     public List<OrderAssignment> findByOrderId(Long orderId){
         String sql = "SELECT * FROM assignment WHERE order_id = :orderId ORDER BY assignment_time DESC";
         return jdbc.query(sql, Map.of("orderId", orderId), mapper);
     }
 
-    // 查询某个维修工的所有分配记录
     @Override
     public List<OrderAssignment> findByRepairmanId(Long repairmanId){
         String sql = "SELECT * FROM assignment WHERE repairman_id = :repairmanId ORDER BY assignment_time DESC";

@@ -65,17 +65,18 @@ public class OrderAssignmentService {
         return dto;
     }
 
+    @Transactional
     public void acceptAssignment(Long assignmentId){
         OrderAssignment assignment = assignmentRepository.findById(assignmentId).get();
         repairmanProfileService.copeWithOrderAssignment(assignment, true);
     }
 
+    @Transactional
     public void rejectAssignment(Long assignmentId){
         OrderAssignment assignment = assignmentRepository.findById(assignmentId).get();
         repairmanProfileService.copeWithOrderAssignment(assignment, false);
     }
 
-        @Transactional
     public void deleteAssignment(Long AssignmentId){
         assignmentRepository.deleteById(AssignmentId);
     }

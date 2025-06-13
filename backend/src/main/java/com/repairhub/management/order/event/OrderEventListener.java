@@ -40,7 +40,6 @@ public class OrderEventListener {
     
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void onOrderCreated(OrderCreatedEvent event) {
-        // 处理订单创建事件
         orderService.assignOrder(event.getRepairOrder());
     }
 
@@ -48,10 +47,7 @@ public class OrderEventListener {
     public void onAssignmentCoped(AssignmentCopedEvent event) {
         OrderAssignment assignment = event.getOrderAssignment();
         if(!assignment.getStatus().isAccepted()){
-            // 如果维修工拒绝了订单分配，则将订单状态改为 PENDING
             orderService.findById(assignment.getOrderId()).ifPresent(order -> {
-                // order.setStatus(OrderStatus.PENDING);
-                // orderService.getRepairOrderRepository().update(order);
                 var asgRepo = orderService.getOrderAssignmentRepository();
                 Long orderId = order.getOrderId();
                 if(asgRepo.existByOrderIdAndStatus(orderId,AssignmentStatus.ACCEPTED) 
@@ -64,7 +60,6 @@ public class OrderEventListener {
             });
         } else {
             orderService.findById(assignment.getOrderId()).ifPresent(order -> {
-                // 如果维修工接受了订单分配，则将订单状态改为 PROCESSING
                 order.setStatus(OrderStatus.PROCESSING);
                 orderService.getRepairOrderRepository().update(order);
             });
@@ -74,7 +69,6 @@ public class OrderEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onOrderCoped(OrderDealtEvent event) {
-        // 处理订单完成事件
         RepairOrder order = event.getRepairOrder();
         repairFeeService.createLaborFeeLog(event.getCreateLaborFeeLogDTO());
         BigDecimal fee = repairFeeService.calculateFeeByOrder(order);

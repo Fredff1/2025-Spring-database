@@ -14,7 +14,6 @@ public class UserProfileService {
     }
 
     public UserStatusDTO updateStatus(Long userId,UserStatusDTO userStatusDTO){
-        
         userRepository.updateStatus(userId, userStatusDTO.getStatus());
         return userStatusDTO;
     }

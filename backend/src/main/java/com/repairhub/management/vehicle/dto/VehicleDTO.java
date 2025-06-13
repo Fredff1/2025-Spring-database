@@ -28,7 +28,7 @@ public class VehicleDTO {
         .licensePlate(vehicle.getLicensePlate())
         .model(vehicle.getModel())
         .brand(vehicle.getBrand())
-        .registerDate(vehicle.getRegisterDate()) //TODO time
+        .registerDate(vehicle.getRegisterDate()) 
 
         .build();
         return dto;

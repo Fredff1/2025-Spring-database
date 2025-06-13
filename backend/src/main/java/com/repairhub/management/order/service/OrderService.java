@@ -49,7 +49,7 @@ public class OrderService {
     private final VehicleRepository vehicleRepository;
     private final RepairmanBaseInfoRepository repairmanBaseInfoRepository; 
 
-    private String assignType = "ALL";
+    private String assignType = "SINGLE";
 
     public OrderService(
         UserRepository userRepository,
@@ -71,14 +71,13 @@ public class OrderService {
 
     @Transactional
     public RepairOrder createOrder(User user, CreateOrderRequest request) {
-        // 创建订单逻辑
         RepairOrder order = RepairOrder.builder()
                 .userId(user.getUserId())
                 .vehicleId(request.getVehicleId())
                 .submitTime(java.time.LocalDateTime.now())
                 .updateTime(LocalDateTime.now())
                 .faultType(request.getFaultType())
-                .status(OrderStatus.PENDING) // 假设初始状态为 PENDING
+                .status(OrderStatus.PENDING) 
                 .description(request.getDescription())
                 .totalFee(BigDecimal.valueOf(0L))
                 .isPaid(false)
@@ -100,7 +99,7 @@ public class OrderService {
                 .submitTime(java.time.LocalDateTime.now())
                 .updateTime(LocalDateTime.now())
                 .faultType(request.getFaultType())
-                .status(OrderStatus.PENDING) // 假设初始状态为 PENDING
+                .status(OrderStatus.PENDING) 
                 .description(request.getDescription())
                 .totalFee(BigDecimal.valueOf(0L))
                 .isPaid(false)
@@ -135,19 +134,6 @@ public class OrderService {
 
     public Optional<RepairOrder> findById(Long orderId) {
         var order = repairOrderRepository.findById(orderId);
-        if(order.isPresent()){
-            List<OrderAssignment> assignments = orderAssignmentRepository.findByOrderId(order.get().getOrderId());
-            if(assignments != null && !assignments.isEmpty()){
-                List<Long> assignedRepairmanIds = new ArrayList<>();
-                for (OrderAssignment assignment : assignments) {
-                    if(assignment.getStatus().isAccepted()){
-                        assignedRepairmanIds.add(assignment.getRepairmanId());
-                    }
-                }
-                order.get().setAssignedRepairmanIds(assignedRepairmanIds);
-            }
-        }
-        
         return order;
     }
 
@@ -161,7 +147,6 @@ public class OrderService {
         repairOrderRepository.update(order);
     }
 
-    @Transactional
     public void updateRepairOrder(Long orderId, UpdateOrderRequest request) {
         RepairOrder order = repairOrderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
         order.setStatus(request.getOrderStatus());
@@ -209,7 +194,6 @@ public class OrderService {
         if(profiles.isEmpty()){
             profiles = repairmanProfileService.findAllWithFilter(null, filter);
             if(profiles.isEmpty()){
-                // 兜底维修人
                 User repairman = userRepository.findByUsername("duty_repair").get();
                 OrderAssignment assignment = OrderAssignment.builder()
                     .orderId(order.getOrderId())
@@ -251,18 +235,15 @@ public class OrderService {
     @Transactional
     public void assignOrderToCertainRepairman(RepairOrder order, String repairmanNumber) {
         RepairmanProfile profile = repairmanProfileService.getRepairmanProfileRepository().findByRepairmanNumber(repairmanNumber).get();
-        // 检查维修工是否存在
         User repairman = userRepository.findById(profile.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("Repairman not found"));
-        // 检查订单是否存在
         RepairOrder existingOrder = repairOrderRepository.findById(order.getOrderId())
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        // 创建订单分配
         OrderAssignment assignment = OrderAssignment.builder()
                 .orderId(existingOrder.getOrderId())
                 .repairmanId(repairman.getUserId())
                 .assignmentTime(LocalDateTime.now())
-                .status(AssignmentStatus.PENDING) // 初始状态为 PENDING
+                .status(AssignmentStatus.PENDING) 
                 .build();
         orderAssignmentRepository.insert(assignment);
     }

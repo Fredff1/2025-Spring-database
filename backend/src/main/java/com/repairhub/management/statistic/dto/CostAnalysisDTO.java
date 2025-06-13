@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CostAnalysisDTO {
-    private BigDecimal materialCost;     // 材料费总额
-    private BigDecimal laborCost;        // 工时费总额
+    private BigDecimal materialCost;     
+    private BigDecimal laborCost;        
     private BigDecimal materialRatio;    // 材料费占比（materialCost / (materialCost + laborCost)）
     private BigDecimal laborRatio;       // 工时费占比（laborCost / (materialCost + laborCost)）
     private String period;      

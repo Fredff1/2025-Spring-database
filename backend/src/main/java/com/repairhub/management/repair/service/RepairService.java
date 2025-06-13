@@ -191,10 +191,6 @@ public class RepairService {
         }
 
         recordRepository.delete(recordId);
-        // ON DELETE CASCADE 已经处理了这个问题
-        // LaborFeeLog log = laborFeeLogRepository.findByRecordId(recordId).get();
-        // laborFeeLogRepository.delete(log.getLaborFeeLogId());
-
         updateOrderFee(record.getOrderId());
         
     }

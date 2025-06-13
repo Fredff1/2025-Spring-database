@@ -20,7 +20,7 @@ public class RepairFeedbackDTO {
     private Long orderId;
     private FeedbackType type;  // 反馈类型：RATING(评分)、URGENT(催单)、GENERAL(一般反馈)
     private Integer rating;  // 评分，仅当type为RATING时有值
-    private String description;  // 反馈内容
+    private String description;  
     private LocalDateTime feedbackTime;
     private String username;
     private String response;  

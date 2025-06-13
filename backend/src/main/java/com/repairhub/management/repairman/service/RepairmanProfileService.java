@@ -176,6 +176,7 @@ public class RepairmanProfileService {
                 .build();
         return dto;
     }
+
     public RepairmanOverviewDTO getOverview(User repairman) {
         Long repairmanId = repairman.getUserId();
         LocalDateTime startTime = LocalDateTime.of(LocalDate.of(1980, 1, 1), LocalTime.of(1, 1, 1));
@@ -227,6 +228,7 @@ public class RepairmanProfileService {
         return dto;
     }
 
+    @Transactional
     public UserProfileDTO updateProfile(Long userId, RepairmanProfileUpdateDTO dto){
         userRepository.updateBasicInfo(userId, dto.getUsername(), dto.getPhone(), dto.getEmail());
         repairmanProfileRepository.update(userId, dto);
@@ -242,7 +244,7 @@ public class RepairmanProfileService {
             .userStatus(updatedUser.getStatus())
             .build();
     }
-
+    
     public int insertProfile(RepairmanProfile profile) {
         RepairmanProfile existingProfile = repairmanProfileRepository.findByUserId(profile.getUserId())
                 .orElse(null);

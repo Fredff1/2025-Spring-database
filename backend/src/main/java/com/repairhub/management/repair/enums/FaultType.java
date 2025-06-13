@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum FaultType {
-    MAINTENANCE,       // 发动机
-    REPAIR,   // 电气
-    PAINT,        // 刹车
-    TIRE, // 传动
+    MAINTENANCE,       
+    REPAIR,   
+    PAINT,        
+    TIRE, 
     OTHER,
     ELECTRICAL, 
     BODYWORK,
