@@ -407,6 +407,7 @@ public class AdminInformationCRUDController {
     ) {
         try {
             repairService.submitMaterialUsage(materialUsage);
+            repairService.updateOrderFee(materialUsage.getOrderId());
             return ResponseEntity.ok(HttpStatus.ACCEPTED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

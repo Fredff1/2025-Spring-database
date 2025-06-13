@@ -284,6 +284,7 @@
             <div class="feedback-header">
               <span class="feedback-time">{{ (feedback.feedbackTime) }}</span>
               <el-rate
+                v-if="feedback.rating"
                 v-model="feedback.rating"
                 disabled
                 show-score
@@ -292,6 +293,8 @@
             </div>
             <div class="feedback-content"><strong>客户：{{ feedback.username }}</strong></div>
             <div class="feedback-content">{{ feedback.description }}</div>
+            <div class="feedback-content" v-if="feedback.response"><strong>系统回复</strong></div>
+            <div class="feedback-content" v-if="feedback.response">{{ feedback.response }}</div>
             <div class="feedback-actions">
               <el-button type="primary" link @click="handleCreateFeedbackResponseDialog(feedback)">回复</el-button>
               <el-button type="danger" link @click="handleDeleteFeedback(feedback.feedbackId)">删除</el-button>
@@ -570,6 +573,7 @@ const handleView = async (row) => {
 
 // 查看反馈
 const handleFeedback = async (row) => {
+  currentOrder.value = row
   currentOrderId.value = row.id
   feedbackDialogVisible.value = true
   try {
@@ -668,6 +672,7 @@ const handleCreateRecord = async () => {
         })
         ElMessage.success('创建维修记录成功')
         createRecordDialogVisible.value = false
+        handleView(currentOrder.value)
         fetchOrders()
       } catch (error) {
         console.error('创建维修记录失败:', error)
@@ -689,6 +694,7 @@ const handleCreateMaterial = async () => {
         })
         ElMessage.success('创建材料使用记录成功')
         createMaterialDialogVisible.value = false
+        handleView(currentOrder.value)
         fetchOrders()
       } catch (error) {
         console.error('创建材料使用记录失败:', error)
@@ -704,9 +710,11 @@ const handleCreateFeedbackResponse = async () => {
   await createFeedbackResponseFormRef.value.validate(async (valid) => {
     if (valid) {
       try {
+        console.log(createFeedbackResponseForm)
+
         await admin.createFeedbackResponse({
           feedbackId: createFeedbackResponseForm.feedbackId,
-          response: createFeedbackResponseForm.response
+          adminResponse: createFeedbackResponseForm.response
         })
         ElMessage.success('回复反馈成功')
         createFeedbackResponseDialogVisible.value = false
@@ -728,6 +736,7 @@ const handleDeleteRecord = async (recordId) => {
     await admin.deleteRepairRecord(recordId)
     ElMessage.success('删除维修记录成功')
     handleView(currentOrder.value)
+    fetchOrders()
   } catch (error) {
     if (error !== 'cancel') {
       console.error('删除维修记录失败:', error)

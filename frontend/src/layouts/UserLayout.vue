@@ -113,7 +113,7 @@ const handleLogout = async () => {
 }
 
 .sidebar {
-  width: 240px;
+  width: 180px;
   background: white;
   border-right: 1px solid #eee;
 }

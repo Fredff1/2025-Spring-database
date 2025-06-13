@@ -91,15 +91,20 @@ public class RepairService {
     }
 
     @Transactional
+    public void updateOrderFee(Long orderId){
+        RepairOrder order = repairOrderRepository.findById(orderId).get();
+        var result = repairFeeService.calculateFeeByOrder(order);
+        order.setTotalFee(result);
+        repairOrderRepository.update(order);
+    }
+
+    @Transactional
     public void deleteMaterialUsage(Long materialId){
         MaterialUsage materialUsage = 
             materialUsageRepository.findById(materialId)
                 .orElseThrow(() -> new IllegalArgumentException("Material usage not found"));
         materialUsageRepository.delete(materialId);
-        RepairOrder order = repairOrderRepository.findById(materialUsage.getOrderId()).get();
-        var result = repairFeeService.calculateFeeByOrder(order);
-        order.setTotalFee(result);
-        repairOrderRepository.update(order);
+        updateOrderFee(materialUsage.getOrderId());
     }
 
     @Transactional
@@ -112,10 +117,7 @@ public class RepairService {
         materialUsage.setUnitPrice(dto.getUnitPrice());
         materialUsage.setCreateTime(LocalDateTime.now());
         materialUsageRepository.update(materialUsage);
-        RepairOrder order = repairOrderRepository.findById(materialUsage.getOrderId()).get();
-        var result = repairFeeService.calculateFeeByOrder(order);
-        order.setTotalFee(result);
-        repairOrderRepository.update(order);
+        updateOrderFee(materialUsage.getOrderId());
         return materialUsage;
     }
 
@@ -189,13 +191,11 @@ public class RepairService {
         }
 
         recordRepository.delete(recordId);
-        LaborFeeLog log = laborFeeLogRepository.findByRecordId(recordId).get();
-        laborFeeLogRepository.delete(log.getLaborFeeLogId());
+        // ON DELETE CASCADE 已经处理了这个问题
+        // LaborFeeLog log = laborFeeLogRepository.findByRecordId(recordId).get();
+        // laborFeeLogRepository.delete(log.getLaborFeeLogId());
 
-        RepairOrder order = repairOrderRepository.findById(record.getOrderId()).get();
-        var result = repairFeeService.calculateFeeByOrder(order);
-        order.setTotalFee(result);
-        repairOrderRepository.update(order);
+        updateOrderFee(record.getOrderId());
         
     }
 
@@ -219,11 +219,8 @@ public class RepairService {
         log.setTotalHours(request.getActualWorkingHours());
         log.setTotalIncome(request.getActualWorkingHours().multiply(profile.getHourlyMoneyRate()));
         laborFeeLogRepository.update(log);
-
-        RepairOrder order = repairOrderRepository.findById(record.getOrderId()).get();
-        var result = repairFeeService.calculateFeeByOrder(order);
-        order.setTotalFee(result);
-        repairOrderRepository.update(order);
+        // 不用触发器，因为业务逻辑稍显复杂
+        updateOrderFee(record.getOrderId());
     }
 
     @Transactional

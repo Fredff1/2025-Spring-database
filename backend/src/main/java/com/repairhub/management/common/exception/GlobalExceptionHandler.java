@@ -9,8 +9,10 @@ import com.repairhub.management.common.dto.CommonErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     
-    @ExceptionHandler(Exception.class)
+    
+    //@ExceptionHandler(Exception.class)
     public ResponseEntity<CommonErrorResponse> handleAllException(Exception e){
         CommonErrorResponse resp = new CommonErrorResponse(500, e.getMessage());
         e.printStackTrace();

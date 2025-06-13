@@ -284,7 +284,7 @@ public class OrderService {
     }
 
     public PageResponse<RepairOrder> getOrders(User user,int page,int limit){
-        PageResponse<RepairOrder> orders = repairOrderRepository.findByUserIdWithPage(user.getUserId(), page, page);
+        PageResponse<RepairOrder> orders = repairOrderRepository.findByUserIdWithPage(user.getUserId(), page, limit);
         return orders;
     }
 }

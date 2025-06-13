@@ -283,6 +283,8 @@
                       text-color="#ff9900"
                     />
                     <p>{{ feedback.description }}</p>
+                    <p class="feedback-content"v-if="feedback.response"><strong>  系统回复</strong></p>
+                    <p class="feedback-content"v-if="feedback.response">{{ feedback.response }}</p>
                   </div>
                 </el-card>
               </el-timeline-item>

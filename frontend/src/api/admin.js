@@ -71,7 +71,5 @@ export const deleteMaterialUsage = (materialUsageId) => http.delete(`/admin/mate
 })
 
 // Feedback CRUD
-export const deleteFeedback = (id) => http.delete(`/admin/feedback`, {
-    params: { id }
-  })
+export const deleteFeedback = (id) => http.delete(`/admin/feedback?id=${id}`)
 export const createFeedbackResponse = (data) => http.post('/admin/feedback/response', data) 
