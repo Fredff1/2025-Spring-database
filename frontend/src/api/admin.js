@@ -72,4 +72,12 @@ export const deleteMaterialUsage = (materialUsageId) => http.delete(`/admin/mate
 
 // Feedback CRUD
 export const deleteFeedback = (id) => http.delete(`/admin/feedback?id=${id}`)
-export const createFeedbackResponse = (data) => http.post('/admin/feedback/response', data) 
+export const createFeedbackResponse = (data) => http.post('/admin/feedback/response', data)
+
+export const updateAssignment = (assignmentId, status) => http.post('/admin/repair-order/assign/update', null, {
+  params: { assignmentId, status }
+})
+
+export const deleteAssignment = (assignmentId) => http.delete('/admin/repair-order/assign', {
+  params: { assignmentId }
+}) 

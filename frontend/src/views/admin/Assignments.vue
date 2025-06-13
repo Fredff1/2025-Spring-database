@@ -18,7 +18,7 @@
         </el-table-column>
         <el-table-column prop="problem" label="问题描述" min-width="200" show-overflow-tooltip />
         <el-table-column prop="assignmentTime" label="分配时间" width="180" />
-        <el-table-column prop="repairmanName" label="维修人员" width="180" />
+        <el-table-column prop="repairmanName" label="维修人员" width="120" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="getAssignmentStatusTag(row.status)">
@@ -26,25 +26,48 @@
             </el-tag>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button
-              v-if="row.status === 'ACCEPTED'"
+              v-if="row.status != 'ACCEPTED'"
               type="primary"
               link
-              @click="handleStartRepair(row)"
+              @click="handleUpdateStatus(row, 'ACCEPTED')"
             >
-              查看详情
+              接受
+            </el-button>
+            <el-button
+              v-if="row.status != 'REJECTED'"
+              type="warning"
+              link
+              @click="handleUpdateStatus(row, 'REJECTED')"
+            >
+              拒绝
+            </el-button>
+            <el-button
+              v-if="row.status != 'CANCELED'"
+              type="danger"
+              link
+              @click="handleUpdateStatus(row,'CANCELED')"
+            >
+              取消
+            </el-button>
+            <el-button
+              type="danger"
+              link
+              @click="handleDelete(row)"
+            >
+              删除
             </el-button>
           </template>
-        </el-table-column> -->
+        </el-table-column>
       </el-table>
 
       <!-- 分页 -->
       <div class="pagination">
         <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
+          v-model:currentPage="currentPage"
+          v-model:pageSize="pageSize"
           :total="total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next"
@@ -146,6 +169,62 @@ const handleSizeChange = (val) => {
 const handleCurrentChange = (val) => {
   currentPage.value = val
   fetchData()
+}
+
+// 更新任务分配状态
+const handleUpdateStatus = async (row, status) => {
+  const map = {
+    ACCEPTED: '接受',
+    REJECTED: '拒绝',
+    CANCELED: '取消',
+  }
+  try {
+    
+    await ElMessageBox.confirm(
+      `确定要${map[status]}该任务分配吗？`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    
+    await admin.updateAssignment(row.assignmentId, status)
+    ElMessage.success('更新状态成功')
+    fetchData()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('更新状态失败:', error)
+      ElMessage.error('更新状态失败')
+    }
+  }
+}
+
+
+
+// 删除任务分配
+const handleDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm(
+      '确定要删除该任务分配吗？若只是普通业务需求请直接更改状态为\"取消\"',
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    
+    await admin.deleteAssignment(row.assignmentId)
+    ElMessage.success('删除成功')
+    fetchData()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('删除失败:', error)
+      ElMessage.error('删除失败')
+    }
+  }
 }
 
 onMounted(() => {

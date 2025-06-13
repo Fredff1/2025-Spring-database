@@ -78,10 +78,11 @@
     <el-card shadow="hover" class="table-card">
       <template #header>
         <div class="card-header">
-          <span>收入记录</span>
+          <span>工时费记录</span>
           <el-button type="primary" link @click="handleExport">导出</el-button>
         </div>
       </template>
+      <div>注：工时费记录与维修记录一一对应，修改请前往订单页面与维修记录同步修改</div>
       <el-table :data="details" style="width: 100%" v-loading="loading">
         <el-table-column prop="repairmanName" label="维修人员" width="180" />
         <el-table-column prop="orderId" label="发放订单号" width="180" />
@@ -122,6 +123,7 @@
       </div>
     </el-card>
   </div>
+  
 </template>
 
 <script setup>
