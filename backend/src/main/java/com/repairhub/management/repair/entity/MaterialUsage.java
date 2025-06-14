@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MaterialUsage {
     private Long materialId;
+    private Long submitterId;
     private Long orderId;
     private String materialName;
     private Integer quantity;

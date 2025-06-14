@@ -43,11 +43,11 @@
         </el-form-item>
 
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" placeholder="请输入邮箱（选填）" />
+          <el-input v-model="form.email" placeholder="请输入邮箱" />
         </el-form-item>
 
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入手机号（选填）" />
+          <el-input v-model="form.phone" placeholder="请输入手机号" />
         </el-form-item>
 
         <el-form-item>
@@ -120,9 +120,11 @@ const rules = {
     { required: true, message: '请选择角色', trigger: 'change' }
   ],
   email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
     { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
   ],
   phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
     { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
   ]
 }

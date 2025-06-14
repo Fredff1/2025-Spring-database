@@ -341,6 +341,9 @@
     <!-- 编辑材料使用对话框 -->
     <el-dialog v-model="editMaterialDialogVisible" title="编辑材料使用" width="500px" destroy-on-close>
       <el-form ref="editMaterialFormRef" :model="editMaterialForm" :rules="editMaterialRules" label-width="100px">
+        <el-form-item label="维修人员工号" prop="submitterId">
+          <el-input v-model="editMaterialForm.submitterId" placeholder="请输入维修人员工号" />
+        </el-form-item>
         <el-form-item label="材料名称" prop="materialName">
           <el-input v-model="editMaterialForm.materialName" placeholder="请输入材料名称" />
         </el-form-item>
@@ -442,6 +445,7 @@ const createRecordRules = {
 const createMaterialDialogVisible = ref(false)
 const createMaterialFormRef = ref(null)
 const createMaterialForm = reactive({
+  submitterId: '',
   materialName: '',
   quantity: 1,
   unitPrice: 0

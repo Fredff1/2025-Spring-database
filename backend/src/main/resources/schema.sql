@@ -106,6 +106,7 @@ CREATE INDEX idx_repair_record_repairman ON repair_record(repairman_id);
 
 CREATE TABLE `material_usage` (
   material_usage_id BIGINT      NOT NULL AUTO_INCREMENT,
+  submitter_id      BIGINT      NOT NULL,
   order_id          BIGINT      NOT NULL,
   material_name     VARCHAR(100) NOT NULL,
   quantity          INT         NOT NULL,

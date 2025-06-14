@@ -46,8 +46,16 @@
           <el-input v-model="form.brand" placeholder="请输入品牌" />
         </el-form-item>
         <el-form-item label="型号" prop="model">
-          <el-input v-model="form.model" placeholder="请输入型号" />
-        </el-form-item> 
+          <el-select v-model="form.model" placeholder="请选择车型">
+            <el-option label="多用途车" value="SUV" />
+            <el-option label="轿车" value="Sedan" />
+            <el-option label="皮卡" value="Pickup" />
+            <el-option label="货车" value="Van" />
+            <el-option label="小型车" value="Hatchback" />
+            <el-option label="跑车" value="Coupe" />
+            <el-option label="敞篷车" value="Convertible" />
+          </el-select>
+        </el-form-item>
         
       </el-form>
       <template #footer>

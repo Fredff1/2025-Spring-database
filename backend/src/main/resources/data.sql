@@ -559,67 +559,67 @@ WHERE description IN (
 
 -- === 7. 材料消耗记录（material_usage）示例 ===
 -- charlie 的工单：paint 材料 1 瓶（100.00）
-INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+INSERT INTO `material_usage` (order_id, submitter_id, material_name, quantity, unit_price, create_time) VALUES
   (
     (SELECT order_id FROM repair_order WHERE description LIKE '%发动机异响%'),
-    '张紧轮', 1, 120.00, '2025-05-09 12:15:07'
+    3, '张紧轮', 1, 120.00, '2025-05-09 12:15:07'
   ),
   (
     (SELECT order_id FROM repair_order WHERE description LIKE '%发动机异响%'),
-    '润滑油', 2, 30.00, '2025-05-09 12:15:07'
+    3, '润滑油', 2, 30.00, '2025-05-09 12:15:07'
   );
 
 -- diana 的工单：刹车片 1 套（200.00）
-INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+INSERT INTO `material_usage` (order_id, submitter_id, material_name, quantity, unit_price, create_time) VALUES
   (
     (SELECT order_id FROM repair_order WHERE description LIKE '%刹车片磨损%'),
-    '刹车片套装', 1, 200.00, '2025-04-04 11:11:11'
+    4, '刹车片套装', 1, 200.00, '2025-04-04 11:11:11'
   );
 
 -- henry 的工单：保险丝 1 个（15.00）
-INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+INSERT INTO `material_usage` (order_id, submitter_id, material_name, quantity, unit_price, create_time) VALUES
   ((SELECT order_id FROM repair_order WHERE description LIKE '%车灯%'),
-   '保险丝', 1, 15.00, '2025-04-06 11:11:11');
+   8, '保险丝', 1, 15.00, '2025-04-06 11:11:11');
 
 -- irene 的工单：喷漆材料 1 套（250.00）
-INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+INSERT INTO `material_usage` (order_id, submitter_id, material_name, quantity, unit_price, create_time) VALUES
   ((SELECT order_id FROM repair_order WHERE description LIKE '%划痕%'),
-   '喷漆材料', 1, 250.00, '2025-06-06 12:12:12');
+   9, '喷漆材料', 1, 250.00, '2025-06-06 12:12:12');
 
-INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+INSERT INTO `material_usage` (order_id, submitter_id, material_name, quantity, unit_price, create_time) VALUES
   ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
-   '主控制单元', 1, 300.00, NOW()),
+   11, '主控制单元', 1, 300.00, NOW()),
   ((SELECT order_id FROM repair_order WHERE description LIKE '%仪表盘无响应%'),
-   '保险丝', 2, 15.00, NOW());
-INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+   11, '保险丝', 2, 15.00, NOW());
+INSERT INTO `material_usage` (order_id, submitter_id, material_name, quantity, unit_price, create_time) VALUES
   ((SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
-   '复合组件0', 1, 160, '2025-05-08 23:45:07'),
+   12, '复合组件0', 1, 160, '2025-05-08 23:45:07'),
   ((SELECT order_id FROM repair_order WHERE description = '电池电量掉得快'),
-   '维修材料', 2, 30.00, '2025-05-08 23:45:07');
+   12, '维修材料', 2, 30.00, '2025-05-08 23:45:07');
 
-INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+INSERT INTO `material_usage` (order_id, submitter_id, material_name, quantity, unit_price, create_time) VALUES
   ((SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
-   '复合组件1', 1, 165, '2025-05-26 23:45:07'),
+   4, '复合组件1', 1, 165, '2025-05-26 23:45:07'),
   ((SELECT order_id FROM repair_order WHERE description = '轮胎鼓包'),
-   '维修材料', 2, 30.00, '2025-05-26 23:45:07');
+   4, '维修材料', 2, 30.00, '2025-05-26 23:45:07');
 
-INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+INSERT INTO `material_usage` (order_id, submitter_id, material_name, quantity, unit_price, create_time) VALUES
   ((SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
-   '复合组件2', 1, 170, '2025-05-07 23:45:07'),
+   11, '复合组件2', 1, 170, '2025-05-07 23:45:07'),
   ((SELECT order_id FROM repair_order WHERE description = '导航系统崩溃'),
-   '维修材料', 2, 30.00, '2025-05-07 23:45:07');
+   11, '维修材料', 2, 30.00, '2025-05-07 23:45:07');
 
-INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+INSERT INTO `material_usage` (order_id, submitter_id, material_name, quantity, unit_price, create_time) VALUES
   ((SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
-   '复合组件3', 1, 175, '2025-05-11 23:45:07'),
+   12, '复合组件3', 1, 175, '2025-05-11 23:45:07'),
   ((SELECT order_id FROM repair_order WHERE description = '车窗升降失灵'),
-   '维修材料', 2, 30.00, '2025-05-11 23:45:07');
+   12, '维修材料', 2, 30.00, '2025-05-11 23:45:07');
 
-INSERT INTO `material_usage` (order_id, material_name, quantity, unit_price, create_time) VALUES
+INSERT INTO `material_usage` (order_id, submitter_id, material_name, quantity, unit_price, create_time) VALUES
   ((SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
-   '复合组件4', 1, 180, '2025-05-27 23:45:07'),
+   3, '复合组件4', 1, 180, '2025-05-27 23:45:07'),
   ((SELECT order_id FROM repair_order WHERE description = '车漆开裂，需要喷涂'),
-   '维修材料', 2, 30.00, '2025-05-27 23:45:07');
+   3, '维修材料', 2, 30.00, '2025-05-27 23:45:07');
 
 -- === 8. 工时费日志（labor_fee_log）示例 ===
 -- charlie 的工单由 grace 完成，用时 2.50h，时薪 75.00，收入合计 187.50

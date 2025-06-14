@@ -80,6 +80,7 @@ public class RepairService {
     @Transactional
     public MaterialUsage submitMaterialUsage(CreateMaterialUsageDTO dto){
         MaterialUsage materialUsage = MaterialUsage.builder()
+            .submitterId(14L)
             .orderId(dto.getOrderId())
             .materialName(dto.getMaterialName())
             .quantity(dto.getQuantity())
@@ -138,6 +139,7 @@ public class RepairService {
         for(CreateMaterialUsageDTO usageDto:dto.getMaterials()){
             MaterialUsage materialUsage = MaterialUsage.builder()
             .orderId(usageDto.getOrderId())
+            .submitterId(14L)
             .materialName(usageDto.getMaterialName())
             .quantity(usageDto.getQuantity())
             .unitPrice(usageDto.getUnitPrice())

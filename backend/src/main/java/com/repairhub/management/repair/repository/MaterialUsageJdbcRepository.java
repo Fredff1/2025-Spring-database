@@ -47,6 +47,7 @@ public class MaterialUsageJdbcRepository implements MaterialUsageRepository {
             UPDATE material_usage
                 SET
                 order_id = :orderId,
+                submitter_id = :submitterId,
                 material_name = :materialName,
                 quantity = :quantity,
                 unit_price = :unitPrice
@@ -54,6 +55,7 @@ public class MaterialUsageJdbcRepository implements MaterialUsageRepository {
                 """;
         MapSqlParameterSource source = new MapSqlParameterSource()
         .addValue("orderId", materialUsage.getOrderId())
+        .addValue("submitterId", materialUsage.getSubmitterId())
         .addValue("materialName", materialUsage.getMaterialName())
         .addValue("quantity", materialUsage.getQuantity())
         .addValue("unitPrice", materialUsage.getUnitPrice())

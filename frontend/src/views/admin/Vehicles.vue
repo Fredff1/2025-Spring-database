@@ -78,7 +78,8 @@
         </el-form-item>
         <el-form-item label="注册日期" prop="registerDate">
           <el-date-picker
-            v-model="form.registerDate"
+            v-model="form.registerDate" 
+            :disabled="dialogType === 'edit'"
             type="date"
             placeholder="选择日期"
             format="YYYY-MM-DD"
