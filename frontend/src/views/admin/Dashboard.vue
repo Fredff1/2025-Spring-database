@@ -239,7 +239,6 @@ const handleRefreshStatus = async () => {
 
 onMounted(() => {
   fetchData()
-  setInterval(fetchData, 5 * 60 * 1000)
 })
 </script>
 

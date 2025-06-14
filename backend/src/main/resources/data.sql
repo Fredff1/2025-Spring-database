@@ -2,6 +2,19 @@
 -- data.sql —— 示例数据初始化（与代码层初始化互不重合）
 -- ================================================
 
+-- 注意：此文件仅用于演示数据初始化
+-- 初始化的内容主要包括完整的业务流程
+-- 1. 用户（CUSTOMER 与 REPAIRMAN）的初始化。因为repaiman_profile表依赖于users表，所以需要先插入用户数据
+-- 2. 维修人员档案（repairman_profile）的初始化。插入维修人员的专业技能、时薪等信息
+-- 3. 车辆（vehicle）的初始化。插入 Customer 的车辆信息
+-- 4. 报修工单（repair_order）的初始化。插入 Customer 提交的报修工单
+-- 5. 派单（assignment）的初始化。插入维修人员接单信息
+-- 6. 维修记录（repair_record）的初始化。插入维修人员完成的维修记录
+-- 7. 材料消耗记录（material_usage）的初始化。插入维修过程中使用的材料信息
+-- 8. 工时费日志（labor_fee_log）的初始化。插入维修人员的工时费记录
+-- 9. 反馈（feedback）的初始化。插入 Customer 对维修服务的反馈信息
+
+
 -- === 1. 用户（CUSTOMER 与 REPAIRMAN）示例 ===
 INSERT INTO `users` (
   username, role, password, email, phone, status, created_at, updated_at
