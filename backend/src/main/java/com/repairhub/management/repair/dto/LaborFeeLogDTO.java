@@ -1,6 +1,7 @@
 package com.repairhub.management.repair.dto;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.Month;
 
@@ -35,7 +36,7 @@ public class LaborFeeLogDTO {
                 .repairmanName(repairman.getUsername())
                 .repairmanId(log.getRepairmanId())
                 .month(log.getMonth())
-                .hourlyMoneyRate(repairmanProfile.getHourlyMoneyRate())
+                .hourlyMoneyRate(log.getTotalIncome().divide(log.getTotalHours(),RoundingMode.HALF_UP))
                 .totalHours(log.getTotalHours())
                 .totalIncome(log.getTotalIncome())
                 .settleTime(log.getSettleTime())
