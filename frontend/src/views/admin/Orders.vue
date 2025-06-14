@@ -124,6 +124,11 @@
         <el-descriptions-item label="维修费用">
           ¥{{ currentOrder.amount.toFixed(2) }}
         </el-descriptions-item>
+        <el-descriptions-item label="支付状态">
+          <el-tag :type="currentOrder?.isPaid ? 'success' : 'warning'">
+            {{ currentOrder?.isPaid ? '已支付' : '未支付' }}
+          </el-tag>
+        </el-descriptions-item>
         <el-descriptions-item label="创建时间">
           {{ currentOrder.createTime }}
         </el-descriptions-item>
