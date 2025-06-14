@@ -113,7 +113,8 @@ CREATE TABLE `material_usage` (
   unit_price        DECIMAL(10,2) NOT NULL,
   create_time        DATETIME      NOT NULL,
   PRIMARY KEY(material_usage_id),
-  CONSTRAINT fk_mu_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id) ON DELETE CASCADE
+  CONSTRAINT fk_mu_order FOREIGN KEY(order_id) REFERENCES repair_order(order_id) ON DELETE CASCADE,
+  CONSTRAINT fk_mu_submitter FOREIGN KEY(submitter_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8mb4;
 
 CREATE INDEX idx_material_usage_order ON material_usage(order_id);
