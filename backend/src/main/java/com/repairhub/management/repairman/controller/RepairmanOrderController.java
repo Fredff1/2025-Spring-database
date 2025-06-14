@@ -29,6 +29,8 @@ import com.repairhub.management.repair.service.RepairService;
 import com.repairhub.management.repairman.service.RepairmanProfileService;
 import com.repairhub.management.utils.PageUtils;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -92,7 +94,7 @@ public class RepairmanOrderController {
 
     @PostMapping("/records")
     public ResponseEntity<CommonResponse<Boolean>> submitRepairRecord(
-        @RequestBody CreateRepairRecordDTO request,
+        @RequestBody @Valid CreateRepairRecordDTO request,
         @AuthenticationPrincipal User repairman
         ) {
         repairService.submitRepairRecord(request,repairman);
